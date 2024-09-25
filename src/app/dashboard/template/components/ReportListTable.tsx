@@ -1,7 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import { Table, Button, Modal, Form, Input, DatePicker, message } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  message,
+  Tag,
+} from "antd";
 import { createReport } from "../actions/createReport"; // Import the server action
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 
@@ -74,6 +84,22 @@ export default function ReportListTable({
       title: "Description",
       dataIndex: "description",
       key: "description",
+    },
+    {
+      title: "Fields",
+      dataIndex: "fields",
+      key: "fields",
+      render: (data: any) => {
+        return (
+          <>
+            {data?.map((field: any) => (
+              <Tag color="magenta" key={field._id}>
+                {field.name}
+              </Tag>
+            ))}
+          </>
+        );
+      },
     },
     {
       title: "Start Date",

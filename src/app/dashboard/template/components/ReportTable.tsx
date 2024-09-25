@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, message } from "antd";
+import { Table, Button, Modal, Form, Input, Select, message, Tag } from "antd";
 import { reportsWithFields, fieldType, fields } from "../types"; // Ensure fields type is imported
 import { createField } from "../actions/createField";
 import { addFieldToReport } from "../actions/addFieldToReport";
-
+import { updateField } from "../actions/updateField";
 const { Option } = Select;
 
 export default function ReportTable({
@@ -20,40 +21,74 @@ export default function ReportTable({
   const [fields, setFields] = useState(data.fields);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const [editing, setEditing] = useState(false);
+  const [selectedFieldId, setSelectedFieldId] = useState<any>(null);
   // Function to handle adding a new report
   const handleAddReport = () => {
+    setEditing(false);
+    form.resetFields();
     setIsModalVisible(true);
   };
 
   // Function to handle form submission
   const handleFormSubmit = async (values: fields) => {
-    console.log("Submitted values:", values);
+    if (!editing) {
+      console.log("Submitted values:", values);
 
-    // Call the createField function
-    const { result, status } = await createField(values);
+      // Call the createField function
+      const { result, status } = await createField(values);
 
-    if (status === 201) {
-      // Update the fields state with the new field
-      setFields((prevFields) => [...prevFields, result]); // Assuming result contains the new field data
-      const { result: addFieldToReportResult, status: addFieldToReportStatus } =
-        await addFieldToReport({
+      if (status === 201) {
+        // Update the fields state with the new field
+        setFields((prevFields) => [...prevFields, result]); // Assuming result contains the new field data
+        const {
+          result: addFieldToReportResult,
+          status: addFieldToReportStatus,
+        } = await addFieldToReport({
           reportId,
           field: result._id,
         });
-      console.log(addFieldToReportResult);
-      console.log(addFieldToReportStatus);
+        console.log(addFieldToReportResult);
+        console.log(addFieldToReportStatus);
 
-      if (addFieldToReportStatus == 200) {
-        form.resetFields();
-        setIsModalVisible(false);
-        message.success("Report added successfully!");
+        if (addFieldToReportStatus == 200) {
+          form.resetFields();
+          setIsModalVisible(false);
+          message.success("Report added successfully!");
+        } else {
+          message.error("Failed to add report. Please try again.");
+        }
+        // Reset form and close modal
       } else {
         message.error("Failed to add report. Please try again.");
       }
-      // Reset form and close modal
     } else {
-      message.error("Failed to add report. Please try again.");
+      console.log("====== in update =========");
+      console.log(reportId);
+      console.log(values);
+      const { body: result, status } = await updateField(
+        selectedFieldId,
+        values
+      );
+      if (status == 200) {
+        console.log(fields);
+        setFields((prevFields) =>
+          prevFields.map((field: any) => {
+            if (field._id == selectedFieldId) {
+              return {
+                ...values,
+                _id: selectedFieldId,
+              };
+            } else return field;
+          })
+        );
+        setIsModalVisible(false);
+        message.success("Report fields updated successfully");
+      } else {
+        console.log(result);
+        console.log(status);
+        message.error("Failed to update report fields");
+      }
     }
   };
 
@@ -73,22 +108,19 @@ export default function ReportTable({
       title: "Filtered",
       dataIndex: "filtered",
       key: "filtered",
-      render: (filtered: boolean) => (filtered ? "Yes" : "No"), // Render Yes/No based on boolean
+      render: (filtered: boolean) =>
+        filtered == true ? (
+          <Tag color="green">Yes</Tag>
+        ) : filtered == false ? (
+          <Tag color="magenta">No</Tag>
+        ) : (
+          ""
+        ), // Render Yes/No based on boolean
     },
   ];
 
   // Add the "Add Row" button as the last row
-  const dataWithAddButton = [
-    ...(fields?.length > 0 ? fields : []),
-    {
-      key: "addButtonRow",
-      name: (
-        <Button type="primary" onClick={handleAddReport}>
-          Add Row
-        </Button>
-      ),
-    },
-  ];
+  const dataWithAddButton = [...(fields?.length > 0 ? fields : [])];
 
   return (
     <>
@@ -98,7 +130,20 @@ export default function ReportTable({
         dataSource={dataWithAddButton}
         pagination={false}
         rowKey="key"
+        onRow={(record: any) => ({
+          onClick: () => {
+            setSelectedFieldId(record._id);
+            setIsModalVisible(true);
+            form.setFieldsValue({
+              ...record,
+            });
+            setEditing(true);
+          }, // Handle row click
+        })}
       />
+      <Button type="primary" onClick={handleAddReport}>
+        Add Row
+      </Button>
 
       {/* Modal with Form */}
       <Modal

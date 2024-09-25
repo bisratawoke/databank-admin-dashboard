@@ -3,5 +3,7 @@ import ReportListTable from "../components/ReportListTable";
 
 export default async function page() {
   const result = await fetchReports();
+  console.log("============ in report ========");
+  console.log(result);
   return <ReportListTable reports={result} />;
 }
