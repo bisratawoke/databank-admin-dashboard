@@ -5,10 +5,6 @@ export default async function Page({ params }: { params: { id: string } }) {
   const report = await fetchReport(params.id);
   const fieldTypes = await fetchFieldTypes();
   return (
-    <ReportTable
-      reportId={params.id}
-      report={report}
-      fieldTypes={fieldTypes}
-    ></ReportTable>
+    <ReportTable reportId={params.id} report={report} fieldTypes={fieldTypes} />
   );
 }

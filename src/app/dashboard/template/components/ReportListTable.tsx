@@ -2,18 +2,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  message,
-  Tag,
-} from "antd";
+import { Table, Modal, Form, Input, DatePicker, message, Tag } from "antd";
 import { createReport } from "../actions/createReport"; // Import the server action
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import AddButton from "./ui/AddButton";
 
 export default function ReportListTable({
   reports: data,
@@ -119,9 +111,10 @@ export default function ReportListTable({
     {
       key: "addButtonRow",
       name: (
-        <Button type="primary" onClick={showModal}>
-          Add
-        </Button>
+        <AddButton action={showModal} />
+        // <Button type="primary" onClick={showModal}>
+        //   Add
+        // </Button>
       ),
     },
   ];

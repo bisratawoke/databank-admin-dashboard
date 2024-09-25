@@ -2,11 +2,24 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, message, Tag } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  message,
+  Tag,
+  Space,
+} from "antd";
 import { reportsWithFields, fieldType, fields } from "../types"; // Ensure fields type is imported
 import { createField } from "../actions/createField";
 import { addFieldToReport } from "../actions/addFieldToReport";
 import { updateField } from "../actions/updateField";
+import AddButton from "./ui/AddButton";
+import { deleteField } from "../actions/deleteField";
+import DeleteButton from "./ui/DeleteButton";
 const { Option } = Select;
 
 export default function ReportTable({
@@ -41,15 +54,10 @@ export default function ReportTable({
       if (status === 201) {
         // Update the fields state with the new field
         setFields((prevFields) => [...prevFields, result]); // Assuming result contains the new field data
-        const {
-          result: addFieldToReportResult,
-          status: addFieldToReportStatus,
-        } = await addFieldToReport({
+        const { status: addFieldToReportStatus } = await addFieldToReport({
           reportId,
           field: result._id,
         });
-        console.log(addFieldToReportResult);
-        console.log(addFieldToReportStatus);
 
         if (addFieldToReportStatus == 200) {
           form.resetFields();
@@ -63,15 +71,11 @@ export default function ReportTable({
         message.error("Failed to add report. Please try again.");
       }
     } else {
-      console.log("====== in update =========");
-      console.log(reportId);
-      console.log(values);
       const { body: result, status } = await updateField(
         selectedFieldId,
         values
       );
       if (status == 200) {
-        console.log(fields);
         setFields((prevFields) =>
           prevFields.map((field: any) => {
             if (field._id == selectedFieldId) {
@@ -117,9 +121,30 @@ export default function ReportTable({
           ""
         ), // Render Yes/No based on boolean
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_: any, record: any) => (
+        <Space size="middle">
+          <DeleteButton
+            action={async (e) => {
+              e.stopPropagation();
+              const result = await deleteField(record._id);
+              if (result.status == 200) {
+                message.info("Successfully deleted record");
+                setFields((fields) =>
+                  fields.filter((field: any) => field._id != record._id)
+                );
+              } else {
+                message.error("Error deleting record");
+              }
+            }}
+          />
+        </Space>
+      ),
+    },
   ];
 
-  // Add the "Add Row" button as the last row
   const dataWithAddButton = [...(fields?.length > 0 ? fields : [])];
 
   return (
@@ -141,9 +166,7 @@ export default function ReportTable({
           }, // Handle row click
         })}
       />
-      <Button type="primary" onClick={handleAddReport}>
-        Add Row
-      </Button>
+      <AddButton action={handleAddReport} />
 
       {/* Modal with Form */}
       <Modal
