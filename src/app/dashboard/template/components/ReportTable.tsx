@@ -13,7 +13,7 @@ import {
   Tag,
   Space,
 } from "antd";
-import { reportsWithFields, fieldType, fields } from "../types"; // Ensure fields type is imported
+import { reportsWithFields, fieldType } from "../types";
 import { createField } from "../actions/createField";
 import { addFieldToReport } from "../actions/addFieldToReport";
 import { updateField } from "../actions/updateField";
@@ -36,24 +36,25 @@ export default function ReportTable({
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState<any>(null);
-  // Function to handle adding a new report
+
   const handleAddReport = () => {
     setEditing(false);
     form.resetFields();
     setIsModalVisible(true);
   };
 
-  // Function to handle form submission
-  const handleFormSubmit = async (values: fields) => {
+  const handleFormSubmit = async (values: any) => {
     if (!editing) {
-      console.log("Submitted values:", values);
-
-      // Call the createField function
-      const { result, status } = await createField(values);
+      const { result, status } = await createField({
+        ...values,
+        type: JSON.parse(values.type)["_id"],
+      });
 
       if (status === 201) {
-        // Update the fields state with the new field
-        setFields((prevFields) => [...prevFields, result]); // Assuming result contains the new field data
+        setFields((prevFields) => [
+          ...prevFields,
+          { ...result, type: JSON.parse(values.type) },
+        ]);
         const { status: addFieldToReportStatus } = await addFieldToReport({
           reportId,
           field: result._id,
@@ -66,15 +67,14 @@ export default function ReportTable({
         } else {
           message.error("Failed to add report. Please try again.");
         }
-        // Reset form and close modal
       } else {
         message.error("Failed to add report. Please try again.");
       }
     } else {
-      const { body: result, status } = await updateField(
-        selectedFieldId,
-        values
-      );
+      const { status } = await updateField(selectedFieldId, {
+        ...values,
+        type: JSON.parse(values.type)["_id"],
+      });
       if (status == 200) {
         setFields((prevFields) =>
           prevFields.map((field: any) => {
@@ -82,6 +82,7 @@ export default function ReportTable({
               return {
                 ...values,
                 _id: selectedFieldId,
+                type: JSON.parse(values.type),
               };
             } else return field;
           })
@@ -89,14 +90,11 @@ export default function ReportTable({
         setIsModalVisible(false);
         message.success("Report fields updated successfully");
       } else {
-        console.log(result);
-        console.log(status);
         message.error("Failed to update report fields");
       }
     }
   };
 
-  // Define columns for the table
   const columns = [
     {
       title: "Name",
@@ -119,37 +117,53 @@ export default function ReportTable({
           <Tag color="magenta">No</Tag>
         ) : (
           ""
-        ), // Render Yes/No based on boolean
+        ),
     },
     {
       title: "Action",
       key: "action",
       render: (_: any, record: any) => (
-        <Space size="middle">
-          <DeleteButton
-            action={async (e) => {
-              e.stopPropagation();
-              const result = await deleteField(record._id);
-              if (result.status == 200) {
-                message.info("Successfully deleted record");
-                setFields((fields) =>
-                  fields.filter((field: any) => field._id != record._id)
-                );
-              } else {
-                message.error("Error deleting record");
-              }
-            }}
-          />
-        </Space>
+        <>
+          {record.key !== "addButtonRow" ? (
+            <Space size="middle">
+              <DeleteButton
+                action={async (e) => {
+                  e.stopPropagation();
+                  const result = await deleteField(record._id);
+                  if (result.status == 200) {
+                    message.info("Successfully deleted record");
+                    setFields((fields) =>
+                      fields.filter((field: any) => field._id != record._id)
+                    );
+                  } else {
+                    message.error("Error deleting record");
+                  }
+                }}
+              />
+            </Space>
+          ) : (
+            <></>
+          )}
+        </>
       ),
     },
   ];
 
-  const dataWithAddButton = [...(fields?.length > 0 ? fields : [])];
+  const dataWithAddButton = [
+    ...(fields?.length > 0
+      ? fields.map((field) => ({
+          ...field,
+          type: field.type.name,
+        }))
+      : []),
+    {
+      key: "addButtonRow",
+      name: <AddButton action={handleAddReport} />,
+    },
+  ];
 
   return (
     <>
-      {/* Render the table */}
       <Table
         columns={columns}
         dataSource={dataWithAddButton}
@@ -157,18 +171,18 @@ export default function ReportTable({
         rowKey="key"
         onRow={(record: any) => ({
           onClick: () => {
-            setSelectedFieldId(record._id);
-            setIsModalVisible(true);
-            form.setFieldsValue({
-              ...record,
-            });
-            setEditing(true);
-          }, // Handle row click
+            if (record.key !== "addButtonRow") {
+              setSelectedFieldId(record._id);
+              setIsModalVisible(true);
+              form.setFieldsValue({
+                ...record,
+              });
+              setEditing(true);
+            }
+          },
         })}
       />
-      <AddButton action={handleAddReport} />
 
-      {/* Modal with Form */}
       <Modal
         title="Add New Report"
         visible={isModalVisible}
@@ -176,7 +190,6 @@ export default function ReportTable({
         footer={null}
       >
         <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
-          {/* Name Field */}
           <Form.Item
             label="Name"
             name="name"
@@ -185,7 +198,6 @@ export default function ReportTable({
             <Input placeholder="Enter report name" />
           </Form.Item>
 
-          {/* Type Field as Select */}
           <Form.Item
             label="Type"
             name="type"
@@ -194,15 +206,13 @@ export default function ReportTable({
             <Select placeholder="Select report type">
               {/*eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
               {fieldTypes.map((type: any) => (
-                <Option key={type._id} value={type._id}>
-                  {type.name}{" "}
-                  {/* Assuming each field type has a 'name' property */}
+                <Option key={type._id} value={JSON.stringify(type)}>
+                  {type.name}
                 </Option>
               ))}
             </Select>
           </Form.Item>
 
-          {/* Filtered Field */}
           <Form.Item
             label="Filtered"
             name="filtered"

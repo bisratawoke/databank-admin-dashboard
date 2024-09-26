@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import { Table, Modal, Form, Input, DatePicker, message, Tag } from "antd";
-import { createReport } from "../actions/createReport"; // Import the server action
-import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import { createReport } from "../actions/createReport";
+import { useRouter } from "next/navigation";
 import AddButton from "./ui/AddButton";
 
 export default function ReportListTable({
@@ -12,7 +12,7 @@ export default function ReportListTable({
 }: {
   reports: Array<Record<string, unknown>>;
 }) {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
   const [reports, setReports] = useState(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -47,7 +47,7 @@ export default function ReportListTable({
             const result = res.body;
             setReports((prevReports) => [
               ...prevReports,
-              { ...result, key: result._id }, // Assuming id is the same as the key here
+              { ...result, key: result._id },
             ]);
 
             form.resetFields();
@@ -65,7 +65,6 @@ export default function ReportListTable({
       });
   };
 
-  // Define columns for the table
   const columns = [
     {
       title: "Name",
@@ -105,23 +104,16 @@ export default function ReportListTable({
     },
   ];
 
-  // Add the Add button row as the last row
   const dataWithButton = [
     ...(reports || []),
     {
       key: "addButtonRow",
-      name: (
-        <AddButton action={showModal} />
-        // <Button type="primary" onClick={showModal}>
-        //   Add
-        // </Button>
-      ),
+      name: <AddButton action={showModal} />,
     },
   ];
 
   return (
     <>
-      {/* Render the table */}
       <Table
         columns={columns}
         dataSource={dataWithButton}
@@ -129,14 +121,12 @@ export default function ReportListTable({
         onRow={(record) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
-              // Navigate to the detail page of the report with the corresponding id
               router.push(`/dashboard/template/reports/${record._id}`);
             }
           },
         })}
       />
 
-      {/* Modal with Form */}
       <Modal
         title="Add New Report"
         open={isModalVisible}
@@ -144,7 +134,6 @@ export default function ReportListTable({
         onCancel={handleClose}
       >
         <Form form={form} layout="vertical">
-          {/* Name Field */}
           <Form.Item
             label="Name"
             name="name"
@@ -153,7 +142,6 @@ export default function ReportListTable({
             <Input placeholder="Enter report name" />
           </Form.Item>
 
-          {/* Description Field */}
           <Form.Item
             label="Description"
             name="description"
@@ -164,7 +152,6 @@ export default function ReportListTable({
             <Input placeholder="Enter report description" />
           </Form.Item>
 
-          {/* Start Date Field */}
           <Form.Item
             label="Start Date"
             name="start_date"
@@ -175,7 +162,6 @@ export default function ReportListTable({
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
 
-          {/* End Date Field */}
           <Form.Item
             label="End Date"
             name="end_date"

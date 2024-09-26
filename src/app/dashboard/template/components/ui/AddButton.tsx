@@ -9,6 +9,7 @@ export default function AddButton({
 }) {
   return (
     <MdOutlineAddBox
+      size={16}
       onClick={action}
       style={{
         cursor: "pointer",

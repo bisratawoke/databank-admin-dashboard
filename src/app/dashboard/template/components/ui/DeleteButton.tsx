@@ -9,6 +9,7 @@ export default function DeleteButton({
 }) {
   return (
     <LuDelete
+      size={16}
       onClick={action}
       style={{
         cursor: "pointer",
