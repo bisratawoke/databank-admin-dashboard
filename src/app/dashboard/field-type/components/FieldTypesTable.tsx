@@ -4,6 +4,7 @@ import { FieldType } from "../type";
 import { useState } from "react";
 import AddButton from "../../components/ui/AddButton";
 import { createFieldType } from "../actions/createFieldType";
+import { UpdateFieldType } from "../actions/updateFieldType";
 
 export default function FieldTypesTables({
   fieldTypes: data,
@@ -35,7 +36,6 @@ export default function FieldTypesTables({
   ];
 
   const showModal = () => {
-    alert(isEditing);
     if (isEditing == false) form.resetFields();
     setIsModalVisible(true);
   };
@@ -45,9 +45,28 @@ export default function FieldTypesTables({
       .validateFields()
       .then(async (values) => {
         if (isEditing) {
-          console.log(selectedRecordId);
-          console.log(values);
           setIsEditing(false);
+          if (selectedRecordId) {
+            const { status, body } = await UpdateFieldType({
+              fieldId: selectedRecordId,
+              body: values,
+            });
+
+            if (status != 200) {
+              message.error("Error updating record");
+            } else {
+              message.success("Record updated successfully");
+              setIsModalVisible(false);
+              form.resetFields();
+              setFieldTypes([
+                ...fieldTypes.map((field) => {
+                  if (field._id == selectedRecordId) {
+                    return body;
+                  } else return field;
+                }),
+              ]);
+            }
+          } else message.error("Error creating new record");
         } else {
           const { body, status } = await createFieldType(values);
 
@@ -78,7 +97,11 @@ export default function FieldTypesTables({
       name: (
         <AddButton
           action={() => {
-            setIsEditing(false);
+            form.setFieldsValue({
+              name: "",
+              description: "",
+              exampleValue: "",
+            });
             showModal();
           }}
         />
@@ -96,15 +119,16 @@ export default function FieldTypesTables({
         onRow={(record: any) => ({
           onClick: (e) => {
             e.stopPropagation();
-            if (record.name !== "addButtonRow") {
+            if (record.key !== "addButtonRow") {
+              showModal();
+              setSelectedRecordId(record._id);
+              setIsEditing(true);
               form.setFieldsValue({
                 ...record,
+                name: record.name,
                 description: record.description || "",
                 exampleValue: record.exampleValue || "",
               });
-              setSelectedRecordId(record._id);
-              setIsEditing(true);
-              showModal();
             }
           },
         })}
