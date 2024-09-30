@@ -75,6 +75,11 @@ export default function FieldTypesTables({
             form.resetFields();
             setIsModalVisible(false);
             message.success("Successfully created new record!");
+          } else if (
+            status == 400 &&
+            body.message == "Field type already exists"
+          ) {
+            message.error(body.message);
           } else {
             message.error("Error creating new record");
           }
