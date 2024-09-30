@@ -75,6 +75,7 @@ export default function ReportTable({
         ...values,
         type: JSON.parse(values.type)["_id"],
       });
+
       if (status == 200) {
         setFields((prevFields) =>
           prevFields.map((field: any) => {
@@ -172,7 +173,10 @@ export default function ReportTable({
         onRow={(record: any) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
-              setSelectedFieldId(record._id);
+              const currentField: any = fields.filter(
+                (field: any) => field._id == record._id
+              )[0];
+              setSelectedFieldId(currentField["_id"]);
               setIsModalVisible(true);
               form.setFieldsValue({
                 ...record,
