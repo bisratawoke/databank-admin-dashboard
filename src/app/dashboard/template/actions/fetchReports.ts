@@ -5,9 +5,9 @@ export async function fetchReports() {
   try {
     const res = await fetch(`${API_URL}/reports`, {
       headers: {
-        "Cache-Control": "no-store", // Prevent caching on the server side
+        "Cache-Control": "no-store",
       },
-      cache: "no-cache", // Ensure no cache is used on the client side
+      cache: "no-cache",
     });
     const result = await res.json();
     return result;

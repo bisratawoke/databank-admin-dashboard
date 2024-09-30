@@ -1,0 +1,15 @@
+.customTable {
+  margin: 20px 0;
+}
+
+.evenRow {
+  background-color: #fafafa;
+}
+
+.oddRow {
+  background-color: #fff;
+}
+
+.ant-table-tbody > tr:hover {
+  background-color: #e6f7ff;
+}

@@ -10,9 +10,7 @@ export async function createField(field: fields) {
     body: JSON.stringify(field),
     method: "POST",
   });
-  console.log(res.status);
   const result = await res.json();
-  console.log(result);
   return {
     result,
     status: res.status,

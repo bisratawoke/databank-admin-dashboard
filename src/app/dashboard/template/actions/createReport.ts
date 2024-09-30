@@ -16,10 +16,8 @@ export async function createReport(report: report) {
       status: res.status,
     };
   } catch (err) {
-    console.log("============ in create report error =======");
     console.log(err);
 
-    // Return a mocked Response-like object to avoid TypeScript errors
     return {
       status: 500,
     };

@@ -6,6 +6,7 @@ import { Table, Modal, Form, Input, DatePicker, message, Tag } from "antd";
 import { createReport } from "../actions/createReport";
 import { useRouter } from "next/navigation";
 import AddButton from "./ui/AddButton";
+import styles from "../styles/ReportListTable.module.css"; // CSS module for custom styles
 
 export default function ReportListTable({
   reports: data,
@@ -38,7 +39,6 @@ export default function ReportListTable({
         };
 
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const res: any = await createReport(newReport);
 
           if (res.status === 201 || res.status === 200) {
@@ -70,6 +70,7 @@ export default function ReportListTable({
       title: "Name",
       dataIndex: "name",
       key: "name",
+      render: (text: string) => <strong>{text}</strong>,
     },
     {
       title: "Description",
@@ -80,17 +81,15 @@ export default function ReportListTable({
       title: "Fields",
       dataIndex: "fields",
       key: "fields",
-      render: (data: any) => {
-        return (
-          <>
-            {data?.map((field: any) => (
-              <Tag color="magenta" key={field._id}>
-                {field.name}
-              </Tag>
-            ))}
-          </>
-        );
-      },
+      render: (fields: any) => (
+        <>
+          {fields?.map((field: any) => (
+            <Tag color="blue" key={field._id}>
+              {field.name}
+            </Tag>
+          ))}
+        </>
+      ),
     },
     {
       title: "Start Date",
@@ -115,9 +114,15 @@ export default function ReportListTable({
   return (
     <>
       <Table
+        className={styles.customTable}
         columns={columns}
         dataSource={dataWithButton}
-        pagination={false}
+        pagination={{ pageSize: 5 }} // Add pagination with 5 records per page
+        bordered // Add borders around the table
+        size="middle" // Set the table size
+        rowClassName={(record, index) =>
+          index % 2 === 0 ? styles.evenRow : styles.oddRow
+        } // Add custom row styling
         onRow={(record) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
@@ -132,6 +137,8 @@ export default function ReportListTable({
         open={isModalVisible}
         onOk={handleSubmit}
         onCancel={handleClose}
+        okText="Create Report"
+        cancelText="Cancel"
       >
         <Form form={form} layout="vertical">
           <Form.Item
