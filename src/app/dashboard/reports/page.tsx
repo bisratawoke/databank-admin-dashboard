@@ -45,7 +45,7 @@ const Reports: React.FC = () => {
   const [fileHeaders, setFileHeaders] = useState([]);
   const [reportFields, setReportFields] = useState([]);
   const [parsedData, setParsedData] = useState([]);
-  const [mapping, setMapping] = useState({});
+  const [mapping, setMapping] = useState<any>({});
   const [step, setStep] = useState<
     "select" | "upload" | "map" | "preview" | "done"
   >("select");
@@ -72,19 +72,24 @@ const Reports: React.FC = () => {
       let data: any = [];
       if (file.type === "text/csv") {
         ({ headers, data } = await parseCSV(file));
-      } else if (file.type.includes("excel")) {
+      } else if (
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.type === "application/vnd.ms-excel"
+      ) {
         ({ headers, data } = await parseExcel(file));
       }
       setFileHeaders(headers);
       setParsedData(data);
       // Automatically map headers to fields
       const autoMappedFields = autoMapFields(headers, reportFields);
-      console.log("autMappedFields: ", autoMappedFields);
+      console.log("autoMappedFields: ", autoMappedFields);
       setMapping(autoMappedFields);
 
       setStep("map"); // Proceed to mapping step in the modal
     } catch (error) {
       message.error("Failed to parse file");
+      console.error(error); // Log the error for more information
     }
   };
 
@@ -95,20 +100,40 @@ const Reports: React.FC = () => {
 
   const handleDataCreate = async () => {
     try {
-      const formattedData = parsedData.flatMap((row) => {
-        return Object.entries(mapping).map(
-          ([fileHeader, reportFieldId]: any) => ({
-            field: reportFieldId,
-            value: row[fileHeader],
-          })
-        );
-      });
+      // Flatten the structured data to a single array with field-value pairs
+      const formattedData: any = parsedData
+        .map((row: any) => {
+          return Object.entries(mapping)
+            .map(([fileHeader, reportFieldId]: [any, any]) => {
+              const value = row[fileHeader]?.toString().trim() || ""; // Get value and trim whitespace, default to ""
+              const fieldId = reportFieldId?.toString().trim(); // Ensure field ID is also a string
 
-      console.log("formattedData: ", formattedData);
+              // Validation: Only return if both fieldId and value are valid
+              if (fieldId && value) {
+                return {
+                  field: fieldId,
+                  value: value,
+                };
+              } else {
+                // Skip invalid entries (fieldId or value is missing/undefined)
+                return null;
+              }
+            })
+            .filter((entry) => entry !== null); // Filter out invalid entries
+        })
+        .filter((entry) => entry.length > 0); // Filter out empty entries
 
-      const { result, status } = await createData(formattedData);
+      console.log("validated formattedData: ", formattedData);
 
-      if (status == 200) {
+      // Prepare the payload for the backend, wrap formattedData in `dataEntries`
+      const payload: any = { dataEntries: formattedData.flat() };
+      console.log("payload : ", payload);
+
+      const { result, status } = await createData(payload);
+      console.log("result: ", result);
+      console.log("status: ", status);
+
+      if (status === 201) {
         console.log("createdData: ", result);
         const dataIds = result.map((data: any) => data._id);
         console.log("dataIds:", dataIds);
@@ -138,7 +163,6 @@ const Reports: React.FC = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    // Do not reset the state when closing modal
   };
 
   return (
