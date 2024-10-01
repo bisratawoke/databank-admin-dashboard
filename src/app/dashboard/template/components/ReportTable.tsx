@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -203,7 +203,9 @@ export default function ReportTable({
               setIsModalVisible(true);
               form.setFieldsValue({
                 ...record,
+                type: JSON.stringify(currentField["type"]),
               });
+
               setEditing(true);
             }
           },
@@ -232,7 +234,6 @@ export default function ReportTable({
           >
             <Input placeholder="Enter description" />
           </Form.Item>
-
           <Form.Item
             label="Type"
             name="type"
