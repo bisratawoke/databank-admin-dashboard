@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Table, Modal, Form, Input, DatePicker, message, Tag } from "antd";
 import { createReport } from "../actions/createReport";
 import { useRouter } from "next/navigation";
-import AddButton from "./ui/AddButton";
+import AddButton from "../../components/ui/AddButton";
 
 export default function ReportListTable({
   reports: data,

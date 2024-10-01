@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Button,
@@ -17,9 +17,9 @@ import { reportsWithFields, fieldType } from "../types";
 import { createField } from "../actions/createField";
 import { addFieldToReport } from "../actions/addFieldToReport";
 import { updateField } from "../actions/updateField";
-import AddButton from "./ui/AddButton";
 import { deleteField } from "../actions/deleteField";
-import DeleteButton from "./ui/DeleteButton";
+import DeleteButton from "../../components/ui/DeleteButton";
+import AddButton from "../../components/ui/AddButton";
 const { Option } = Select;
 
 export default function ReportTable({
