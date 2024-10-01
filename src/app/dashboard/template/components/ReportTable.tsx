@@ -103,9 +103,32 @@ export default function ReportTable({
       key: "name",
     },
     {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Default value",
+      dataIndex: "defaultValue",
+      key: "defaultValue",
+    },
+    {
       title: "Type",
       dataIndex: "type",
       key: "type",
+    },
+    {
+      title: "Required",
+      dataIndex: "required",
+      key: "required",
+      render: (filtered: boolean) =>
+        filtered == true ? (
+          <Tag color="green">Yes</Tag>
+        ) : filtered == false ? (
+          <Tag color="magenta">No</Tag>
+        ) : (
+          ""
+        ),
     },
     {
       title: "Filtered",
@@ -188,7 +211,7 @@ export default function ReportTable({
       />
 
       <Modal
-        title="Add New Report"
+        title="Add New Field"
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
@@ -200,6 +223,14 @@ export default function ReportTable({
             rules={[{ required: true, message: "Please enter the name" }]}
           >
             <Input placeholder="Enter report name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Please enter description" }]}
+          >
+            <Input placeholder="Enter description" />
           </Form.Item>
 
           <Form.Item
@@ -218,6 +249,23 @@ export default function ReportTable({
           </Form.Item>
 
           <Form.Item
+            label="Required"
+            name="required"
+            rules={[
+              { required: true, message: "Please select a required option" },
+            ]}
+          >
+            <Select placeholder="Select required option">
+              <Option value={true}>
+                <span style={{ color: "green" }}>Yes</span>
+              </Option>
+              <Option value={false}>
+                <span style={{ color: "red" }}>No</span>
+              </Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
             label="Filtered"
             name="filtered"
             rules={[
@@ -232,6 +280,13 @@ export default function ReportTable({
                 <span style={{ color: "red" }}>No</span>
               </Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            label="Default Value"
+            name="defaultValue"
+            rules={[{ required: true, message: "Please enter default value" }]}
+          >
+            <Input placeholder="Enter default value" />
           </Form.Item>
 
           <Form.Item>
