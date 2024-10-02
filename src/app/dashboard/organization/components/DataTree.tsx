@@ -2,19 +2,56 @@
 import React from "react";
 import { Tree } from "antd";
 
-const DataTree = ({ data }: any) => {
-  // Function to transform the object into a tree structure
-  const transformToTreeData = (categories: any) => {
-    return categories.map((category: any) => ({
-      title: category.name,
-      key: category._id,
-      children: category.category.map((subcat: any) => ({
-        title: subcat.name,
-        key: subcat._id,
-        children: subcat.subcategory.map((subcategory: any) => ({
+// Define TypeScript interfaces for your data structure
+interface Report {
+  _id: string;
+  name: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  fields: string[];
+  data: any[];
+  __v: number;
+}
+
+interface Subcategory {
+  _id: string;
+  name: string;
+  report: Report[];
+  __v: number;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  subcategory: Subcategory[];
+  __v: number;
+}
+
+interface Department {
+  _id: string;
+  name: string;
+  category: Category[];
+  __v: number;
+}
+
+interface DataTreeProps {
+  data: Department[];
+}
+
+const DataTree: React.FC<DataTreeProps> = ({ data }) => {
+  // Function to transform the data into a tree structure
+  const transformToTreeData = (departments: Department[]) => {
+    return departments.map((department) => ({
+      title: department.name,
+      key: department._id,
+      children: department.category.map((category) => ({
+        title: category.name,
+        key: category._id,
+        children: category.subcategory.map((subcategory) => ({
           title: subcategory.name,
           key: subcategory._id,
-          children: subcategory.report.map((report: any) => ({
+          children: subcategory.report.map((report) => ({
             title: report.name,
             key: report._id,
             children: [
@@ -45,7 +82,7 @@ const DataTree = ({ data }: any) => {
     }));
   };
 
-  // Tree data based on the passed prop
+  // Transform the data prop into tree data
   const treeData = transformToTreeData(data);
 
   return <Tree treeData={treeData} defaultExpandAll selectable={false} />;
