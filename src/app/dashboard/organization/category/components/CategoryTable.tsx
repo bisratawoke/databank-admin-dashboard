@@ -3,20 +3,25 @@
 
 import { category, subcategory } from "../../types";
 import { useState } from "react";
-import { Table, Tag, Modal, Form, Input, Select } from "antd";
+import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { CreateCategory } from "../../actions/createCategory";
+import { UpdateCategory } from "../../actions/updateCategory";
+
+interface CategoryTableProps {
+  data: category[];
+  subcategories: subcategory[];
+}
 
 export default function CategoryTable({
   data,
-  subcategories, // Pass the list of categories as a prop
-}: {
-  data: category[];
-  subcategories: subcategory[];
-}) {
-  const [category, setCategory] = useState(data);
+  subcategories,
+}: CategoryTableProps) {
+  const [categories, setCategories] = useState<category[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
+  const [currentCategoryId, setCurrentCategoryId] = useState<any>(null);
 
   const columns = [
     {
@@ -30,10 +35,11 @@ export default function CategoryTable({
       key: "subcategory",
       render: (subcategory: subcategory[]) => {
         if (subcategory && subcategory.length > 0) {
-          return subcategory.map((category: subcategory) => (
-            <Tag key={category.name}>{category.name}</Tag>
+          return subcategory.map((subcat: subcategory) => (
+            <Tag key={subcat._id}>{subcat.name}</Tag>
           ));
         }
+        return null;
       },
     },
   ];
@@ -42,41 +48,73 @@ export default function CategoryTable({
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        console.log("Form values: ", values);
-        const { body, status } = await CreateCategory(values);
-        console.log(body);
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (isEditing) {
+        const { body, status } = await UpdateCategory({
+          payload: values,
+          categoryId: currentCategoryId,
+        });
+
         console.log(status);
-        if (status == 201) {
-          const newCategory = {
-            ...body,
-            subcategory: subcategories.filter((subcategory) =>
-              body.subcategory.includes(subcategory._id)
+        console.log(body);
+        if (status === 200) {
+          const updatedCategories: any = categories.map((cat) =>
+            cat._id === currentCategoryId
+              ? {
+                  ...cat,
+                  name: values.name,
+                  subcategory: subcategories.filter((subcat) =>
+                    values.subcategory.includes(subcat._id)
+                  ),
+                }
+              : cat
+          );
+          setCategories(updatedCategories);
+          message.success("Category updated successfully!");
+        } else {
+          message.error("Failed to update category.");
+        }
+      } else {
+        const { status, body } = await CreateCategory(values);
+
+        if (status === 201) {
+          const newCategory: any = {
+            _id: body._id,
+            name: body.name,
+            subcategory: subcategories.filter((subcat) =>
+              body.subcategory.includes(subcat._id)
             ),
           };
-          setCategory((prev) => [...prev, newCategory]);
+          setCategories((current) => [...current, newCategory]);
+          message.success("Category created successfully!");
+        } else {
+          message.error("Failed to create category.");
         }
+      }
 
-        setIsModalVisible(false);
-        form.resetFields(); // Reset the form fields
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
+      setIsModalVisible(false);
+      form.resetFields();
+      setIsEditing(false);
+    } catch (error) {
+      console.log("Validation Failed:", error);
+    }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    form.resetFields();
+    setIsEditing(false);
   };
 
   const dataWithButton = [
-    ...(category || []),
+    ...(categories || []),
     {
       key: "addButtonRow",
       name: <AddButton action={showModal} />,
+      subcategory: [], // Empty subcategory for the add button row
     },
   ];
 
@@ -85,12 +123,27 @@ export default function CategoryTable({
       <Table
         dataSource={dataWithButton}
         columns={columns}
-        rowKey="_id" // Replace with a unique identifier if available
-        pagination={false} // Optional: Disable pagination if you want to display all records
+        rowKey="_id"
+        pagination={false}
+        onRow={(record: any) => ({
+          onClick: () => {
+            if (record.key !== "addButtonRow") {
+              setIsEditing(true);
+              setCurrentCategoryId(record._id);
+              form.setFieldsValue({
+                name: record.name,
+                subcategory: record.subcategory.map(
+                  (subcat: subcategory) => subcat._id
+                ),
+              });
+              showModal();
+            }
+          },
+        })}
       />
 
       <Modal
-        title="Add Category"
+        title={isEditing ? "Edit Category" : "Add Category"}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -108,7 +161,7 @@ export default function CategoryTable({
 
           <Form.Item
             name="subcategory"
-            label="Sub Category"
+            label="Sub Categories"
             rules={[
               {
                 required: true,
@@ -116,12 +169,9 @@ export default function CategoryTable({
               },
             ]}
           >
-            <Select
-              mode="multiple" // Enable multiple selection
-              placeholder="Select categories"
-            >
+            <Select mode="multiple" placeholder="Select subcategories">
               {subcategories.map((subcat) => (
-                <Select.Option key={subcat.name} value={subcat._id}>
+                <Select.Option key={subcat._id} value={subcat._id}>
                   {subcat.name}
                 </Select.Option>
               ))}
