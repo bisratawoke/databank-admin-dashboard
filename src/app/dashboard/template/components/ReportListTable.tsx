@@ -2,17 +2,30 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Modal, Form, Input, DatePicker, message, Tag } from "antd";
+import {
+  Table,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  message,
+  Tag,
+  Select,
+} from "antd";
 import { createReport } from "../actions/createReport";
 import { useRouter } from "next/navigation";
-import styles from "../styles/ReportListTable.module.css"; // CSS module for custom styles
+import styles from "../styles/ReportListTable.module.css";
 
 import AddButton from "../../components/ui/AddButton";
+import { UpdateSubCategory } from "../../organization/actions/updateSubcategory";
+const { Option } = Select;
 
 export default function ReportListTable({
   reports: data,
+  subCategories,
 }: {
   reports: Array<Record<string, unknown>>;
+  subCategories: Array<any>;
 }) {
   const router = useRouter();
   const [reports, setReports] = useState(data);
@@ -31,6 +44,8 @@ export default function ReportListTable({
     form
       .validateFields()
       .then(async (values) => {
+        const anVal = { ...values };
+        delete values.type;
         const newReport = {
           ...values,
           start_date: values.start_date?.format("YYYY-MM-DD"),
@@ -43,16 +58,38 @@ export default function ReportListTable({
           const res: any = await createReport(newReport);
 
           if (res.status === 201 || res.status === 200) {
-            message.success("Report added successfully!");
-
             const result = res.body;
-            setReports((prevReports) => [
-              ...prevReports,
-              { ...result, key: result._id },
-            ]);
 
-            form.resetFields();
-            setIsModalVisible(false);
+            alert(JSON.parse(anVal.type));
+            console.log(res.body);
+            console.log(JSON.parse(anVal.type));
+            const subCat = JSON.parse(anVal.type);
+
+            const { status } = await UpdateSubCategory({
+              payload: {
+                name: subCat.name,
+                report: [
+                  ...subCat.report.map((report: any) => report._id),
+                  result._id,
+                ],
+              },
+              subCategoryId: subCat._id,
+            });
+
+            if (status == 200) {
+              message.success("Report added successfully!");
+
+              setReports((prevReports) => [
+                ...prevReports,
+                { ...result, key: result._id },
+              ]);
+
+              form.resetFields();
+              setIsModalVisible(false);
+            } else {
+              alert(status);
+              // console.log(body);
+            }
           } else {
             message.error("Failed to add the report.");
           }
@@ -71,7 +108,7 @@ export default function ReportListTable({
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <strong>{text}</strong>,
+      render: (text: string) => <span>{text}</span>,
     },
     {
       title: "Description",
@@ -118,12 +155,11 @@ export default function ReportListTable({
         className={styles.customTable}
         columns={columns}
         dataSource={dataWithButton}
-        pagination={{ pageSize: 5 }} // Add pagination with 5 records per page
-        bordered // Add borders around the table
-        size="small" // Set the table size
+        bordered
+        size="small"
         rowClassName={(record, index) =>
           index % 2 === 0 ? styles.evenRow : styles.oddRow
-        } // Add custom row styling
+        }
         onRow={(record) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
@@ -131,6 +167,7 @@ export default function ReportListTable({
             }
           },
         })}
+        pagination={false}
       />
 
       <Modal
@@ -160,22 +197,51 @@ export default function ReportListTable({
             <Input placeholder="Enter report description" />
           </Form.Item>
 
-          <Form.Item
-            label="Start Date"
-            name="start_date"
-            rules={[
-              { required: true, message: "Please select the start date" },
-            ]}
+          <div
+            style={{
+              display: "flex",
+              gap: "16px",
+            }}
           >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
+            <Form.Item
+              label="Start Date"
+              name="start_date"
+              rules={[
+                { required: true, message: "Please select the start date" },
+              ]}
+              style={{
+                flexGrow: 1,
+              }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
 
+            <Form.Item
+              label="End Date"
+              name="end_date"
+              rules={[
+                { required: true, message: "Please select the end date" },
+              ]}
+              style={{
+                flexGrow: 1,
+              }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </div>
           <Form.Item
-            label="End Date"
-            name="end_date"
-            rules={[{ required: true, message: "Please select the end date" }]}
+            label="Type"
+            name="type"
+            rules={[{ required: true, message: "Please select a type" }]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <Select placeholder="Select report type">
+              {/*eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
+              {subCategories.map((type: any) => (
+                <Option key={type._id} value={JSON.stringify(type)}>
+                  {type.name}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

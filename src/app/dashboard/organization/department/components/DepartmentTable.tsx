@@ -59,7 +59,7 @@ export default function DepartmentTable({
         });
 
         if (status === 200) {
-          const updatedDepartments = departments.map((dept) =>
+          const updatedDepartments = departments.map((dept: any) =>
             dept._id === currentDeptId
               ? {
                   ...dept,
