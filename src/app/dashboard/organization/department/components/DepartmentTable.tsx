@@ -133,9 +133,7 @@ export default function DepartmentTable({
           onClick: (e) => {
             if (record.key !== "addButtonRow") {
               setIsEditing(true);
-              // Alert for debugging purposes
-              alert(JSON.stringify(record));
-              // Set form fields with department data
+
               setCurrentDepId(record._id);
               form.setFieldsValue({
                 name: record.name,
