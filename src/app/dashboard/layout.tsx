@@ -3,10 +3,16 @@ import { Flex, Layout, Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import Link from "next/link";
 import styles from "./dashboard.module.css";
-import Logo from "./public/logo.jpg";
+
 import Image from "next/image";
 import { MdDashboard } from "react-icons/md";
 import User from "./component/User";
+import Logo from "../(components)/Logo";
+import NavItem from "../(components)/NavItem";
+import NotificationIcon from "../(components)/NotificationIcon";
+import HelpIcon from "../(components)/HelpIcon";
+import ShareIcon from "../(components)/ShareIcon";
+import SecondaryNav from "../(components)/SecondaryNav";
 const { Header, Content, Footer } = Layout;
 
 const items = [
@@ -25,7 +31,7 @@ export default function Index({
 }>) {
   return (
     <Layout className={styles.outerLayout} hasSider>
-      <Sider
+      {/* <Sider
         theme="light"
         collapsible
         defaultCollapsed
@@ -42,18 +48,76 @@ export default function Index({
           mode="inline"
           items={items}
         />
-      </Sider>
-      <Layout className={styles.innerLayout}>
-        <Header
-          className={styles.header}
+      </Sider> */}
+      <Layout
+        style={{
+          backgroundColor: "red",
+        }}
+      >
+        <div
+          // className={styles.header}
           style={{
-            backgroundColor: "white",
+            backgroundColor: "#166EE1",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            height: "50px",
+            padding: "20px",
+            justifyContent: "space-between",
           }}
         >
-          <Flex justify="end" align="center" style={{ height: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <Logo />
+            <span
+              style={{
+                font: "Roboto",
+                fontSize: "17px",
+                lineHeight: "24px",
+                color: "white",
+                fontWeight: 675,
+              }}
+            >
+              Ess Stat Bank
+            </span>
+
+            <div>
+              <NavItem label="Organization" link="/dashboard/organization" />
+              <NavItem label="Data Types" link="/dashboard/field-type" />
+              <NavItem
+                label="Report Designer"
+                link="/dashboard/template/reports"
+              />
+              <NavItem label="Import tool" link="/dashboard/reports" />
+            </div>
+          </div>
+          <Flex
+            gap={16}
+            // justify="end"
+            align="center"
+            style={{ height: "100%" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <HelpIcon />
+              <ShareIcon />
+            </div>
+            <NotificationIcon />
             <User />
           </Flex>
-        </Header>
+        </div>
+        <SecondaryNav />
         <Content className={styles.content}>{children}</Content>
         <Footer className={styles.footer} style={{ backgroundColor: "white" }}>
           <span>
@@ -73,4 +137,3 @@ export default function Index({
     </Layout>
   );
 }
-
