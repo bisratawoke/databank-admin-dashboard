@@ -17,9 +17,9 @@ import { reportsWithFields, fieldType } from "../types";
 import { createField } from "../actions/createField";
 import { addFieldToReport } from "../actions/addFieldToReport";
 import { updateField } from "../actions/updateField";
-import AddButton from "./ui/AddButton";
 import { deleteField } from "../actions/deleteField";
-import DeleteButton from "./ui/DeleteButton";
+import DeleteButton from "../../components/ui/DeleteButton";
+import AddButton from "../../components/ui/AddButton";
 const { Option } = Select;
 
 export default function ReportTable({
@@ -103,9 +103,32 @@ export default function ReportTable({
       key: "name",
     },
     {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Default value",
+      dataIndex: "defaultValue",
+      key: "defaultValue",
+    },
+    {
       title: "Type",
       dataIndex: "type",
       key: "type",
+    },
+    {
+      title: "Required",
+      dataIndex: "required",
+      key: "required",
+      render: (filtered: boolean) =>
+        filtered == true ? (
+          <Tag color="green">Yes</Tag>
+        ) : filtered == false ? (
+          <Tag color="magenta">No</Tag>
+        ) : (
+          ""
+        ),
     },
     {
       title: "Filtered",
@@ -180,7 +203,9 @@ export default function ReportTable({
               setIsModalVisible(true);
               form.setFieldsValue({
                 ...record,
+                type: JSON.stringify(currentField["type"]),
               });
+
               setEditing(true);
             }
           },
@@ -188,7 +213,7 @@ export default function ReportTable({
       />
 
       <Modal
-        title="Add New Report"
+        title="Add New Field"
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
@@ -203,6 +228,13 @@ export default function ReportTable({
           </Form.Item>
 
           <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true, message: "Please enter description" }]}
+          >
+            <Input placeholder="Enter description" />
+          </Form.Item>
+          <Form.Item
             label="Type"
             name="type"
             rules={[{ required: true, message: "Please select a type" }]}
@@ -214,6 +246,23 @@ export default function ReportTable({
                   {type.name}
                 </Option>
               ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Required"
+            name="required"
+            rules={[
+              { required: true, message: "Please select a required option" },
+            ]}
+          >
+            <Select placeholder="Select required option">
+              <Option value={true}>
+                <span style={{ color: "green" }}>Yes</span>
+              </Option>
+              <Option value={false}>
+                <span style={{ color: "red" }}>No</span>
+              </Option>
             </Select>
           </Form.Item>
 
@@ -232,6 +281,13 @@ export default function ReportTable({
                 <span style={{ color: "red" }}>No</span>
               </Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            label="Default Value"
+            name="defaultValue"
+            rules={[{ required: true, message: "Please enter default value" }]}
+          >
+            <Input placeholder="Enter default value" />
           </Form.Item>
 
           <Form.Item>
