@@ -1,23 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { Data } from "../types";
+import { revalidatePath } from "next/cache";
 
 const API_URL = process.env.BACKEND_URL;
-export const updateReport = async (
-  reportId: string,
-  data: Data[]
-): Promise<{ result: any; status: number }> => {
-  const response = await fetch(`${API_URL}/reports/${reportId}`, {
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ data }),
-    method: "PUT",
-  });
-  const result = await response.json();
 
-  return {
-    result,
-    status: response.status,
-  };
-};
+export async function updateReport({
+  reportId,
+  data,
+}: {
+  reportId: string;
+  data: any[];
+}) {
+  console.log(
+    "Sending update request with:",
+    { reportId },
+    JSON.stringify(data)
+  );
+
+  if (!reportId || !data?.length) {
+    throw new Error("Invalid reportId or dataIds");
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/reports/${reportId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data,
+      }),
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(
+        errorData.message || `Failed to update report: ${res.status}`
+      );
+    }
+
+    const responseData = await res.json();
+    revalidatePath("/dashboard/reports");
+    return responseData;
+  } catch (error: any) {
+    console.error("Error in updateReport:", error);
+    throw error;
+  }
+}

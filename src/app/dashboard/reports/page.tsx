@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import { message, Modal, Button } from "antd";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState, useTransition } from "react";
+import { message, Modal } from "antd";
 import ReportsTable from "./components/ReportsTable";
 import FileUploader from "./components/FileUploader";
 import ParsedDataPreview from "./components/ParsedDataPreview";
@@ -9,7 +10,7 @@ import { parseExcel } from "./_parsers/xlsParser";
 import FileMapping from "./components/FileMapping";
 import { createData } from "./actions/createData";
 import { updateReport } from "./actions/updateReport";
-import { Data } from "./types";
+import { fetchReports } from "./actions/fetchReports";
 
 const autoMapFields = (
   fileHeaders: string[],
@@ -41,6 +42,7 @@ const autoMapFields = (
   return mapping;
 };
 const Reports: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [fileHeaders, setFileHeaders] = useState([]);
   const [reportFields, setReportFields] = useState([]);
@@ -49,7 +51,36 @@ const Reports: React.FC = () => {
   const [step, setStep] = useState<
     "select" | "upload" | "map" | "preview" | "done"
   >("select");
+  const [reports, setReports] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    async function getReports() {
+      try {
+        setLoading(true);
+        const data = await fetchReports();
+        setReports(data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getReports();
+  }, []);
+
+  const refreshReports = async () => {
+    try {
+      const updatedReports = await fetchReports();
+      setReports(updatedReports);
+    } catch (error) {
+      console.error("Failed to refresh reports:", error);
+      message.error("Failed to refresh reports list");
+    }
+  };
 
   const handleReportSelect = async (record: any) => {
     console.log("reportId: ", record._id);
@@ -98,59 +129,290 @@ const Reports: React.FC = () => {
     setStep("preview");
   };
 
-  const handleDataCreate = async () => {
+  const handleDataCreate = async (reportId: string, data: any[]) => {
+    console.log("received data for update case: ", reportId, data);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
-      // Flatten the structured data to a single array with field-value pairs
-      const formattedData: any = parsedData
-        .map((row: any) => {
-          return Object.entries(mapping)
-            .map(([fileHeader, reportFieldId]: [any, any]) => {
-              const value = row[fileHeader]?.toString().trim() || ""; // Get value and trim whitespace, default to ""
-              const fieldId = reportFieldId?.toString().trim(); // Ensure field ID is also a string
-
-              // Validation: Only return if both fieldId and value are valid
-              if (fieldId && value) {
-                return {
-                  field: fieldId,
-                  value: value,
-                };
-              } else {
-                // Skip invalid entries (fieldId or value is missing/undefined)
-                return null;
-              }
+      // Format the parsed data with field-value pairs
+      const formattedData = parsedData
+        .map((row: any) =>
+          Object.entries(mapping)
+            .map(([fileHeader, reportFieldId]: [string, unknown]) => {
+              const value = row[fileHeader]?.toString().trim() || "";
+              const fieldId = reportFieldId?.toString().trim();
+              return fieldId && value
+                ? {
+                    field: fieldId,
+                    value,
+                  }
+                : null;
             })
-            .filter((entry) => entry !== null); // Filter out invalid entries
-        })
-        .filter((entry) => entry.length > 0); // Filter out empty entries
+            .filter(Boolean)
+        )
+        .filter((entry) => entry.length > 0)
+        .flat()
+        .filter((element) => element !== null);
 
-      console.log("validated formattedData: ", formattedData);
+      if (formattedData.length === 0) {
+        // Update the report directly with the new data IDs
+        const updateResponse = await updateReport({
+          reportId: selectedReport ? selectedReport : reportId,
+          data: data,
+        });
+        if (updateResponse.error) {
+          throw new Error(updateResponse.error);
+        }
 
-      // Prepare the payload for the backend, wrap formattedData in `dataEntries`
-      const payload: any = { dataEntries: formattedData.flat() };
-      console.log("payload : ", payload);
-
-      const { result, status } = await createData(payload);
-      console.log("result: ", result);
-      console.log("status: ", status);
-
-      if (status === 201) {
-        console.log("createdData: ", result);
-        const dataIds = result.map((data: any) => data._id);
-        console.log("dataIds:", dataIds);
-
-        await updateReport(selectedReport, dataIds);
-        setStep("done");
         message.success("Report updated successfully");
+
+        // Close modal, refresh reports, and reset state
+        await refreshReports();
+        setIsModalVisible(false);
         reset();
       } else {
-        message.error("Failed to create data");
-        console.log("error: ", result);
+        // Create new data entries and associate them with the report
+        const response = await createData(reportId, formattedData);
+        if (response.error || !response.result) {
+          throw new Error(response.error || "Failed to create data entries");
+        }
+
+        // No need to update report data separately since it's already handled in createMultiple
+
+        message.success("Report updated successfully with new data entries");
+
+        // Close modal, refresh reports, and reset state
+        await refreshReports();
+        setIsModalVisible(false);
+        reset();
       }
-    } catch (error) {
-      message.error("Failed to create data or update report");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Error in handleDataCreate:", error);
+      message.error(error.message || "Failed to update the report");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  // const handleDataCreate = async () => {
+  //   if (isSubmitting) return;
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // Format the data
+  //     const formattedData = parsedData
+  //       .map((row: any) =>
+  //         Object.entries(mapping)
+  //           .map(([fileHeader, reportFieldId]: [string, unknown]) => {
+  //             const value = row[fileHeader]?.toString().trim() || "";
+  //             const fieldId = reportFieldId?.toString().trim();
+  //             return fieldId && value
+  //               ? {
+  //                   field: fieldId,
+  //                   value,
+  //                 }
+  //               : null;
+  //           })
+  //           .filter(Boolean)
+  //       )
+  //       .filter((entry) => entry.length > 0)
+  //       .flat()
+  //       .filter((element) => element !== null);
+
+  //     const existingData = await fetchReport(selectedReport);
+  //     const reportId = existingData?._id || selectedReport; // Safely retrieve reportId
+  //     console.log("existingData: ", existingData);
+  //     console.log("selectedReport: ", selectedReport);
+
+  //     // Proceed with update or creation
+  //     if (existingData?.length > 0) {
+  //       const dataIds = existingData.map((data: any) => data._id.toString());
+  //       await updateReport({ reportId, dataIds });
+  //       message.success("Report updated successfully");
+  //     } else {
+  //       // Create new data entries
+  //       const response = await createData(formattedData);
+  //       if (response.error || !response.result) {
+  //         throw new Error(response.error || "Failed to create data entries");
+  //       }
+
+  //       // Extract the created data IDs
+  //       const dataIds = response.result.map((data: any) => data._id);
+
+  //       // Update the report with the new data IDs
+  //       const updateResponse = await updateReport({ reportId, dataIds });
+  //       if (updateResponse.error) {
+  //         throw new Error(updateResponse.error);
+  //       }
+
+  //       message.success("Report updated successfully");
+  //     }
+
+  //     // Close modal and reset state
+  //     await refreshReports();
+  //     setIsModalVisible(false);
+  //     reset();
+  //   } catch (error: any) {
+  //     console.error("Error in handleDataCreate:", error);
+  //     message.error(error.message || "Failed to format data");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // const handleDataCreate = async () => {
+  //   if (isSubmitting) return;
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // Format the data
+  //     const formattedData = parsedData
+  //       .map((row: any) =>
+  //         Object.entries(mapping)
+  //           .map(([fileHeader, reportFieldId]: [string, unknown]) => {
+  //             const value = row[fileHeader]?.toString().trim() || "";
+  //             const fieldId = reportFieldId?.toString().trim();
+  //             return fieldId && value
+  //               ? {
+  //                   field: fieldId,
+  //                   value,
+  //                 }
+  //               : null;
+  //           })
+  //           .filter(Boolean)
+  //       )
+  //       .filter((entry) => entry.length > 0)
+  //       .flat()
+  //       .filter((element) => element !== null);
+
+  //     const existingData = await fetchReport(selectedReport);
+  //     console.log("existingData: ", existingData);
+  //     console.log("selectedReport: ", selectedReport);
+  //     let reportId = existingData._id;
+
+  //     if (existingData.length > 0) {
+  //       const dataIds = existingData.map((data: any) => data._id.toString());
+  //       alert(reportId);
+  //       await updateReport({ reportId, dataIds });
+  //       message.success("Report updated successfully");
+  //       await refreshReports();
+  //       setIsModalVisible(false);
+  //       reset();
+  //     } else {
+  //       const response = await createData(formattedData);
+
+  //       if (response.error || !response.result) {
+  //         throw new Error(response.error || "Failed to create data entries");
+  //       }
+
+  //       // Extract the created data IDs
+  //       const dataIds = response.result.map((data: any) => data._id);
+
+  //       reportId = selectedReport;
+  //       // Update the report with the new data IDs
+  //       const updateResponse = await updateReport({ reportId, dataIds });
+
+  //       if (updateResponse.error) {
+  //         throw new Error(updateResponse.error);
+  //       }
+
+  //       message.success("Report updated successfully");
+  //       await refreshReports();
+  //       setIsModalVisible(false);
+  //       reset();
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error in handleDataCreate:", error);
+  //     message.error(error.message || "Failed to format data");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // const handleDataCreate = async () => {
+  //   if (isSubmitting) return;
+
+  //   setIsSubmitting(true);
+  //   try {
+  //     // Flatten the structured data to a single array with field-value pairs
+  //     const formattedData: any = parsedData
+  //       .map((row: any) => {
+  //         return Object.entries(mapping)
+  //           .map(([fileHeader, reportFieldId]: [any, any]) => {
+  //             const value = row[fileHeader]?.toString().trim() || ""; // Get value and trim whitespace, default to ""
+  //             const fieldId = reportFieldId?.toString().trim(); // Ensure field ID is also a string
+
+  //             // Validation: Only return if both fieldId and value are valid
+  //             if (fieldId && value) {
+  //               return {
+  //                 field: fieldId,
+  //                 value: value,
+  //               };
+  //             } else {
+  //               // Skip invalid entries (fieldId or value is missing/undefined)
+  //               return null;
+  //             }
+  //           })
+  //           .filter((entry) => entry !== null); // Filter out invalid entries
+  //       })
+  //       .filter((entry) => entry.length > 0); // Filter out empty entries
+
+  //     console.log("validated formattedData: ", formattedData);
+
+  //     // Prepare the payload for the backend, wrap formattedData in `dataEntries`
+  //     const payload: any = { dataEntries: formattedData.flat() };
+  //     console.log("payload : ", payload);
+
+  //     const { result, status } = await createData(payload);
+  //     console.log("result: ", result);
+  //     console.log("status: ", status);
+
+  //     if (status === 201) {
+  //       console.log("createdData: ", result);
+  //       const dataIds = result.map((data: any) => data._id);
+  //       await updateReport(selectedReport, dataIds);
+  //       console.log("dataIds:", dataIds);
+
+  //       message.success("Report updated successfully");
+  //       await refreshReports();
+
+  //       setIsModalVisible(false);
+  //       reset();
+  //     } else {
+  //       message.error("Failed to create data");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating data:", error);
+  //     message.error("Failed to upload data");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // const handleReportUpdate = async (reportId: string, updatedData: any[]) => {
+  //   try {
+  //     // First create the new data entries
+  //     const { result, status } = await createData({ dataEntries: updatedData });
+
+  //     if (status === 201) {
+  //       const dataIds = result.map((data: any) => data._id);
+
+  //       // Then update the report with the new data IDs
+  //       await updateReport(reportId, dataIds);
+  //       message.success("Report updated successfully");
+
+  //       // Close any open modals and reset state if needed
+  //       setIsModalVisible(false);
+  //       reset();
+  //     } else {
+  //       message.error("Failed to update data");
+  //     }
+  //   } catch (error) {
+  //     message.error("Failed to update report");
+  //     console.error(error);
+  //   }
+  // };
 
   const reset = () => {
     setStep("select");
@@ -159,16 +421,27 @@ const Reports: React.FC = () => {
     setReportFields([]);
     setParsedData([]);
     setMapping({});
+    setIsSubmitting(false);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    reset();
   };
 
   return (
     <>
       {/* Render the Report Selection Table regardless of modal visibility */}
-      <ReportsTable onReportSelect={handleReportSelect} />
+      <ReportsTable
+        loading={loading}
+        onReportSelect={handleReportSelect}
+        reports={reports}
+        refreshReports={refreshReports}
+        onUpdateReport={(props) => {
+          alert(props);
+          handleDataCreate(props.reportId, props.data);
+        }}
+      />
 
       {/* Modal  */}
       <Modal
@@ -177,12 +450,15 @@ const Reports: React.FC = () => {
             ? "Upload File"
             : step === "map"
             ? "Map File Headers"
-            : "Preview Parsed Data"
+            : step === "preview"
+            ? "Preview Parsed Data"
+            : "Update Report"
         }
         open={isModalVisible}
         onCancel={handleCancel}
         footer={step === "preview" ? null : undefined}
-        width={step === "preview" ? "80%" : undefined} // Increase modal width for preview
+        width={step === "preview" ? "80%" : undefined}
+        destroyOnClose={true}
       >
         {step === "upload" && <FileUploader onFileSelect={handleFileSelect} />}
         {step === "map" && (
@@ -197,7 +473,10 @@ const Reports: React.FC = () => {
           <ParsedDataPreview
             data={parsedData}
             mapping={mapping}
-            onSubmit={handleDataCreate}
+            onSubmit={() => {
+              handleDataCreate(selectedReport, parsedData);
+            }}
+            isSubmitting={isSubmitting}
           />
         )}
       </Modal>

@@ -60,9 +60,6 @@ export default function ReportListTable({
           if (res.status === 201 || res.status === 200) {
             const result = res.body;
 
-            alert(JSON.parse(anVal.type));
-            console.log(res.body);
-            console.log(JSON.parse(anVal.type));
             const subCat = JSON.parse(anVal.type);
 
             const { status } = await UpdateSubCategory({
