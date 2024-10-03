@@ -16,13 +16,7 @@ export default function Index({
   children: React.ReactNode;
 }>) {
   return (
-    <Layout
-      className={styles.outerLayout}
-      hasSider
-      style={{
-        backgroundColor: "red",
-      }}
-    >
+    <Layout className={styles.outerLayout} hasSider>
       {/* <Sider
         theme="light"
         collapsible
