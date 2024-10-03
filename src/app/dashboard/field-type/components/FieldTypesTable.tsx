@@ -59,8 +59,8 @@ export default function FieldTypesTables({
               setIsModalVisible(false);
               form.resetFields();
               setFieldTypes([
-                ...fieldTypes.map((field) => {
-                  if (field._id == selectedRecordId) {
+                ...fieldTypes.map((field: FieldType) => {
+                  if (field?._id == selectedRecordId) {
                     return body;
                   } else return field;
                 }),

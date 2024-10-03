@@ -1,24 +1,50 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { Data } from "../types";
+import { revalidatePath } from "next/cache";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+interface DataEntry {
+    field: string;
+    value: string;
+}
 
+interface CreateDataResponse {
+    result?: any[];
+    error?: string;
+    status: number;
+}
 
-export async function createData(dataEntries: { field: string; value: string }[]) {
+export async function createData(reportId: string, dataEntries: DataEntry[]): Promise<CreateDataResponse> {
+    console.log("dataEntries: ", dataEntries)
+    const API_URL = process.env.BACKEND_URL;
 
-    console.log("dataEntiries: ", dataEntries)
-    const res = await fetch(`${API_URL}/data/bulk`, {
-        headers: {
-            "content-type": "application/json",
-        },
-        body: JSON.stringify(dataEntries), // Wrap dataEntries in an object
-        method: "POST",
-    });
-    const result = await res.json();
+    try {
+        const res = await fetch(`${API_URL}/data/bulk`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reportId, dataEntries }),
+        });
 
-    return {
-        result,
-        status: res.status,
-    };
+        const result = await res.json();
+
+        if (!res.ok) {
+            throw new Error(`Failed to create data: ${res.status} ${res.statusText}`);
+        }
+
+        // Revalidate the reports page
+        revalidatePath("/dashboard/reports");
+
+        return {
+            result,
+            status: res.status,
+        };
+    } catch (error: any) {
+        console.error("Error in createData:", error);
+        return {
+            error: error.message,
+            status: error.status || 500,
+        };
+    }
 }

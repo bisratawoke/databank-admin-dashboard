@@ -1,6 +1,6 @@
 "use server"
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_URL = process.env.BACKEND_URL;
 export async function fetchReports() {
     try {
         const res = await fetch(`${API_URL}/reports`, {
