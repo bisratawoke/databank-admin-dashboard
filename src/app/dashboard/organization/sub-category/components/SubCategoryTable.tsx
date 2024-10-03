@@ -11,7 +11,7 @@ import { UpdateSubCategory } from "../../actions/updateSubcategory"; // You need
 
 export default function SubCategoryTable({
   data,
-  reports, // Pass the list of reports as a prop
+  reports,
 }: {
   data: subcategory[];
   reports: report[];
@@ -52,7 +52,7 @@ export default function SubCategoryTable({
       const values = await form.validateFields();
       if (isEditing) {
         // Update existing subcategory
-        const { body, status } = await UpdateSubCategory({
+        const { status } = await UpdateSubCategory({
           payload: values,
           subCategoryId: currentSubCategoryId,
         });
@@ -119,7 +119,9 @@ export default function SubCategoryTable({
         dataSource={dataWithButton}
         columns={columns}
         rowKey="_id"
+        size={"small"}
         pagination={false}
+        className="custom-table"
         onRow={(record: any) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
@@ -133,6 +135,7 @@ export default function SubCategoryTable({
             }
           },
         })}
+        bordered
       />
 
       <Modal
@@ -165,6 +168,21 @@ export default function SubCategoryTable({
           </Form.Item>
         </Form>
       </Modal>
+
+      <style jsx>{`
+        .custom-table :global(.ant-table-thead > tr > th),
+        .custom-table :global(.ant-table-tbody > tr > td) {
+          border-color: #cccccc !important; /* Set border color */
+        }
+
+        .custom-table :global(.ant-table-row) {
+          height: 100px; !important /* Reduce row height for more compact look */
+        }
+
+        .custom-table :global(.ant-table-tbody > tr:hover) {
+          background-color: #f0f0f0 !important; /* Optional: Add a hover effect */
+        }
+      `}</style>
     </>
   );
 }

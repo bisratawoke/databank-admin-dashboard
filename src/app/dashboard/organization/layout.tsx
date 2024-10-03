@@ -6,9 +6,9 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div>
       <TabNav />
       {children}
-    </>
+    </div>
   );
 }

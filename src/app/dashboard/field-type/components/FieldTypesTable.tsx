@@ -1,5 +1,6 @@
 "use client";
-import { Table, Modal, Form, Input, Button, message } from "antd";
+import { Table, Modal, Form, Input, Button, message, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { FieldType } from "../type";
 import { useState } from "react";
 import AddButton from "../../components/ui/AddButton";
@@ -17,21 +18,82 @@ export default function FieldTypesTables({
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
+  // Helper function to apply filters
+  const getColumnSearchProps = (dataIndex: keyof FieldType) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters, confirm)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value: string, record: FieldType) =>
+      record[dataIndex]?.toString().toLowerCase().includes(value.toLowerCase()),
+  });
+
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: () => void,
+    dataIndex: keyof FieldType
+  ) => {
+    confirm();
+  };
+
+  const handleReset = (clearFilters: () => void, confirm: () => void) => {
+    clearFilters();
+    confirm();
+  };
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      ...getColumnSearchProps("description"),
     },
     {
       title: "Example Value",
       dataIndex: "exampleValue",
       key: "exampleValue",
+      ...getColumnSearchProps("exampleValue"),
     },
   ];
 
@@ -41,53 +103,44 @@ export default function FieldTypesTables({
   };
 
   const handleOk = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        if (isEditing) {
-          setIsEditing(false);
-          if (selectedRecordId) {
-            const { status, body } = await UpdateFieldType({
-              fieldId: selectedRecordId,
-              body: values,
-            });
-
-            if (status != 200) {
-              message.error("Error updating record");
-            } else {
-              message.success("Record updated successfully");
-              setIsModalVisible(false);
-              form.resetFields();
-              setFieldTypes([
-                ...fieldTypes.map((field) => {
-                  if (field._id == selectedRecordId) {
-                    return body;
-                  } else return field;
-                }),
-              ]);
-            }
-          } else message.error("Error creating new record");
-        } else {
-          const { body, status } = await createFieldType(values);
-
-          if (status == 201) {
-            setFieldTypes([...fieldTypes, body]);
-            form.resetFields();
-            setIsModalVisible(false);
-            message.success("Successfully created new record!");
-          } else if (
-            status == 400 &&
-            body.message == "Field type already exists"
-          ) {
-            message.error(body.message);
+    form.validateFields().then(async (values) => {
+      if (isEditing) {
+        setIsEditing(false);
+        if (selectedRecordId) {
+          const { status, body } = await UpdateFieldType({
+            fieldId: selectedRecordId,
+            body: values,
+          });
+          if (status != 200) {
+            message.error("Error updating record");
           } else {
-            message.error("Error creating new record");
+            message.success("Record updated successfully");
+            setIsModalVisible(false);
+            form.resetFields();
+            setFieldTypes([
+              ...fieldTypes.map((field) =>
+                field._id == selectedRecordId ? body : field
+              ),
+            ]);
           }
+        } else message.error("Error creating new record");
+      } else {
+        const { body, status } = await createFieldType(values);
+        if (status == 201) {
+          setFieldTypes([...fieldTypes, body]);
+          form.resetFields();
+          setIsModalVisible(false);
+          message.success("Successfully created new record!");
+        } else if (
+          status == 400 &&
+          body.message == "Field type already exists"
+        ) {
+          message.error(body.message);
+        } else {
+          message.error("Error creating new record");
         }
-      })
-      .catch((info) => {
-        console.log("Validation failed:", info);
-      });
+      }
+    });
   };
 
   const handleCancel = () => {
@@ -120,8 +173,9 @@ export default function FieldTypesTables({
         columns={columns}
         dataSource={dataWithButton}
         pagination={{ pageSize: 10 }}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onRow={(record: any) => ({
+        bordered
+        size="small"
+        onRow={(record) => ({
           onClick: (e) => {
             e.stopPropagation();
             if (record.key !== "addButtonRow") {
@@ -138,7 +192,6 @@ export default function FieldTypesTables({
           },
         })}
       />
-
       <Modal
         title="Add Field Type"
         visible={isModalVisible}

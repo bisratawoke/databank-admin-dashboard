@@ -125,6 +125,8 @@ export default function CategoryTable({
         columns={columns}
         rowKey="_id"
         pagination={false}
+        size={"small"}
+        className="custom-table"
         onRow={(record: any) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {
@@ -140,6 +142,7 @@ export default function CategoryTable({
             }
           },
         })}
+        bordered
       />
 
       <Modal
@@ -179,6 +182,21 @@ export default function CategoryTable({
           </Form.Item>
         </Form>
       </Modal>
+
+      <style jsx>{`
+        .custom-table :global(.ant-table-thead > tr > th),
+        .custom-table :global(.ant-table-tbody > tr > td) {
+          border-color: #cccccc !important; /* Set border color */
+        }
+
+        .custom-table :global(.ant-table-row) {
+          height: 100px; !important /* Reduce row height for more compact look */
+        }
+
+        .custom-table :global(.ant-table-tbody > tr:hover) {
+          background-color: #f0f0f0 !important; /* Optional: Add a hover effect */
+        }
+      `}</style>
     </>
   );
 }

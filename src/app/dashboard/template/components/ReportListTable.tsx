@@ -120,7 +120,7 @@ export default function ReportListTable({
         dataSource={dataWithButton}
         pagination={{ pageSize: 5 }} // Add pagination with 5 records per page
         bordered // Add borders around the table
-        size="middle" // Set the table size
+        size="small" // Set the table size
         rowClassName={(record, index) =>
           index % 2 === 0 ? styles.evenRow : styles.oddRow
         } // Add custom row styling

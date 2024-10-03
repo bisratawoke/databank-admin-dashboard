@@ -193,6 +193,8 @@ export default function ReportTable({
         dataSource={dataWithAddButton}
         pagination={false}
         rowKey="key"
+        size="small"
+        bordered
         onRow={(record: any) => ({
           onClick: () => {
             if (record.key !== "addButtonRow") {

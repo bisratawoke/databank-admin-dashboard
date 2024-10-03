@@ -16,10 +16,10 @@ const TabNav: React.FC = () => {
   const pathname = usePathname();
 
   const tabs: TabItem[] = [
-    { key: "/dashboard/organization", tab: "organization" },
-    { key: "/dashboard/organization/department", tab: "department" },
-    { key: "/dashboard/organization/category", tab: "category" },
-    { key: "/dashboard/organization/sub-category", tab: "sub-category" },
+    { key: "/dashboard/organization", tab: "Organization" },
+    { key: "/dashboard/organization/department", tab: "Department" },
+    { key: "/dashboard/organization/category", tab: "Category" },
+    { key: "/dashboard/organization/sub-category", tab: "Sub-category" },
   ];
 
   const activeKey = tabs.find((tab) => pathname === tab.key) ? pathname : "/";
