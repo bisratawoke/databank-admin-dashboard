@@ -5,6 +5,7 @@ import {
   DownloadOutlined,
   SaveOutlined,
   EditOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { Data, fields, report } from "../types";
 import * as XLSX from "xlsx";
@@ -16,7 +17,8 @@ interface ReportsTableProps {
     reportId,
     data,
   }: {
-    reportId: string;
+    dataId?: string;
+    reportId?: string;
     data: any[];
   }) => void;
   reports: any[];
@@ -39,6 +41,8 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<DataType[]>([]);
   const [originalData, setOriginalData] = useState<DataType[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [savedData, setSavedData] = useState<DataType[]>([]);
 
   const columns = [
     {
@@ -92,7 +96,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
 
         const limitedData = data.slice(0, 4).map((item) => ({
           ...item,
-          value: item.value.slice(0, 4),
+          value: item?.value?.slice(0, 4),
         }));
 
         return (
@@ -106,10 +110,40 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
         );
       },
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: any, record: any) => (
+        <div className="flex space-x-2">
+          <Button
+            icon={<UploadOutlined />}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent row click
+              showReportDetails(record, true);
+            }}
+            size="small"
+          >
+            Upload
+          </Button>
+        </div>
+      ),
+    },
   ];
 
-  const showReportDetails = (record: report) => {
-    if (record.data && record.data.length > 0) {
+  // const showReportDetails = (record: report) => {
+  //   if (record.data && record.data.length > 0) {
+  //     setSelectedReport(record);
+  //     setIsModalVisible(true);
+  //     setIsEditing(false);
+  //     setEditedData([]);
+  //   } else {
+  //     onReportSelect(record);
+  //   }
+  // };
+  const showReportDetails = (record: report, isUpload: boolean = false) => {
+    if (isUpload) {
+      onReportSelect(record); // This will trigger the upload flow
+    } else if (record.data && record.data.length > 0) {
       setSelectedReport(record);
       setIsModalVisible(true);
       setIsEditing(false);
@@ -119,11 +153,6 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
     }
   };
 
-  // const handleEditClick = () => {
-  //   if (!selectedReport) return;
-  //   setIsEditing(true);
-  //   setEditedData(transformData(selectedReport.data, selectedReport.fields));
-  // };
   const handleEditClick = () => {
     if (!selectedReport) return;
     setIsEditing(true);
@@ -132,131 +161,174 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       selectedReport.fields
     );
     setEditedData(transformed);
-    setOriginalData(transformed); // Store the original data for comparison
+    setOriginalData(transformed);
+    setSavedData(transformed);
+    setHasUnsavedChanges(false);
   };
 
-  // const handleSaveClick = async () => {
+  const handleSaveLocally = () => {
+    console.log("edditedData: ", editedData);
+    setSavedData([...editedData]);
+    setHasUnsavedChanges(false);
+  };
+
+  // const handleSubmitChanges = async () => {
   //   if (!selectedReport || !onUpdateReport) return;
 
-  //   const updatedData = editedData.flatMap((row) =>
-  //     Object.entries(row)
+  //   const updatedData = savedData.flatMap((row, rowIndex) => {
+  //     const originalRow = originalData[rowIndex];
+
+  //     return Object.entries(row)
   //       .map(([fieldName, value]) => {
   //         const field = selectedReport.fields.find(
   //           (f: fields) => f.name === fieldName
   //         );
   //         if (!field || fieldName === "key") return null;
 
-  //         return {
-  //           _id: field._id,
-  //           field: field._id,
-  //           value: value?.toString() || "",
-  //         };
+  //         if (originalRow[fieldName] !== value) {
+  //           return {
+  //             _id: field._id,
+  //             field: field._id,
+  //             value: value?.toString() || "",
+  //           };
+  //         }
+  //         return null;
   //       })
-  //       .filter(Boolean)
-  //   );
+  //       .filter(Boolean);
+  //   });
 
-  //   console.log("Selected Report ID:", selectedReport._id); // Add this line for debugging
   //   try {
   //     if (selectedReport && selectedReport._id) {
-  //       onUpdateReport({ reportId: selectedReport._id, data: updatedData });
+  //       if (updatedData.length > 0) {
+  //         onUpdateReport({
+  //           dataId: updatedData[0]?._id,
+  //           data: updatedData,
+  //         });
+  //         await refreshReports();
+  //         setIsModalVisible(false);
+  //       }
   //     } else {
-  //       console.error("selectedReport is undefined or missing _id property");
+  //       console.log("updatedData being sent: ", updatedData);
+  //       onUpdateReport({
+  //         data: updatedData,
+  //       });
   //     }
-  //     setIsEditing(false);
-  //     await refreshReports(); // Use the passed refreshReports function
-  //     setIsModalVisible(false); // Close modal after successful update
   //   } catch (error) {
-  //     console.error("Failed to update report:", error);
+  //     console.error("Failed to update report data:", error);
+  //   } finally {
+  //     setIsEditing(false);
+  //     setHasUnsavedChanges(false);
   //   }
   // };
 
-  const handleSaveClick = async () => {
+  const handleSubmitChanges = async () => {
     if (!selectedReport || !onUpdateReport) return;
 
-    // Create an updatedData array only with changed values
-    const updatedData = editedData.flatMap((row, rowIndex) => {
-      const originalRow = originalData[rowIndex];
+    const updatedData = savedData.flatMap((row) => {
+      const originalRow = originalData.find((orig) => orig.key === row.key);
+      if (!originalRow) return [];
 
       return Object.entries(row)
         .map(([fieldName, value]) => {
-          const field = selectedReport.fields.find(
-            (f: fields) => f.name === fieldName
-          );
-          if (!field || fieldName === "key") return null;
+          // Skip if this is an ID field or the key field
+          if (fieldName.endsWith("_id") || fieldName === "key") return null;
 
-          // Check if the value has changed
+          // Get the specific data ID for this field
+          const dataId = row[`${fieldName}_id`];
+          if (!dataId) return null;
+
+          // Only include if the value has changed
           if (originalRow[fieldName] !== value) {
+            const field = selectedReport.fields.find(
+              (f) => f.name === fieldName
+            );
+            if (!field) return null;
+
             return {
-              _id: field._id,
+              _id: dataId, // Use the specific data ID for this field
               field: field._id,
               value: value?.toString() || "",
             };
           }
-          return null; // Return null if there's no change
+          return null;
         })
-        .filter(Boolean); // Filter out null values
+        .filter(Boolean); // Remove null entries
     });
 
-    console.log("Selected Report ID:", selectedReport._id); // Debugging
     try {
-      if (selectedReport && selectedReport._id) {
-        if (updatedData.length > 0) {
-          // Only call if there is data to update
-          onUpdateReport({
-            reportId: selectedReport._id,
-            data: updatedData,
-          });
-          await refreshReports(); // Use the passed refreshReports function
-          setIsModalVisible(false); // Close modal after successful update
-        }
-      } else {
-        console.error("selectedReport is undefined or missing _id property");
+      if (updatedData.length > 0) {
+        await onUpdateReport({
+          data: updatedData,
+        });
+        await refreshReports();
+        setIsModalVisible(false);
       }
     } catch (error) {
-      console.error("Failed to update report:", error);
+      console.error("Failed to update report data:", error);
     } finally {
       setIsEditing(false);
+      setHasUnsavedChanges(false);
     }
   };
+
   const handleInputChange = (
     value: string,
     rowIndex: number,
     fieldName: string
   ) => {
     const updatedData = [...editedData];
+
+    // Preserve all existing data including IDs when updating
     updatedData[rowIndex] = {
       ...updatedData[rowIndex],
       [fieldName]: value,
     };
+
     setEditedData(updatedData);
+    setHasUnsavedChanges(true);
   };
 
   const transformData = (data: any[], fields: any[]) => {
-    // First, group the data by unique combinations
-    const groupedData = data.reduce((groups, item) => {
+    // Create an object to store the grouped data
+    const groupedByRow: { [key: string]: any } = {};
+
+    // First pass: group data by row number based on field patterns
+    data.forEach((item) => {
       const fieldName = item.field.name;
       const value = item.value;
+      const dataId = item._id;
 
-      let group = groups.find((g: object) => !g.hasOwnProperty(fieldName));
+      // Find which row this item belongs to
+      let rowIndex = Object.keys(groupedByRow).find((key) => {
+        const row = groupedByRow[key];
+        // Check if this row is incomplete (missing this field)
+        return !row.hasOwnProperty(fieldName);
+      });
 
-      if (!group) {
-        group = {};
-        groups.push(group);
+      // If no existing row is found, create a new one
+      if (!rowIndex) {
+        rowIndex = String(Object.keys(groupedByRow).length);
+        groupedByRow[rowIndex] = {};
       }
 
-      group[fieldName] = value;
+      // Store both the value and the data ID for this field
+      groupedByRow[rowIndex][fieldName] = value;
+      groupedByRow[rowIndex][`${fieldName}_id`] = dataId; // Store the ID with a field-specific key
+    });
 
-      return groups;
-    }, [] as any[]);
+    // Convert the grouped data into an array format
+    const transformedData = Object.keys(groupedByRow).map((rowIndex) => {
+      const row = groupedByRow[rowIndex];
+      const result: any = { key: parseInt(rowIndex) };
 
-    // Ensure all fields are present in each group
-    const fieldNames = fields.map((field) => field.name);
-    const transformedData = groupedData.map((group: any, index: number) => {
-      const row: any = { key: index };
-      fieldNames.forEach((fieldName) => {
-        row[fieldName] = group[fieldName] || "";
+      // Add all fields and their IDs to the row
+      fields.forEach((field) => {
+        const fieldName = field.name;
+        result[fieldName] = row[fieldName] || "";
+        result[`${fieldName}_id`] = row[`${fieldName}_id`] || null;
       });
-      return row;
+
+      return result;
     });
 
     return transformedData;
@@ -339,7 +411,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   ];
 
   return (
-    <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+    <div>
       <Table
         loading={loading}
         dataSource={reports}
@@ -366,22 +438,41 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
             {selectedReport && selectedReport.data?.length > 0 && (
               <div>
                 {!isEditing ? (
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={handleEditClick}
-                    className="mr-2"
-                  >
-                    Edit
-                  </Button>
+                  <>
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={handleEditClick}
+                      className="mr-2"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      icon={<UploadOutlined />}
+                      onClick={() => showReportDetails(selectedReport, true)}
+                      className="mr-2"
+                    >
+                      Upload
+                    </Button>
+                  </>
                 ) : (
-                  <Button
-                    icon={<SaveOutlined />}
-                    onClick={handleSaveClick}
-                    type="primary"
-                    className="mr-2"
-                  >
-                    Save
-                  </Button>
+                  <>
+                    <Button
+                      icon={<SaveOutlined />}
+                      onClick={handleSaveLocally}
+                      className="mr-2"
+                      disabled={!hasUnsavedChanges}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="primary"
+                      onClick={handleSubmitChanges}
+                      className="mr-2"
+                      disabled={hasUnsavedChanges}
+                    >
+                      Submit
+                    </Button>
+                  </>
                 )}
                 <Dropdown
                   menu={{ items: exportMenuItems }}
@@ -400,7 +491,9 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
           setIsModalVisible(false);
           setIsEditing(false);
           setEditedData([]);
-          setSelectedReport(null); // Reset selectedReport when closing modal
+          setSavedData([]);
+          setHasUnsavedChanges(false);
+          setSelectedReport(null);
         }}
         width="80%"
         footer={null}

@@ -45,8 +45,8 @@ export type reportsWithData = {
 
 export type Data = {
     _id?: string;
-    field: string;
-    value: string
+    field?: string;
+    value?: string
 }
 
 export type FileObject = {
