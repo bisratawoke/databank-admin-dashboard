@@ -87,7 +87,7 @@ const User: React.FC = () => {
             </Space>
             <Space>
               <TeamOutlined />
-              {groups.length > 0 ? (
+              {groups?.length > 0 ? (
                 <NormalText>{groups.join(", ")}</NormalText>
               ) : (
                 <GrayText>No roles assigned</GrayText>
