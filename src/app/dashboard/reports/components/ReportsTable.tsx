@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Data, fields, report } from "../types";
 import * as XLSX from "xlsx";
+import { prepareDataForExport } from "../_parsers/exportHelper";
 
 interface ReportsTableProps {
   loading: boolean;
@@ -172,55 +173,6 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
     setHasUnsavedChanges(false);
   };
 
-  // const handleSubmitChanges = async () => {
-  //   if (!selectedReport || !onUpdateReport) return;
-
-  //   const updatedData = savedData.flatMap((row, rowIndex) => {
-  //     const originalRow = originalData[rowIndex];
-
-  //     return Object.entries(row)
-  //       .map(([fieldName, value]) => {
-  //         const field = selectedReport.fields.find(
-  //           (f: fields) => f.name === fieldName
-  //         );
-  //         if (!field || fieldName === "key") return null;
-
-  //         if (originalRow[fieldName] !== value) {
-  //           return {
-  //             _id: field._id,
-  //             field: field._id,
-  //             value: value?.toString() || "",
-  //           };
-  //         }
-  //         return null;
-  //       })
-  //       .filter(Boolean);
-  //   });
-
-  //   try {
-  //     if (selectedReport && selectedReport._id) {
-  //       if (updatedData.length > 0) {
-  //         onUpdateReport({
-  //           dataId: updatedData[0]?._id,
-  //           data: updatedData,
-  //         });
-  //         await refreshReports();
-  //         setIsModalVisible(false);
-  //       }
-  //     } else {
-  //       console.log("updatedData being sent: ", updatedData);
-  //       onUpdateReport({
-  //         data: updatedData,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to update report data:", error);
-  //   } finally {
-  //     setIsEditing(false);
-  //     setHasUnsavedChanges(false);
-  //   }
-  // };
-
   const handleSubmitChanges = async () => {
     if (!selectedReport || !onUpdateReport) return;
 
@@ -356,21 +308,22 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   };
 
   const exportToExcel = (data: any[]) => {
-    const ws = XLSX.utils.json_to_sheet(data);
+    const cleanedData = prepareDataForExport(data);
+    const ws = XLSX.utils.json_to_sheet(cleanedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Report");
     XLSX.writeFile(wb, `${selectedReport?.name}.xlsx`);
   };
 
   const exportToCSV = (data: any[]) => {
-    const headers = Object.keys(data[0]).filter((key) => key !== "key");
+    const cleanedData = prepareDataForExport(data);
+    const headers = Object.keys(cleanedData[0]);
     const csvContent = [
       headers.join(","),
-      ...data.map((row) =>
+      ...cleanedData.map((row) =>
         headers
           .map((header) => {
             const value = row[header]?.toString() || "";
-            // Escape commas and quotes in the value
             return `"${value.replace(/"/g, '""')}"`;
           })
           .join(",")
@@ -431,12 +384,53 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
 
       <Modal
         title={
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center ">
             <span className="text-lg font-bold text-blue-600">
               Report Details
             </span>
+          </div>
+        }
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setIsEditing(false);
+          setEditedData([]);
+          setSavedData([]);
+          setHasUnsavedChanges(false);
+          setSelectedReport(null);
+        }}
+        width="80%"
+        footer={null}
+        destroyOnClose={true}
+      >
+        {selectedReport && (
+          <>
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                {selectedReport.name}
+              </h3>
+              <p className="text-gray-600 mb-2">{selectedReport.description}</p>
+              <p className="text-sm text-gray-500">
+                Date Range:{" "}
+                <span className="font-medium">
+                  {new Date(selectedReport.start_date).toLocaleDateString()} -{" "}
+                  {new Date(selectedReport.end_date).toLocaleDateString()}
+                </span>
+              </p>
+            </div>
+            <Table
+              dataSource={
+                isEditing
+                  ? editedData
+                  : transformData(selectedReport.data, selectedReport.fields)
+              }
+              columns={getModalColumns()}
+              rowKey="key"
+              className="bg-white rounded-lg overflow-hidden"
+              rowClassName="hover:bg-blue-50 transition-colors duration-200"
+            />
             {selectedReport && selectedReport.data?.length > 0 && (
-              <div>
+              <div className="flex justify-end">
                 {!isEditing ? (
                   <>
                     <Button
@@ -484,47 +478,6 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
                 </Dropdown>
               </div>
             )}
-          </div>
-        }
-        open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          setIsEditing(false);
-          setEditedData([]);
-          setSavedData([]);
-          setHasUnsavedChanges(false);
-          setSelectedReport(null);
-        }}
-        width="80%"
-        footer={null}
-        destroyOnClose={true}
-      >
-        {selectedReport && (
-          <>
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <h3 className="text-xl font-semibold text-blue-600 mb-2">
-                {selectedReport.name}
-              </h3>
-              <p className="text-gray-600 mb-2">{selectedReport.description}</p>
-              <p className="text-sm text-gray-500">
-                Date Range:{" "}
-                <span className="font-medium">
-                  {new Date(selectedReport.start_date).toLocaleDateString()} -{" "}
-                  {new Date(selectedReport.end_date).toLocaleDateString()}
-                </span>
-              </p>
-            </div>
-            <Table
-              dataSource={
-                isEditing
-                  ? editedData
-                  : transformData(selectedReport.data, selectedReport.fields)
-              }
-              columns={getModalColumns()}
-              rowKey="key"
-              className="bg-white rounded-lg overflow-hidden"
-              rowClassName="hover:bg-blue-50 transition-colors duration-200"
-            />
           </>
         )}
       </Modal>
