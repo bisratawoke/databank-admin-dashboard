@@ -23,16 +23,36 @@ export default function CategoryTable({
   const [form] = Form.useForm();
   const [currentCategoryId, setCurrentCategoryId] = useState<any>(null);
 
+  // Create filters for the name and subcategory columns
+  const nameFilterOptions = categories.map((category) => ({
+    text: category.name,
+    value: category.name,
+  }));
+
+  const subcategoryFilterOptions = subcategories.map((subcat) => ({
+    text: subcat.name,
+    value: subcat._id,
+  }));
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      filters: nameFilterOptions,
+      onFilter: (value: any, record: category) => record.name == value,
     },
     {
       title: "Sub Category",
       dataIndex: "subcategory",
       key: "subcategory",
+      filters: subcategoryFilterOptions,
+      onFilter: (value: any, record: category) => {
+        // Check if any subcategory's _id matches the selected filter value
+        return record.subcategory.some(
+          (subcat: subcategory) => subcat._id === value
+        );
+      },
       render: (subcategory: subcategory[]) => {
         if (subcategory && subcategory.length > 0) {
           return subcategory.map((subcat: subcategory) => (
@@ -58,8 +78,6 @@ export default function CategoryTable({
           categoryId: currentCategoryId,
         });
 
-        console.log(status);
-        console.log(body);
         if (status === 200) {
           const updatedCategories: any = categories.map((cat) =>
             cat._id === currentCategoryId

@@ -15,23 +15,42 @@ interface DepartmentTableProps {
 
 export default function DepartmentTable({
   data,
-  categories, // Pass the list of categories as a prop
+  categories,
 }: DepartmentTableProps) {
   const [departments, setDepartments] = useState<department[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
   const [currentDeptId, setCurrentDepId] = useState<any>(null);
+
+  // Get unique department names and category names for the filters
+  const departmentNameFilters = [
+    ...new Set(departments.map((dept) => dept.name)),
+  ].map((name) => ({
+    text: name,
+    value: name,
+  }));
+
+  const categoryFilters = categories.map((category) => ({
+    text: category.name,
+    value: category._id,
+  }));
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      filters: departmentNameFilters, // Apply filters for department names
+      onFilter: (value, record) => record.name == value, // Filtering function for names
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
+      filters: categoryFilters, // Apply filters for categories
+      onFilter: (value, record) =>
+        record.category.some((cat: category) => cat._id === value), // Filtering function for categories
       render: (categories: category[]) => {
         if (categories && categories.length > 0) {
           return categories.map((category: category) => (
@@ -61,7 +80,6 @@ export default function DepartmentTable({
         });
 
         if (status === 200) {
-          // Find the updated department and replace it in the state
           const updatedDepartments = departments.map((dept) =>
             dept._id === currentDeptId
               ? {
@@ -73,7 +91,7 @@ export default function DepartmentTable({
                 }
               : dept
           );
-          setDepartments(updatedDepartments); // Update the state with the new department data
+          setDepartments(updatedDepartments);
           message.success("Department updated successfully!");
         } else {
           message.error("Failed to update department.");
@@ -98,7 +116,6 @@ export default function DepartmentTable({
         }
       }
 
-      // Close the modal, reset the form, and reset the editing state
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
@@ -118,7 +135,7 @@ export default function DepartmentTable({
     {
       key: "addButtonRow",
       name: <AddButton action={showModal} />,
-      category: [], // Empty category for the add button row
+      category: [],
     },
   ];
 
@@ -129,8 +146,8 @@ export default function DepartmentTable({
         columns={columns}
         size={"small"}
         bordered
-        rowKey="_id" // Ensure each department has a unique _id
-        pagination={false} // Optional: Disable pagination if you want to display all records
+        rowKey="_id"
+        pagination={false}
         onRow={(record: any) => ({
           onClick: (e) => {
             if (record.key !== "addButtonRow") {
@@ -167,10 +184,7 @@ export default function DepartmentTable({
           </Form.Item>
 
           <Form.Item name="category" label="Categories">
-            <Select
-              mode="multiple" // Enable multiple selection
-              placeholder="Select categories"
-            >
+            <Select mode="multiple" placeholder="Select categories">
               {categories.map((cat) => (
                 <Select.Option key={cat._id} value={cat._id}>
                   {cat.name}

@@ -10,7 +10,10 @@ export async function CreateDepartment(data: createDepartment) {
       "content-type": "application/json",
     },
     cache: "no-cache",
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      category: data.category ? data.category : [],
+    }),
     method: "POST",
   });
   const result = await res.json();

@@ -227,11 +227,11 @@ export default function ReportListTable({
             </Form.Item>
           </div>
           <Form.Item
-            label="Type"
+            label="Sub-category"
             name="type"
-            rules={[{ required: true, message: "Please select a type" }]}
+            rules={[{ required: true, message: "Please select a subcategory" }]}
           >
-            <Select placeholder="Select report type">
+            <Select placeholder="Select report subcategory">
               {/*eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
               {subCategories.map((type: any) => (
                 <Option key={type._id} value={JSON.stringify(type)}>

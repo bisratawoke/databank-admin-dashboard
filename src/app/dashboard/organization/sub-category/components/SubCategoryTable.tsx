@@ -18,20 +18,38 @@ export default function SubCategoryTable({
 }) {
   const [subcategories, setSubcategories] = useState(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // New state to track edit mode
-  const [currentSubCategoryId, setCurrentSubCategoryId] = useState<any>(null); // To store the subcategory being edited
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentSubCategoryId, setCurrentSubCategoryId] = useState<any>(null);
   const [form] = Form.useForm();
+
+  // Create unique report options for filtering
+  const reportFilterOptions = reports.map((report) => ({
+    text: report.name,
+    value: report._id,
+  }));
 
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      filters: subcategories.map((subcat) => ({
+        text: subcat.name,
+        value: subcat.name,
+      })),
+      onFilter: (value: string, record: subcategory) => record.name == value,
     },
     {
       title: "Report",
       dataIndex: "report",
       key: "report",
+      filters: reportFilterOptions,
+      onFilter: (value: string, record: subcategory) => {
+        if (record && record.report) {
+          return record.report.some((rep: report) => rep._id === value);
+        }
+        return false;
+      },
       render: (report: report[]) => {
         if (report && report.length > 0) {
           return report.map((rep: report) => (
@@ -51,7 +69,6 @@ export default function SubCategoryTable({
     try {
       const values = await form.validateFields();
       if (isEditing) {
-        // Update existing subcategory
         const { status } = await UpdateSubCategory({
           payload: values,
           subCategoryId: currentSubCategoryId,
@@ -75,7 +92,6 @@ export default function SubCategoryTable({
           message.error("Failed to update subcategory.");
         }
       } else {
-        // Create new subcategory
         const { status, body } = await CreateSubCategory(values);
         if (status === 201) {
           const newSubcategory: any = {
@@ -90,7 +106,6 @@ export default function SubCategoryTable({
         }
       }
 
-      // Close modal and reset form
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
@@ -172,15 +187,15 @@ export default function SubCategoryTable({
       <style jsx>{`
         .custom-table :global(.ant-table-thead > tr > th),
         .custom-table :global(.ant-table-tbody > tr > td) {
-          border-color: #cccccc !important; /* Set border color */
+          border-color: #cccccc !important;
         }
 
         .custom-table :global(.ant-table-row) {
-          height: 100px; !important /* Reduce row height for more compact look */
+          height: 100px !important;
         }
 
         .custom-table :global(.ant-table-tbody > tr:hover) {
-          background-color: #f0f0f0 !important; /* Optional: Add a hover effect */
+          background-color: #f0f0f0 !important;
         }
       `}</style>
     </>

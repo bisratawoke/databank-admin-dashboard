@@ -172,7 +172,7 @@ export default function FieldTypesTables({
       <Table
         columns={columns}
         dataSource={dataWithButton}
-        pagination={{ pageSize: 10 }}
+        pagination={false}
         bordered
         size="small"
         onRow={(record) => ({
