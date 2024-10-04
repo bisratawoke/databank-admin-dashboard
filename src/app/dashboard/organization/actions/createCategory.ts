@@ -9,7 +9,10 @@ export async function CreateCategory(payload: createCategory) {
       "cache-control": "no-cache",
     },
     cache: "no-store",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      ...payload,
+      subcategory: payload.subcategory ? payload.subcategory : [],
+    }),
     method: "POST",
   });
   const result = await res.json();

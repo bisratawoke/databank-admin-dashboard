@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
+
 import { category, department } from "../../types";
 import { useState } from "react";
 import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
@@ -15,14 +15,13 @@ interface DepartmentTableProps {
 
 export default function DepartmentTable({
   data,
-  categories,
+  categories, // Pass the list of categories as a prop
 }: DepartmentTableProps) {
   const [departments, setDepartments] = useState<department[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
   const [currentDeptId, setCurrentDepId] = useState<any>(null);
-
   const columns = [
     {
       title: "Name",
@@ -53,13 +52,17 @@ export default function DepartmentTable({
       const values = await form.validateFields();
 
       if (isEditing) {
+        console.log("============ in editing mode =================");
+        console.log(values);
+
         const { body, status } = await UpdateDepartment({
           payload: values,
           depId: currentDeptId,
         });
 
         if (status === 200) {
-          const updatedDepartments = departments.map((dept: any) =>
+          // Find the updated department and replace it in the state
+          const updatedDepartments = departments.map((dept) =>
             dept._id === currentDeptId
               ? {
                   ...dept,
@@ -70,12 +73,13 @@ export default function DepartmentTable({
                 }
               : dept
           );
-          setDepartments(updatedDepartments);
+          setDepartments(updatedDepartments); // Update the state with the new department data
           message.success("Department updated successfully!");
         } else {
           message.error("Failed to update department.");
         }
       } else {
+        console.log("Form values: ", values);
         const { status, body } = await CreateDepartment(values);
 
         if (status === 201) {
@@ -94,6 +98,7 @@ export default function DepartmentTable({
         }
       }
 
+      // Close the modal, reset the form, and reset the editing state
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
@@ -122,15 +127,15 @@ export default function DepartmentTable({
       <Table
         dataSource={dataWithButton}
         columns={columns}
-        rowKey="_id"
-        pagination={false}
         size={"small"}
-        bordered // Add borders
-        className="custom-table" // Add custom class for extra styling
+        bordered
+        rowKey="_id" // Ensure each department has a unique _id
+        pagination={false} // Optional: Disable pagination if you want to display all records
         onRow={(record: any) => ({
           onClick: (e) => {
             if (record.key !== "addButtonRow") {
               setIsEditing(true);
+
               setCurrentDepId(record._id);
               form.setFieldsValue({
                 name: record.name,
@@ -161,17 +166,11 @@ export default function DepartmentTable({
             <Input placeholder="Enter department name" />
           </Form.Item>
 
-          <Form.Item
-            name="category"
-            label="Categories"
-            rules={[
-              {
-                required: true,
-                message: "Please select at least one category",
-              },
-            ]}
-          >
-            <Select mode="multiple" placeholder="Select categories">
+          <Form.Item name="category" label="Categories">
+            <Select
+              mode="multiple" // Enable multiple selection
+              placeholder="Select categories"
+            >
               {categories.map((cat) => (
                 <Select.Option key={cat._id} value={cat._id}>
                   {cat.name}
@@ -181,21 +180,6 @@ export default function DepartmentTable({
           </Form.Item>
         </Form>
       </Modal>
-
-      <style jsx>{`
-        .custom-table :global(.ant-table-thead > tr > th),
-        .custom-table :global(.ant-table-tbody > tr > td) {
-          border-color: #cccccc !important; /* Set border color */
-        }
-
-        .custom-table :global(.ant-table-row) {
-          height: 100px; !important /* Reduce row height for more compact look */
-        }
-
-        .custom-table :global(.ant-table-tbody > tr:hover) {
-          background-color: #f0f0f0 !important; /* Optional: Add a hover effect */
-        }
-      `}</style>
     </>
   );
 }

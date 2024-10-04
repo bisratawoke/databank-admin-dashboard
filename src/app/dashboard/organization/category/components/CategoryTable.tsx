@@ -162,16 +162,7 @@ export default function CategoryTable({
             <Input placeholder="Enter category name" />
           </Form.Item>
 
-          <Form.Item
-            name="subcategory"
-            label="Sub Categories"
-            rules={[
-              {
-                required: true,
-                message: "Please select at least one subcategory",
-              },
-            ]}
-          >
+          <Form.Item name="subcategory" label="Sub Categories">
             <Select mode="multiple" placeholder="Select subcategories">
               {subcategories.map((subcat) => (
                 <Select.Option key={subcat._id} value={subcat._id}>

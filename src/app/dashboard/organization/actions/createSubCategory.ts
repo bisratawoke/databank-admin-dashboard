@@ -10,7 +10,10 @@ export async function CreateSubCategory(payload: createSubCategory) {
     },
     cache: "no-cache",
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      ...payload,
+      report: payload.report ? payload.report : [],
+    }),
   });
   const result = await res.json();
   return {
