@@ -21,7 +21,16 @@ import { FiUser } from "react-icons/fi";
 
 // Custom hook to get user data
 const useUser = () => {
-  const userString = localStorage.getItem("user");
+  // const userString = localStorage.getItem("user");
+  // generate random user json
+  const userString = JSON.stringify({
+    firstName: "John",
+    lastName: "Doe",
+    fullName: "John Doe",
+    email: "XG5Z0@example.com",
+    groups: ["group1", "group2"],
+    organizationalUnitName: "Organizational Unit",
+  });
   let firstName = "";
   let lastName = "";
   let fullName = "";
