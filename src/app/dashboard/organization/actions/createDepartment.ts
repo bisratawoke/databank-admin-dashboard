@@ -3,7 +3,6 @@
 import { createDepartment } from "../types";
 
 export async function CreateDepartment(data: createDepartment) {
-  console.log(JSON.stringify(data));
   const res = await fetch(`${process.env.BACKEND_URL}/departments`, {
     headers: {
       "cache-control": "no-cache",

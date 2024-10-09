@@ -6,7 +6,8 @@ import { ColumnsType } from "antd/es/table";
 import { publication } from "../../types";
 import { FaFolder, FaFile } from "react-icons/fa"; // Importing icons
 import Details from "./Details";
-
+import { CiMenuKebab } from "react-icons/ci";
+import PublicationInfoMenu from "./PublicationsInfoMenu";
 const flattenPublications = (publications: Array<publication>): Array<any> => {
   const flatData: any[] = [];
 
@@ -94,6 +95,17 @@ export default function PublicationListView({
       dataIndex: "etag",
       key: "etag",
     },
+    {
+      dataIndex: "Action",
+      render: (_, record) => (
+        <PublicationInfoMenu
+          showInfo={() => {
+            setSelectedFile(record);
+            setShowDetail(true);
+          }}
+        />
+      ),
+    },
   ];
 
   return (
@@ -108,16 +120,16 @@ export default function PublicationListView({
         columns={columns}
         pagination={false}
         style={{ flexGrow: 1 }}
-        onRow={(record) => {
+        onRow={() => {
           return {
             style: {
               cursor: "pointer",
             },
-            onClick: (e) => {
-              e.stopPropagation();
-              setSelectedFile(record);
-              setShowDetail(true);
-            },
+            // onClick: (e) => {
+            //   e.stopPropagation();
+            //   setSelectedFile(record);
+            //   setShowDetail(true);
+            // },
           };
         }}
       />
