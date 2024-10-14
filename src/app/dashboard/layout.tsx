@@ -80,6 +80,10 @@ export default function Index({
                 link="/dashboard/template/reports"
               />
               <NavItem label="Import tool" link="/dashboard/reports" />
+              <NavItem
+                label="Publication"
+                link="/dashboard/publication/list-view"
+              />
             </div>
           </div>
           <Flex

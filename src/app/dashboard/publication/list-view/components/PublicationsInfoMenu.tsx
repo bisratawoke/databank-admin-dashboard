@@ -1,15 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
 import { Dropdown, Menu } from "antd";
-import { CiMenuKebab } from "react-icons/ci";
 import { IoIosCodeDownload } from "react-icons/io";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { HiDotsVertical } from "react-icons/hi";
 
-const PublicationInfoMenu = ({ showInfo }: { showInfo: any }) => {
+const PublicationInfoMenu = ({
+  showInfo,
+  downloadFile,
+}: {
+  showInfo: any;
+  downloadFile: any;
+}) => {
   const menu = (
     <Menu>
-      <Menu.Item key="1" icon={<IoIosCodeDownload />}>
+      <Menu.Item
+        key="1"
+        icon={<IoIosCodeDownload />}
+        onClick={() => downloadFile()}
+      >
         Download
       </Menu.Item>
       <Menu.Item
@@ -27,7 +38,7 @@ const PublicationInfoMenu = ({ showInfo }: { showInfo: any }) => {
   return (
     <Dropdown overlay={menu} trigger={["hover"]}>
       <span style={{ cursor: "pointer" }}>
-        <CiMenuKebab size={24} />
+        <HiDotsVertical size={24} />
       </span>
     </Dropdown>
   );

@@ -47,7 +47,7 @@ export default function Details({
         gap: "24px",
         backgroundColor: "#FAFAFA",
         position: "relative",
-        padding: "10px",
+        padding: "15px",
         borderRadius: "5px",
       }}
     >

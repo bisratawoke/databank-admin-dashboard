@@ -1,12 +1,15 @@
 "use server";
 
-export async function FetchPublications() {
-  const res = await fetch(`${process.env.BACKEND_URL}/publications`, {
-    headers: {
-      "cache-control": "no-cache",
-    },
-    cache: "no-cache",
-  });
+export async function FetchPublications({ path = "" }: { path?: string }) {
+  const res = await fetch(
+    `${process.env.BACKEND_URL}/publications?path=${path}`,
+    {
+      headers: {
+        "cache-control": "no-cache",
+      },
+      cache: "no-cache",
+    }
+  );
 
   const result = await res.json();
 
