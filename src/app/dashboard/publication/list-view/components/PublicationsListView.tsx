@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Table, Breadcrumb } from "antd";
+import { Table, Breadcrumb, Modal, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { publication } from "../../types";
 import { FaFolder, FaFile } from "react-icons/fa";
@@ -11,6 +11,7 @@ import PublicationInfoMenu from "./PublicationsInfoMenu";
 import { downloadFile } from "../../utils/downloadFile";
 import { FetchPublications } from "../../actions/fetchPublications";
 import { RiArrowRightWideFill } from "react-icons/ri";
+import PublicationUpload from "../../upload/components/PublicationUpload";
 export default function PublicationListView({
   publications: initialPublications,
 }: {
@@ -37,6 +38,8 @@ export default function PublicationListView({
     { title: string; path: string }[]
   >([]);
 
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+
   /**
    * Effect to flatten publications whenever the publications list or current path changes
    */
@@ -46,19 +49,83 @@ export default function PublicationListView({
     updateBreadcrumb(currentPath); // Update breadcrumb based on current path
   }, [publications, currentPath]);
 
+  // /**
+  //  * Function to flatten publications based on the current path
+  //  * Only immediate folders and files within the current path are included
+  //  */
+  // const flattenPublications = (
+  //   publications: Array<publication>,
+  //   currentPath: string
+  // ): any[] => {
+  //   const flatData: any[] = [];
+
+  //   publications.forEach((pub) => {
+  //     const fullPath = pub.name;
+  //     let relativePath = "";
+
+  //     // Determine the relative path based on the current path
+  //     if (currentPath === "") {
+  //       relativePath = fullPath;
+  //     } else if (fullPath.startsWith(`${currentPath}/`)) {
+  //       relativePath = fullPath.substring(currentPath.length + 1);
+  //     } else {
+  //       // If the publication is not under the current path, ignore it
+  //       return;
+  //     }
+
+  //     const parts = relativePath.split("/");
+
+  //     if (parts.length === 1) {
+  //       // It's a file directly under the current path
+  //       flatData.push({
+  //         key: pub.name, // Use the full path as the key
+  //         name: parts[0],
+  //         isLeaf: true,
+  //         icon: <FaFile style={{ marginRight: 8 }} />,
+  //         lastModified: pub.lastModified,
+  //         size: pub.size,
+  //         etag: pub.etag,
+  //       });
+  //     } else if (parts.length > 1) {
+  //       // It's inside a subfolder; only display the first subfolder
+  //       const firstSubFolder = parts[0];
+  //       const folderPath = currentPath
+  //         ? `${currentPath}/${firstSubFolder}`
+  //         : firstSubFolder;
+
+  //       if (!flatData.some((item) => item.key === folderPath)) {
+  //         flatData.push({
+  //           key: folderPath, // Use the full path of the subfolder as the key
+  //           name: firstSubFolder,
+  //           isLeaf: false,
+  //           icon: <FaFolder style={{ marginRight: 8 }} />,
+  //           lastModified: "",
+  //           size: "",
+  //           etag: "",
+  //         });
+  //       }
+  //     }
+  //   });
+
+  //   return flatData;
+  // };
+
   /**
    * Function to flatten publications based on the current path
    * Only immediate folders and files within the current path are included
    */
   const flattenPublications = (
-    publications: Array<publication>,
+    publications: Array<any>, // Adjust type according to your use case
     currentPath: string
   ): any[] => {
     const flatData: any[] = [];
 
     publications.forEach((pub) => {
-      const fullPath = pub.name;
+      const fullPath = pub.fileName; // Replace pub.name with pub.fileName
       let relativePath = "";
+
+      // Ensure fullPath is defined before proceeding
+      if (!fullPath) return;
 
       // Determine the relative path based on the current path
       if (currentPath === "") {
@@ -75,13 +142,13 @@ export default function PublicationListView({
       if (parts.length === 1) {
         // It's a file directly under the current path
         flatData.push({
-          key: pub.name, // Use the full path as the key
+          key: pub.fileName, // Use the full path as the key
           name: parts[0],
           isLeaf: true,
           icon: <FaFile style={{ marginRight: 8 }} />,
-          lastModified: pub.lastModified,
-          size: pub.size,
-          etag: pub.etag,
+          lastModified: pub.uploadDate, // Adjust this field to match your data
+          size: pub.size, // If size is available in your data
+          etag: pub.metaStoreId, // If needed, adjust to match your data
         });
       } else if (parts.length > 1) {
         // It's inside a subfolder; only display the first subfolder
@@ -222,38 +289,49 @@ export default function PublicationListView({
 
   return (
     <div>
-      <Breadcrumb
+      <div
         style={{
-          marginBottom: "16px",
           display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "16px",
         }}
-        separator={
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <RiArrowRightWideFill />
-          </div>
-        }
       >
-        {breadcrumbItems.map((item) => (
-          <Breadcrumb.Item key={item.path}>
-            <span
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                setCurrentPath(item.path.split("/")[1]);
-                handleBack();
+        <Breadcrumb
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+          }}
+          separator={
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              {item.title}
-            </span>
-          </Breadcrumb.Item>
-        ))}
-      </Breadcrumb>
-
+              <RiArrowRightWideFill />
+            </div>
+          }
+        >
+          {breadcrumbItems.map((item) => (
+            <Breadcrumb.Item key={item.path}>
+              <span
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setCurrentPath(item.path.split("/")[1]);
+                  handleBack();
+                }}
+              >
+                {item.title}
+              </span>
+            </Breadcrumb.Item>
+          ))}
+        </Breadcrumb>
+        <Button onClick={() => setIsUploadModalVisible(true)}>
+          Upload Publication
+        </Button>
+      </div>
       <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
         <Table
           dataSource={files}
@@ -278,6 +356,14 @@ export default function PublicationListView({
           <Details detail={selectedFile} close={() => setShowDetail(false)} />
         )}
       </div>
+      <Modal
+        title="Upload Publication"
+        open={isUploadModalVisible}
+        onCancel={() => setIsUploadModalVisible(false)}
+        footer={null}
+      >
+        <PublicationUpload currentPath={currentPath} />
+      </Modal>
     </div>
   );
 }

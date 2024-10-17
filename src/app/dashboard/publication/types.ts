@@ -4,3 +4,7 @@ export type publication = {
   size: number;
   etag: string;
 };
+
+export type buckets = {
+  name: string;
+}
