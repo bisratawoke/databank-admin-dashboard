@@ -119,6 +119,9 @@ export default function PublicationListView({
     const flatData: any[] = [];
 
     publications.forEach((pub) => {
+      if (pub.metadata) {
+        console.log(pub.metadata);
+      }
       const fullPath = pub.fileName; // Replace pub.name with pub.fileName
       let relativePath = "";
 
@@ -147,6 +150,7 @@ export default function PublicationListView({
           lastModified: pub.uploadDate, // Adjust this field to match your data
           size: pub.size, // If size is available in your data
           etag: pub.metaStoreId, // If needed, adjust to match your data
+          metadata: pub.metadata,
         });
       } else if (parts.length > 1) {
         const firstSubFolder = parts[0];
@@ -163,6 +167,7 @@ export default function PublicationListView({
             lastModified: "",
             size: "",
             etag: "",
+            metadata: pub.metadata,
           });
         }
       }
