@@ -23,6 +23,7 @@ import {
 } from "../actions/publications";
 
 interface UploadFormValues {
+  title: string;
   description: string;
   keyword: string[];
   type: string;
@@ -201,6 +202,14 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
               Select File
             </Button>
           </Upload>
+        </Form.Item>
+
+        <Form.Item
+          name="title"
+          label="Title"
+          rules={[{ required: true, message: "Please enter a title" }]}
+        >
+          <Input placeholder="Enter file title" className="w-full" />
         </Form.Item>
 
         <Form.Item
