@@ -152,6 +152,25 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
     return false; // Prevent automatic upload
   };
 
+  // const beforeUpload = (file: File) => {
+  //   const isValidType = [
+  //     "application/pdf",
+  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  //     "application/csv",
+  //   ].includes(file.type);
+  //   const isValidSize = file.size / 1024 / 1024 < 10; // 10MB limit
+
+  //   if (!isValidType) {
+  //     message.error("You can only upload PDF, DOCX, or XLSX files!");
+  //   }
+  //   if (!isValidSize) {
+  //     message.error("File must be smaller than 10MB!");
+  //   }
+
+  //   return isValidType && isValidSize;
+  // };
+
   const onRemove = () => {
     setFileList([]);
     form.setFieldValue("type", "");

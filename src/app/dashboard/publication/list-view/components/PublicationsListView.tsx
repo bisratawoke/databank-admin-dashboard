@@ -272,7 +272,7 @@ export default function PublicationListView({
         <PublicationInfoMenu
           downloadFile={() => {
             downloadFile(
-              `http://localhost:4000/publications/download/${encodeURIComponent(
+              `http://localhost:3016/publications/download/${encodeURIComponent(
                 record.key
               )}`,
               record.name
@@ -329,7 +329,7 @@ export default function PublicationListView({
           ))}
         </Breadcrumb>
         <Button onClick={() => setIsUploadModalVisible(true)}>
-          Upload Publication
+          Add Publication
         </Button>
       </div>
       <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
