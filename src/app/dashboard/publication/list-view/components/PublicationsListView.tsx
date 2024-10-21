@@ -14,6 +14,7 @@ import { RiArrowRightWideFill } from "react-icons/ri";
 import SearchInput from "./SearchInput";
 import DateFilter from "./DateFilter";
 import Spinner from "@/app/(components)/Spinner";
+import FileStructure from "./FileStructure";
 
 export default function PublicationListView({
   publications: initialPublications,
@@ -235,6 +236,10 @@ export default function PublicationListView({
           </div>
 
           <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+            <FileStructure
+              files={initialPublications}
+              handleRowClick={handleRowClick}
+            />
             <Table
               dataSource={filteredFiles}
               columns={columns}
