@@ -27,6 +27,7 @@ interface UploadFormValues {
   description: string;
   keyword: string[];
   type: string;
+  bucketName: string;
   location: string;
   modified_date: string;
   created_date: string;
@@ -34,10 +35,12 @@ interface UploadFormValues {
 
 interface PublicationUploadProps {
   currentPath: string;
+  onUploadSuccess?: () => void;
 }
 
 const PublicationUpload: React.FC<PublicationUploadProps> = ({
   currentPath,
+  onUploadSuccess,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -55,6 +58,8 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
           fetchBuckets(),
           fetchLocations(),
         ]);
+        console.log("fetchedBuckets", fetchedBuckets);
+        console.log("fetchedLocations", fetchedLocations);
         setBuckets(fetchedBuckets);
         setLocations(fetchedLocations);
       } catch (error) {
@@ -110,6 +115,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
         fileName: file.name,
         size: file.size,
         type: file.type || values.type,
+        bucketName: values.bucketName,
         keyword: values.keyword.filter((k) => k.trim() !== ""),
         modified_date: dayjs(values.modified_date).toISOString(),
         created_date: dayjs(values.created_date).toISOString(),
@@ -132,6 +138,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
         message.success("File uploaded successfully");
         form.resetFields();
         setFileList([]);
+        onUploadSuccess?.(); // Call the callback on success
       } else {
         console.error("Upload error:", result.error);
         message.error(result.error || "Failed to upload file");

@@ -222,6 +222,18 @@ export default function PublicationListView({
     setFilteredFiles(filteredData);
   };
 
+  const refreshPublications = async () => {
+    const { status, body } = await FetchPublications({ path: currentPath });
+    if (status === 200) {
+      setPublications(body);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    setIsUploadModalVisible(false); // Close the modal
+    refreshPublications(); // Refresh the publications list
+  };
+
   const columns: ColumnsType<any> = [
     {
       title: "Name",
@@ -303,7 +315,10 @@ export default function PublicationListView({
             onCancel={() => setIsUploadModalVisible(false)}
             footer={null}
           >
-            <PublicationUpload currentPath={currentPath} />
+            <PublicationUpload
+              currentPath={currentPath}
+              onUploadSuccess={handleUploadSuccess}
+            />
           </Modal>
         </div>
       </div>

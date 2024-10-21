@@ -15,6 +15,7 @@ interface PublicationData {
 }
 
 export async function uploadPublication(formData: FormData) {
+    console.log("uploadPublication", formData)
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/publications/upload`, {
             method: 'POST',
