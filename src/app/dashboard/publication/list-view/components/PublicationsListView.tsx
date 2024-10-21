@@ -273,67 +273,48 @@ export default function PublicationListView({
 
   return (
     <>
-      <Button onClick={() => setIsUploadModalVisible(true)}>
-        Add Publication
-      </Button>
-      <div className="flex items-center">
-        <SearchInput onSearch={handleSearch} />
-        <DateFilter data={files} onFilter={handleDateFilter} />
-      </div>
-      <Modal
-        title="Upload Publication"
-        open={isUploadModalVisible}
-        onCancel={() => setIsUploadModalVisible(false)}
-        footer={null}
-      >
-        <PublicationUpload currentPath={currentPath} />
-      </Modal>
-
-      {files.length > 0 ? (
-        <div>
-          {/* <div className="flex justify-between items-center">
-            <Breadcrumb
-              style={{
-                marginBottom: "16px",
-                display: "flex",
-
-              }}
-              separator={
-                <div
-                  style={{
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <RiArrowRightWideFill />
-                </div>
-              }
-            >
-
-              <RiArrowRightWideFill />
-            </div> */}
-
-          {/* {breadcrumbItems.map((item) => (
+      <div className="flex items-center justify-between">
+        <Breadcrumb>
+          {breadcrumbItems.map((item) => (
             <Breadcrumb.Item key={item.path}>
               <span
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   setCurrentPath(item.path.split("/")[1]);
                   handleBack();
-                  }}
-                  >
-                  {item.title}
-                  </span>
-                  </Breadcrumb.Item>
-                  ))}
-                  </Breadcrumb> */}
+                }}
+              >
+                {item.title}
+              </span>
+            </Breadcrumb.Item>
+          ))}
+        </Breadcrumb>
+        <div className="flex items-center justify-end">
+          <Button onClick={() => setIsUploadModalVisible(true)}>
+            Add Publication
+          </Button>
+          <div className="flex items-center">
+            <SearchInput onSearch={handleSearch} />
+            <DateFilter data={files} onFilter={handleDateFilter} />
+          </div>
+          <Modal
+            title="Upload Publication"
+            open={isUploadModalVisible}
+            onCancel={() => setIsUploadModalVisible(false)}
+            footer={null}
+          >
+            <PublicationUpload currentPath={currentPath} />
+          </Modal>
+        </div>
+      </div>
 
+      {files.length > 0 ? (
+        <div>
           <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-            <FileStructure
+            {/* <FileStructure
               files={initialPublications}
               handleRowClick={handleRowClick}
-            />
+            /> */}
             <Table
               dataSource={filteredFiles}
               columns={columns}
