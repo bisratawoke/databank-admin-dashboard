@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { publication } from "../../types";
 import { VscChromeClose } from "react-icons/vsc";
 const DetailPair = ({ header, value }: { header: string; value: any }) => (
@@ -38,6 +39,9 @@ export default function Details({
   detail: publication | null;
   close: any;
 }) {
+  console.log("========== in details =================s");
+  console.log(JSON.parse(JSON.stringify(detail)));
+  const pub = JSON.parse(JSON.stringify(detail));
   return (
     <div
       style={{
@@ -67,7 +71,7 @@ export default function Details({
             fontWeight: 500,
           }}
         >
-          {detail?.name.split(".")[0]}
+          {pub.name}
         </span>
         <VscChromeClose onClick={() => close()} style={{ cursor: "pointer" }} />
       </div>
@@ -97,23 +101,15 @@ export default function Details({
             gap: "16px",
           }}
         >
-          <DetailPair header={"Type"} value={detail?.name.split(".")[1]} />
-          <DetailPair header={"Size"} value={detail?.size} />
-          <DetailPair header={"Storage Used"} value={detail?.size} />
-          <DetailPair header={"Location"} value={"PLACEHOLDER"} />
-          <DetailPair header={"Owner"} value={"PLACEHOLDER"} />
-          <DetailPair
-            header={"Modified"}
-            value={
-              detail?.lastModified
-                ? new Date(detail?.lastModified).toString()
-                : ""
-            }
-          />
-          <DetailPair header={"Opened"} value={"PLACEHOLDER"} />
-          <DetailPair header={"Created"} value={"PLACEHOLDER"} />
+          <DetailPair header={"Type"} value={pub.metadata.type} />
+          <DetailPair header={"Size"} value={pub.metadata.size} />
+          <DetailPair header={"Location"} value={pub.metadata.location} />
+          {/* <DetailPair header={"Owner"} value={"PLACEHOLDER"} /> */}
+          <DetailPair header={"Modified"} value={pub.metadata.updatedAt} />
+          {/* <DetailPair header={"Opened"} value={"PLACEHOLDER"} /> */}
+          <DetailPair header={"Created"} value={pub.metadata.createdAt} />
           <DetailPair header={"Accessibility"} value={"Public"} />
-          <DetailPair header={"Description"} value={"PLACEHOLDER"} />
+          <DetailPair header={"Description"} value={pub.metadata.description} />
         </div>
       </div>
     </div>

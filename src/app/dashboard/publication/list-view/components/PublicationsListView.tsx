@@ -10,12 +10,11 @@ import Details from "./Details";
 import PublicationInfoMenu from "./PublicationsInfoMenu";
 import { downloadFile } from "../../utils/downloadFile";
 import { FetchPublications } from "../../actions/fetchPublications";
-import { RiArrowRightWideFill } from "react-icons/ri";
 import PublicationUpload from "../../upload/components/PublicationUpload";
 import SearchInput from "./SearchInput";
 import DateFilter from "./DateFilter";
 import Spinner from "@/app/(components)/Spinner";
-import FileStructure from "./FileStructure";
+// import FileStructure from "./FileStructure";
 
 export default function PublicationListView({
   publications: initialPublications,
@@ -119,6 +118,9 @@ export default function PublicationListView({
     const flatData: any[] = [];
 
     publications.forEach((pub) => {
+      if (pub.metadata) {
+        console.log(pub.metadata);
+      }
       const fullPath = pub.fileName; // Replace pub.name with pub.fileName
       let relativePath = "";
 
@@ -147,6 +149,8 @@ export default function PublicationListView({
           lastModified: pub.uploadDate, // Adjust this field to match your data
           size: pub.size, // If size is available in your data
           etag: pub.metaStoreId, // If needed, adjust to match your data
+          metadata: pub.metadata,
+          permanentLink: pub.permanentLink,
         });
       } else if (parts.length > 1) {
         const firstSubFolder = parts[0];
@@ -163,6 +167,7 @@ export default function PublicationListView({
             lastModified: "",
             size: "",
             etag: "",
+            metadata: pub.metadata,
           });
         }
       }
@@ -267,12 +272,8 @@ export default function PublicationListView({
       render: (_, record) => (
         <PublicationInfoMenu
           downloadFile={() => {
-            downloadFile(
-              `http://localhost:3016/publications/download/${encodeURIComponent(
-                record.key
-              )}`,
-              record.name
-            );
+            alert(record.permanentLink);
+            downloadFile(`http://${record.permanentLink}`, record.name);
           }}
           showInfo={() => {
             setSelectedFile(record);
