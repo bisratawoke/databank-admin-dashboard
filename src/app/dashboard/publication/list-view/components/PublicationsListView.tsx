@@ -18,8 +18,10 @@ import Spinner from "@/app/(components)/Spinner";
 
 export default function PublicationListView({
   publications: initialPublications,
+  departments,
 }: {
   publications: Array<publication>;
+  departments: Array<Record<string, any>>;
 }) {
   const [publications, setPublications] =
     useState<Array<publication>>(initialPublications);
@@ -319,12 +321,13 @@ export default function PublicationListView({
             <PublicationUpload
               currentPath={currentPath}
               onUploadSuccess={handleUploadSuccess}
+              departments={departments}
             />
           </Modal>
         </div>
       </div>
 
-      {files.length > 0 ? (
+      {Array.isArray(files) ? (
         <div>
           <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
             {/* <FileStructure

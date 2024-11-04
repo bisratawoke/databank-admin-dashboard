@@ -1,5 +1,6 @@
 "use client";
 import { Flex, Layout } from "antd";
+import { useEffect, useState } from "react";
 import styles from "./dashboard.module.css";
 import User from "./component/User";
 import Logo from "../(components)/Logo";
@@ -8,6 +9,9 @@ import NotificationIcon from "../(components)/NotificationIcon";
 import HelpIcon from "../(components)/HelpIcon";
 import ShareIcon from "../(components)/ShareIcon";
 import SecondaryNav from "../(components)/SecondaryNav";
+import { fetchNotification } from "./actions/fetchNotification";
+import { Badge } from "antd";
+import Notifications from "../(components)/Notifications";
 const { Content } = Layout;
 
 export default function Index({
@@ -15,6 +19,23 @@ export default function Index({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const { body } = await fetchNotification(); // Call the fetchNotification server action
+        console.log("=========== in load notifications =================");
+        console.log(body);
+        setNotifications(body); // Update state with the fetched notifications
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    loadNotifications(); // Call the function to load notifications
+  }, []); // Empty dependency array ensures this runs once on mount
+
   return (
     <Layout className={styles.outerLayout} hasSider>
       {/* <Sider
@@ -41,7 +62,6 @@ export default function Index({
         }}
       >
         <div
-          // className={styles.header}
           style={{
             backgroundColor: "#166EE1",
             display: "flex",
@@ -86,12 +106,7 @@ export default function Index({
               />
             </div>
           </div>
-          <Flex
-            gap={16}
-            // justify="end"
-            align="center"
-            style={{ height: "100%" }}
-          >
+          <Flex gap={16} align="center" style={{ height: "100%" }}>
             <div
               style={{
                 display: "flex",
@@ -103,7 +118,11 @@ export default function Index({
               <HelpIcon />
               <ShareIcon />
             </div>
-            <NotificationIcon />
+            <Notifications notifications={notifications} />
+            {/* <Badge count={notifications.length}>
+              <NotificationIcon />{" "}
+            </Badge> */}
+            {/* Pass notifications to NotificationIcon */}
             <User />
           </Flex>
         </div>

@@ -21,7 +21,8 @@ import {
   fetchLocations,
   uploadPublication,
 } from "../actions/publications";
-
+import { InternalBreadcrumbItem } from "antd/es/breadcrumb/BreadcrumbItem";
+import { FetchDepartment } from "@/app/dashboard/organization/actions/fetchDepartment";
 interface UploadFormValues {
   title: string;
   description: string;
@@ -31,16 +32,26 @@ interface UploadFormValues {
   location: string;
   modified_date: string;
   created_date: string;
+  publicationType: string;
+  department: string;
+}
+
+enum PUBLICATION_TYPE {
+  PUBLIC,
+  INTERNAL,
+  FOR_SALE,
 }
 
 interface PublicationUploadProps {
   currentPath: string;
+  departments: Array<Record<string, any>>;
   onUploadSuccess?: () => void;
 }
 
 const PublicationUpload: React.FC<PublicationUploadProps> = ({
   currentPath,
   onUploadSuccess,
+  departments,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -106,9 +117,15 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
     setUploading(true);
 
     try {
+      console.log("============= in upload file ================== ");
+      console.log(values);
+      alert(JSON.stringify(values));
       const formData = new FormData();
       formData.append("file", file);
-
+      formData.append("publicationType", values.publicationType[0]);
+      formData.append("department", values.department[0]);
+      delete values.publicationType;
+      delete values.department;
       // Prepare metadata
       const metadata = {
         ...values,
@@ -117,6 +134,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
         type: file.type || values.type,
         bucketName: values.bucketName,
         keyword: values.keyword.filter((k) => k.trim() !== ""),
+
         modified_date: dayjs(values.modified_date).toISOString(),
         created_date: dayjs(values.created_date).toISOString(),
       };
@@ -130,6 +148,8 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
           formData.append(key, value as string); // Add all other fields
         }
       });
+
+      // formData.append("department", "67237bbb2b5c915bcefc61c5");
 
       console.log("final formData: ", formData);
       const result = await uploadPublication(formData);
@@ -231,6 +251,47 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
           />
         </Form.Item>
 
+        <Form.Item name="department" label="Department">
+          <Select mode="multiple" placeholder="Select departments">
+            {departments.map((dep) => (
+              <Select.Option key={dep._id} value={dep._id}>
+                {dep.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="publicationType"
+          label="Publication Type"
+          rules={[
+            {
+              required: true,
+              message: "Please enter at least one publication type",
+            },
+          ]}
+        >
+          <Select
+            mode="tags"
+            style={{ width: "100%" }}
+            placeholder="Please Select the publication type"
+            tokenSeparators={[","]}
+            className="w-full"
+            options={[
+              {
+                label: "Public",
+                value: "PUBLIC",
+              },
+              {
+                label: "Internal",
+                value: "INTERNAL",
+              },
+              {
+                label: "For Sale",
+                value: "FOR_SALE",
+              },
+            ]}
+          />
+        </Form.Item>
         <Form.Item
           name="keyword"
           label="Keywords"
