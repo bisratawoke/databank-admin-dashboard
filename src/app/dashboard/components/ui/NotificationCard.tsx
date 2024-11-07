@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar } from "antd";
-import setSeenNotification from "../dashboard/actions/setSeenNotification";
+import setSeenNotification from "@/app/dashboard/actions/setSeenNotification";
 interface NotificationCardProps {
   message: string;
   user: string;
@@ -25,7 +25,7 @@ export default function NotificationCard({
           <p className="text-sm">{message}</p>
           <button
             onClick={async () => {
-              const { body, status } = await setSeenNotification({
+              const { status } = await setSeenNotification({
                 message: message,
                 user: user,
                 seen: true,

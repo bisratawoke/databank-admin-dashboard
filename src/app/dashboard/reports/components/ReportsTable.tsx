@@ -10,6 +10,7 @@ import {
 import { Data, fields, report } from "../types";
 import * as XLSX from "xlsx";
 import { prepareDataForExport } from "../_parsers/exportHelper";
+import ReportStatusManager from "./ReportStatusManager";
 
 interface ReportsTableProps {
   loading: boolean;
@@ -62,6 +63,11 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       title: "Description",
       dataIndex: "description",
       key: "description",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
     },
     {
       title: "Date Range",
@@ -146,6 +152,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       onReportSelect(record); // This will trigger the upload flow
     } else if (record.data && record.data.length > 0) {
       setSelectedReport(record);
+
       setIsModalVisible(true);
       setIsEditing(false);
       setEditedData([]);
@@ -430,52 +437,59 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
               rowClassName="hover:bg-blue-50 transition-colors duration-200"
             />
             {selectedReport && selectedReport.data?.length > 0 && (
-              <div className="flex justify-end">
-                {!isEditing ? (
-                  <>
-                    <Button
-                      icon={<EditOutlined />}
-                      onClick={handleEditClick}
-                      className="mr-2"
-                    >
-                      Edit
+              <div className="flex justify-between">
+                <ReportStatusManager
+                  report={selectedReport}
+                  refreshReports={refreshReports}
+                />
+                {/* <div>{selectedReport.status}</div> */}
+                <div className="flex justify-end">
+                  {!isEditing ? (
+                    <>
+                      <Button
+                        icon={<EditOutlined />}
+                        onClick={handleEditClick}
+                        className="mr-2"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        icon={<UploadOutlined />}
+                        onClick={() => showReportDetails(selectedReport, true)}
+                        className="mr-2"
+                      >
+                        Upload
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        icon={<SaveOutlined />}
+                        onClick={handleSaveLocally}
+                        className="mr-2"
+                        disabled={!hasUnsavedChanges}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleSubmitChanges}
+                        className="mr-2"
+                        disabled={hasUnsavedChanges}
+                      >
+                        Submit
+                      </Button>
+                    </>
+                  )}
+                  <Dropdown
+                    menu={{ items: exportMenuItems }}
+                    placement="bottomRight"
+                  >
+                    <Button icon={<DownloadOutlined />} className="mr-2">
+                      Export
                     </Button>
-                    <Button
-                      icon={<UploadOutlined />}
-                      onClick={() => showReportDetails(selectedReport, true)}
-                      className="mr-2"
-                    >
-                      Upload
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      icon={<SaveOutlined />}
-                      onClick={handleSaveLocally}
-                      className="mr-2"
-                      disabled={!hasUnsavedChanges}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      type="primary"
-                      onClick={handleSubmitChanges}
-                      className="mr-2"
-                      disabled={hasUnsavedChanges}
-                    >
-                      Submit
-                    </Button>
-                  </>
-                )}
-                <Dropdown
-                  menu={{ items: exportMenuItems }}
-                  placement="bottomRight"
-                >
-                  <Button icon={<DownloadOutlined />} className="mr-2">
-                    Export
-                  </Button>
-                </Dropdown>
+                  </Dropdown>
+                </div>
               </div>
             )}
           </>

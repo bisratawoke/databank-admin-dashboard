@@ -113,6 +113,11 @@ export default function ReportListTable({
       key: "description",
     },
     {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
       title: "Fields",
       dataIndex: "fields",
       key: "fields",
@@ -126,6 +131,7 @@ export default function ReportListTable({
         </>
       ),
     },
+
     {
       title: "Start Date",
       dataIndex: "start_date",

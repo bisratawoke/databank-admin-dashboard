@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { Tabs } from "antd";
 import { useRouter, usePathname } from "next/navigation";
-
+import { useSession } from "next-auth/react";
 const { TabPane } = Tabs;
 
 interface TabItem {
@@ -12,6 +12,7 @@ interface TabItem {
 }
 
 const TabNav: React.FC = () => {
+  const {data:session} = useSession();
   const router = useRouter();
   const pathname = usePathname();
 

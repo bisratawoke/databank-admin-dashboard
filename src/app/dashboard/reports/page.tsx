@@ -43,6 +43,7 @@ const autoMapFields = (
   console.log("Final mapping:", mapping);
   return mapping;
 };
+
 const Reports: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);

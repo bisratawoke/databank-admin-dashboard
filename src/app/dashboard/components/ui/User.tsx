@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import {
   Avatar,
   message,
@@ -15,21 +16,18 @@ import {
   ProductOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import styles from "./user.module.css";
 
+import { signOut, useSession } from "next-auth/react";
 import { FiUser } from "react-icons/fi";
 
-// Custom hook to get user data
 const useUser = () => {
-  // const userString = localStorage.getItem("user");
-  // generate random user json
+  const { data: session }: any = useSession();
   const userString = JSON.stringify({
-    firstName: "John",
-    lastName: "Doe",
-    fullName: "John Doe",
-    email: "XG5Z0@example.com",
-    groups: ["group1", "group2"],
-    organizationalUnitName: "Organizational Unit",
+    firstName: session.user.firstName,
+    lastName: session.user.lastName,
+    fullName: `${session.user.firstName}-${session.user.lastName}`,
+    email: session.user.email,
+    groups: session.user.roles,
   });
   let firstName = "";
   let lastName = "";
@@ -70,16 +68,7 @@ const GrayText = ({ children }: { children: any }) => (
 );
 
 const User: React.FC = () => {
-  //   const { logOut } = useContext(AuthContext);
-  //   const navigate = useNavigate();
-  const {
-    firstName,
-    lastName,
-    fullName,
-    email,
-    groups,
-    organizationalUnitName,
-  } = useUser();
+  const { firstName, lastName, fullName, email, groups } = useUser();
 
   const content = (
     <Flex vertical>
@@ -102,16 +91,6 @@ const User: React.FC = () => {
                 <GrayText>No roles assigned</GrayText>
               )}
             </Space>
-            <Space>
-              <ProductOutlined />
-              <Typography.Text>
-                {organizationalUnitName ? (
-                  <NormalText>{organizationalUnitName}</NormalText>
-                ) : (
-                  <GrayText>No organizational unit assigned</GrayText>
-                )}
-              </Typography.Text>
-            </Space>
           </Flex>
         </Space>
         <Flex style={{ width: "100%" }} gap="small">
@@ -127,6 +106,7 @@ const User: React.FC = () => {
             icon={<LogoutOutlined />}
             onClick={() => {
               //   logOut();
+              signOut();
               message.success("Logout successful");
             }}
           >
@@ -144,7 +124,7 @@ const User: React.FC = () => {
       trigger="click"
       placement="bottomRight"
     >
-      <Avatar className={styles.avatar}>
+      <Avatar className="bg-[#078148] pointer">
         {firstName && lastName ? firstName[0] + lastName[0] : "B"}
       </Avatar>
     </Popover>

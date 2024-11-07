@@ -2,11 +2,11 @@
 "use client";
 
 import { Badge, Popover } from "antd";
-import NotificationCard from "./NotificationCard";
-import NotificationIcon from "./NotificationIcon";
+import NotificationCard from "@/app/dashboard/components/ui/NotificationCard";
+import NotificationIcon from "@/app/dashboard/components/ui/NotificationIcon";
 import { useEffect, useState } from "react";
 
-interface Notification {
+export interface Notification {
   message: string;
   user: string;
   createdAt: string;
@@ -24,22 +24,15 @@ export default function Notifications({
   );
 
   useEffect(() => {
-    console.log("============ in user effect =========");
-    console.log(notifications);
     setFilteredNotificationList(notifications.filter((item) => !item.seen));
   }, [notifications]);
-
-  useEffect(() => {
-    console.log("============= in filtered notification list ================");
-    console.log(filteredNotificationList);
-  }, [filteredNotificationList]);
 
   const removeNotification = (notificationId: string) => {
     setFilteredNotificationList((prevList) =>
       prevList.filter((item) => item._id != notificationId)
     );
   };
-  // Render the notification cards
+
   const notificationContent = (
     <div className="max-h-80 overflow-y-auto p-2">
       {filteredNotificationList.length < 1 && (

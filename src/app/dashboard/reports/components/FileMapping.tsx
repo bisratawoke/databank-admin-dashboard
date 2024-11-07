@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const FileMapping: React.FC<{
   fileHeaders: string[];
@@ -7,6 +7,9 @@ const FileMapping: React.FC<{
   mapping: Record<string, string>; // Pass the auto-mapping here
   onMappingComplete: (mapping: any) => void;
 }> = ({ fileHeaders, reportFields, mapping, onMappingComplete }) => {
+  useEffect(() => {
+    alert("============ in file mapping =================");
+  }, []);
   const [currentMapping, setCurrentMapping] = useState(mapping);
 
   const handleFieldMapping = (header: string, fieldId: string) => {
