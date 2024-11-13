@@ -7,6 +7,9 @@ import { message } from "antd";
 import RejectReport from "../actions/RejectReport";
 import PublishReport from "../actions/PublishReport";
 import { useSession } from "next-auth/react";
+import InitalRequestResponse from "../actions/initalRequestResponse";
+import RequestSecondApproval from "../actions/RequestSecondApproval";
+import dissiminationResponse from "../actions/dissiminationDepResponse";
 export default function ReportStatusManager({ report, refreshReports }: any) {
   const { data: session }: any = useSession();
   const [loading, setIsLoading] = useState(true);
@@ -38,11 +41,26 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
       if (action === "Approve") {
         setCurrentStatus("Approved");
         const result = await ApproveReport({ reportId: report._id });
+        const initRequestResult = await InitalRequestResponse({
+          reportId: report._id,
+          status: "Approved",
+        });
+
+        console.log(initRequestResult);
+        const secondApprovalRequestResult = await RequestSecondApproval({
+          reportId: report._id,
+        });
+        console.log("=========== second approval request resultl ==========");
+        console.log(secondApprovalRequestResult);
         if (!(result.status == 200)) throw new Error("Something went wrong");
         message.info("Succesfully approved report");
       } else if (action === "Reject") {
         setCurrentStatus("Rejected");
         const result = await RejectReport({ reportId: report._id });
+        await InitalRequestResponse({
+          reportId: report._id,
+          status: "Rejected",
+        });
         if (!(result.status == 200)) throw new Error("Something went wrong");
         message.info("Succesfully rejected  report");
       } else if (action === "Publish") {
@@ -50,8 +68,13 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
         const result = await PublishReport({ reportId: report._id });
         if (!(result.status == 200)) throw new Error("Something went wrong");
         message.info("Succesfully Published report");
+        await dissiminationResponse({
+          reportId: report._id,
+          status: currentStatus,
+        });
       }
     } catch (err) {
+      console.log("============ in update errpr ===============");
       console.log(err);
       message.error("Something went wrong");
     } finally {
@@ -63,16 +86,20 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
     <Menu>
       {availableActions.map((action) => (
         <>
-          {action == "Publish" &&
-          !session.user.roles.includes("DISSEMINATION_HEAD") ? (
-            <></>
-          ) : (
-            <Menu.Item
-              key={action}
-              onClick={() => handler(report.status, action)}
-            >
-              {action.toLowerCase()}
-            </Menu.Item>
+          {!session.user.roles.includes("DEPARTMENT_EXPERT") && (
+            <>
+              {action == "Publish" &&
+              !session.user.roles.includes("DISSEMINATION_HEAD") ? (
+                <></>
+              ) : (
+                <Menu.Item
+                  key={action}
+                  onClick={() => handler(report.status, action)}
+                >
+                  {action.toLowerCase()}
+                </Menu.Item>
+              )}
+            </>
           )}
         </>
       ))}

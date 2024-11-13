@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
+import { getSession } from "@/lib/auth/auth";
 
 interface INotification {
   message: string;
@@ -8,6 +10,7 @@ interface INotification {
 }
 
 export default async function setSeenNotification(notification: INotification) {
+  const session: any = await getSession();
   console.log(JSON.stringify(notification));
   const res = await fetch(
     `${process.env.BACKEND_URL}/notifire/${notification.notificationId}`,
@@ -16,6 +19,7 @@ export default async function setSeenNotification(notification: INotification) {
       headers: {
         "content-type": "application/json",
         cache: "no-store",
+        authorization: `Bearer ${session.user.accessToken}`,
       },
       body: JSON.stringify({
         message: notification.message,

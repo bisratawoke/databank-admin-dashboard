@@ -1,22 +1,23 @@
 "use server";
 import { getSession } from "@/lib/auth/auth";
-export async function CreateUser(data) {
+export default async function activateUser(userId) {
   const session: any = await getSession();
-  const res = await fetch(`${process.env.BACKEND_URL}/users`, {
+
+  const res = await fetch(`${process.env.BACKEND_URL}/users/${userId}`, {
     headers: {
-      "cache-control": "no-cache",
-      "content-type": "application/json",
       authorization: `Bearer ${session.user.accessToken}`,
+      "content-type": "application/json",
+      cache: "no-cache",
     },
-    cache: "no-cache",
     body: JSON.stringify({
-      ...data,
+      isActive: true,
     }),
-    method: "POST",
+    method: "PATCH",
   });
   const result = await res.json();
+
   return {
-    status: res.status,
     body: result,
+    status: res.status,
   };
 }

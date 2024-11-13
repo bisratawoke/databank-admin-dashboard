@@ -6,6 +6,9 @@ import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { CreateUser } from "../actions/createUsers";
 import { UpdateUser } from "../actions/updateUser";
+import deactivateUser from "../actions/deativateUser";
+import activateUser from "../actions/activateUser";
+import deleteUser from "../actions/deleteUser";
 interface User {
   _id: string;
   email: string;
@@ -22,9 +25,14 @@ interface User {
 interface UserTableProps {
   data: User[];
   roles: Array<any>;
+  departments: Array<any>;
 }
 
-export default function UserTable({ data, roles }: UserTableProps) {
+export default function UserTable({
+  data,
+  roles,
+  departments,
+}: UserTableProps) {
   const [users, setUsers] = useState<User[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -108,6 +116,75 @@ export default function UserTable({ data, roles }: UserTableProps) {
           ? new Date(lastLogin).toLocaleString()
           : "N/A",
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record: User) =>
+        record.key !== "addButtonRow" && (
+          <>
+            <>
+              {record.isActive == true ? (
+                <a
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    console.log("Deactivate user:", record);
+                    const { body, status } = await deactivateUser(record._id);
+                    if (status == 200)
+                      message.success("successfully deactivated user");
+                    setUsers((users) =>
+                      users.map((user) => {
+                        if (user._id == record._id) {
+                          return body;
+                        }
+                        return user;
+                      })
+                    );
+                  }}
+                  style={{ marginRight: 8 }}
+                >
+                  deactivate
+                </a>
+              ) : (
+                <a
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    console.log("activate user:", record);
+                    const { body, status } = await activateUser(record._id);
+                    if (status == 200)
+                      message.success("successfully deactivated user");
+                    setUsers((users) =>
+                      users.map((user) => {
+                        if (user._id == record._id) {
+                          return body;
+                        }
+                        return user;
+                      })
+                    );
+                  }}
+                  style={{ marginRight: 8 }}
+                >
+                  activate
+                </a>
+              )}
+            </>
+
+            <a
+              onClick={async (e) => {
+                e.stopPropagation();
+
+                await deleteUser(record._id);
+                setUsers((users) =>
+                  users.filter((user) => user._id != record._id)
+                );
+                console.log("Delete user:", record);
+              }}
+              style={{ color: "red" }}
+            >
+              Delete
+            </a>
+          </>
+        ),
+    },
   ];
 
   const showModal = () => {
@@ -180,7 +257,23 @@ export default function UserTable({ data, roles }: UserTableProps) {
             if (record.key !== "addButtonRow") {
               setIsEditing(true);
               setCurrentUserId(record._id);
-              form.setFieldsValue(record);
+              console.log("==== in update modal =======");
+              console.log(record.department);
+              console.log(
+                departments.filter((dep) => dep._id == record.department)
+              );
+              form.setFieldsValue({
+                ...record,
+                department: record.department.name,
+                // department: departments.filter(
+                //   (dep) => dep._id == record.department
+                // )[0],
+              });
+
+              // form.setFieldsValue({
+              //   name: record.name,
+              //   category: record.category.map((cat: category) => cat._id),
+              // });
               showModal();
             }
           },
@@ -203,6 +296,7 @@ export default function UserTable({ data, roles }: UserTableProps) {
           >
             <Input placeholder="Enter first name" />
           </Form.Item>
+
           <Form.Item
             name="lastName"
             label="Last Name"
@@ -210,6 +304,7 @@ export default function UserTable({ data, roles }: UserTableProps) {
           >
             <Input placeholder="Enter last name" />
           </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
@@ -220,7 +315,8 @@ export default function UserTable({ data, roles }: UserTableProps) {
           >
             <Input placeholder="Enter email" />
           </Form.Item>
-          {!isEditing == true && (
+
+          {!isEditing && (
             <Form.Item
               name="password"
               label="Password"
@@ -229,6 +325,7 @@ export default function UserTable({ data, roles }: UserTableProps) {
               <Input placeholder="Enter password" />
             </Form.Item>
           )}
+
           <Form.Item name="roles" label="Roles">
             <Select mode="multiple" placeholder="Select roles">
               {roles.map((role) => (
@@ -239,22 +336,15 @@ export default function UserTable({ data, roles }: UserTableProps) {
             </Select>
           </Form.Item>
 
-          {/* 
-          <Form.Item name="roles" label="Roles">
-            <Select mode="multiple" placeholder="Select roles">
-              {roleFilters.map((role) => (
-                <Select.Option key={role.value} value={role.value}>
-                  {role.text}
+          <Form.Item name="department" label="Departments">
+            <Select placeholder="Select departments">
+              {departments.map((department) => (
+                <Select.Option key={department._id} value={department._id}>
+                  {department.name}
                 </Select.Option>
               ))}
             </Select>
-          </Form.Item> */}
-          {/* <Form.Item name="isActive" label="Active">
-            <Select>
-              <Select.Option value={true}>Yes</Select.Option>
-              <Select.Option value={false}>No</Select.Option>
-            </Select>
-          </Form.Item> */}
+          </Form.Item>
         </Form>
       </Modal>
     </>
