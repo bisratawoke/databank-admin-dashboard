@@ -9,7 +9,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getSession();
-  // if (!session) signIn();
+  if (!session) signIn();
   return (
     <html lang="en">
       <body>

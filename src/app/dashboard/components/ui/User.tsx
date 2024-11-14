@@ -22,13 +22,16 @@ import { FiUser } from "react-icons/fi";
 
 const useUser = () => {
   const { data: session }: any = useSession();
-  const userString = JSON.stringify({
-    firstName: session.user.firstName,
-    lastName: session.user.lastName,
-    fullName: `${session.user.firstName}-${session.user.lastName}`,
-    email: session.user.email,
-    groups: session.user.roles,
-  });
+  let userString = null;
+  if (session) {
+    userString = JSON.stringify({
+      firstName: session.user.firstName,
+      lastName: session.user.lastName,
+      fullName: `${session.user.firstName}-${session.user.lastName}`,
+      email: session.user.email,
+      groups: session.user.roles,
+    });
+  }
   let firstName = "";
   let lastName = "";
   let fullName = "";

@@ -19,9 +19,10 @@ export async function addFieldToReport({
     body: JSON.stringify({ fields: [field] }),
     method: "PUT",
   });
-  const result = await res.json();
+  console.log(res.status);
+
   return {
     status: res.status,
-    result: result,
+    result: "",
   };
 }

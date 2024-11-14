@@ -15,14 +15,18 @@ export default async function WithRole({
   role: string;
   action?: ACTION;
 }) {
-  const session: any = await getSession();
+  try {
+    const session: any = await getSession();
 
-  if (!session?.user?.roles.includes(role)) {
-    if (action == ACTION.THROW) {
-      throw new Error("You are not allowed to see this page");
+    if (!session?.user?.roles.includes(role)) {
+      if (action == ACTION.THROW) {
+        throw new Error("You are not allowed to see this page");
+      }
+      return <React.Fragment></React.Fragment>;
     }
-    return <React.Fragment></React.Fragment>;
-  }
 
-  return <React.Fragment>{children}</React.Fragment>;
+    return <React.Fragment>{children}</React.Fragment>;
+  } catch (err) {
+    throw new Error("You are not allowed to see this page");
+  }
 }
