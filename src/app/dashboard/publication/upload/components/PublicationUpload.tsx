@@ -34,6 +34,7 @@ interface UploadFormValues {
   created_date: string;
   publicationType: string;
   department: string;
+  category: string;
 }
 
 enum PUBLICATION_TYPE {
@@ -61,6 +62,16 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
   const [locations, setLocations] = useState<string[]>([]);
   const [loadingLocations, setLoadingLocations] = useState(true);
   const [customLocation, setCustomLocation] = useState(false);
+
+  const [categories, setCategories] = useState(
+    departments.flatMap((department) => department.category)
+  );
+
+  useEffect(() => {
+    console.log("=========== in publication uploads =================");
+    console.log(departments);
+    console.log(categories);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -124,8 +135,10 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
       formData.append("file", file);
       formData.append("publicationType", values.publicationType[0]);
       formData.append("department", values.department[0]);
+      formData.append("category", values.category[0]);
       delete values.publicationType;
       delete values.department;
+      delete values.category;
       // Prepare metadata
       const metadata = {
         ...values,
@@ -252,7 +265,24 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
         </Form.Item>
 
         <Form.Item name="department" label="Department">
-          <Select mode="multiple" placeholder="Select departments">
+          <Select
+            mode="multiple"
+            placeholder="Select departments"
+            onChange={(dep) => {
+              if (dep.length > 0) {
+                setCategories((categories) =>
+                  departments.flatMap(
+                    (department) =>
+                      dep.includes(department._id) && department.category
+                  )
+                );
+              } else {
+                setCategories(
+                  departments.flatMap((department) => department.category)
+                );
+              }
+            }}
+          >
             {departments.map((dep) => (
               <Select.Option key={dep._id} value={dep._id}>
                 {dep.name}
@@ -260,6 +290,17 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
             ))}
           </Select>
         </Form.Item>
+
+        <Form.Item name="category" label="Category">
+          <Select mode="multiple" placeholder="Select categories">
+            {categories.map((cat) => (
+              <Select.Option key={cat._id} value={cat._id}>
+                {cat.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
         <Form.Item
           name="publicationType"
           label="Publication Type"

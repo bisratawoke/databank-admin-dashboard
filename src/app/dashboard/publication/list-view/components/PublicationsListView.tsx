@@ -36,6 +36,9 @@ export default function PublicationListView({
 
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
+  const [categorues, setCategories] = useState(
+    departments.map((department) => department.category)
+  );
   /**
    * Effect to flatten publications whenever the publications list or current path changes
    */
