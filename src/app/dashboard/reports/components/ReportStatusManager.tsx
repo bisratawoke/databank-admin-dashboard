@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import InitalRequestResponse from "../actions/initalRequestResponse";
 import RequestSecondApproval from "../actions/RequestSecondApproval";
 import dissiminationResponse from "../actions/dissiminationDepResponse";
+import { capitalizeFirstLetter } from "./ReportsTable";
 export default function ReportStatusManager({ report, refreshReports }: any) {
   const { data: session }: any = useSession();
   const [loading, setIsLoading] = useState(true);
@@ -96,7 +97,7 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
                   key={action}
                   onClick={() => handler(report.status, action)}
                 >
-                  {action.toLowerCase()}
+                  {capitalizeFirstLetter(action.toLowerCase())}
                 </Menu.Item>
               )}
             </>
@@ -109,7 +110,7 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
   const HandlerButton = () => {
     return (
       <Dropdown overlay={menu} trigger={["hover"]} placement="bottom">
-        <Button type="primary">{currentStatus}</Button>
+        <Button type="primary">{capitalizeFirstLetter(currentStatus)}</Button>
       </Dropdown>
     );
   };

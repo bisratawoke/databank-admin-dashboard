@@ -8,14 +8,7 @@ export default function SecondaryNav() {
   const pathnames = pathname.split("/").filter((x) => x);
 
   return (
-    <div
-      style={{
-        backgroundColor: "#1463CA",
-        padding: "16px",
-        paddingLeft: "20px",
-        // padding: "20px",
-      }}
-    >
+    <div className="bg-[#1463CA] p-[16px] pl-[20px]">
       <Breadcrumb style={{ color: "#fff" }}>
         {pathnames.map((value, index) => {
           const url = `/${pathnames.slice(0, index + 1).join("/")}`;

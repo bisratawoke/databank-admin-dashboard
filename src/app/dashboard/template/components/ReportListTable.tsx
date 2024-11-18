@@ -86,7 +86,6 @@ export default function ReportListTable({
               form.resetFields();
               setIsModalVisible(false);
             } else {
-              alert(status);
               // console.log(body);
             }
           } else {

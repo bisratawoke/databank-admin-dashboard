@@ -274,7 +274,6 @@ export default function PublicationListView({
       render: (_, record) => (
         <PublicationInfoMenu
           downloadFile={() => {
-            alert(record.permanentLink);
             downloadFile(`http://${record.permanentLink}`, record.name);
           }}
           showInfo={() => {

@@ -119,7 +119,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
     try {
       console.log("============= in upload file ================== ");
       console.log(values);
-      alert(JSON.stringify(values));
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("publicationType", values.publicationType[0]);

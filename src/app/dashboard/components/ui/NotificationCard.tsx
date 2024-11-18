@@ -31,7 +31,6 @@ export default function NotificationCard({
                 seen: true,
                 notificationId: notificationId,
               });
-              alert(status);
               if (status == 200) {
                 removeNotification(notificationId);
               }

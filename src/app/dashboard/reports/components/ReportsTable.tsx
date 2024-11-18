@@ -31,6 +31,10 @@ interface DataType extends Data {
   [key: string]: any;
 }
 
+export function capitalizeFirstLetter(str) {
+  if (!str) return str; // Check if the string is empty
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 const ReportsTable: React.FC<ReportsTableProps> = ({
   loading,
   onReportSelect,
@@ -68,6 +72,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (text: string) => <span>{capitalizeFirstLetter(text)}</span>,
     },
     {
       title: "Date Range",

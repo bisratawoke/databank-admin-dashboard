@@ -15,6 +15,7 @@ export default async function dissiminationResponse({
     {
       headers: {
         authorization: `Bearer ${session.user.accessToken}`,
+        "content-type": "application/json",
       },
       method: "POST",
       body: JSON.stringify({
