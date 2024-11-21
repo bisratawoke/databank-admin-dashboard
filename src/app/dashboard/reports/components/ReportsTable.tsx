@@ -11,6 +11,7 @@ import { Data, fields, report } from "../types";
 import * as XLSX from "xlsx";
 import { prepareDataForExport } from "../_parsers/exportHelper";
 import ReportStatusManager from "./ReportStatusManager";
+import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
 
 interface ReportsTableProps {
   loading: boolean;
@@ -31,10 +32,6 @@ interface DataType extends Data {
   [key: string]: any;
 }
 
-export function capitalizeFirstLetter(str) {
-  if (!str) return str; // Check if the string is empty
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 const ReportsTable: React.FC<ReportsTableProps> = ({
   loading,
   onReportSelect,

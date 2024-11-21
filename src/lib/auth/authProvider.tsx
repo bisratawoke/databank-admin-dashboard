@@ -1,5 +1,3 @@
-// in app/providers.tsx
-
 "use client";
 
 import type { Session } from "next-auth";
