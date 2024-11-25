@@ -11,7 +11,6 @@ interface INotification {
 
 export default async function setSeenNotification(notification: INotification) {
   const session: any = await getSession();
-  console.log(JSON.stringify(notification));
   const res = await fetch(
     `${process.env.BACKEND_URL}/notifire/${notification.notificationId}`,
     {

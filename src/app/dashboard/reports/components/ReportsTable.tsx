@@ -69,7 +69,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text: string) => <span>{capitalizeFirstLetter(text)}</span>,
+      render: (text: string) => <span>{text}</span>,
     },
     {
       title: "Date Range",
@@ -408,7 +408,8 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
           setHasUnsavedChanges(false);
           setSelectedReport(null);
         }}
-        width="80%"
+        width={"100%"}
+        height={"100%"}
         footer={null}
         destroyOnClose={true}
       >

@@ -10,9 +10,14 @@ import { useSession } from "next-auth/react";
 import InitalRequestResponse from "../../actions/initalRequestResponse";
 import RequestSecondApproval from "../../actions/requestSecondApproval";
 import dissiminationResponse from "../../actions/dissiminationDepResponse";
-import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
+// import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
+export function capitalizeFirstLetter(str: string) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export default function PublicationStatusManager({
-  report,
+  publication,
   refreshReports,
 }: any) {
   const { data: session }: any = useSession();
@@ -21,10 +26,10 @@ export default function PublicationStatusManager({
   const [currentStatus, setCurrentStatus] = useState<string>("");
 
   useEffect(() => {
-    AmIDepartmentHead(report._id)
+    AmIDepartmentHead(publication._id)
       .then(({ body, status }) => {
         setIsLoading(false);
-        setCurrentStatus(report.status.toLowerCase());
+        setCurrentStatus(publication.status.toLowerCase());
       })
       .catch((err) => console.log(err));
   }, []);
@@ -37,43 +42,42 @@ export default function PublicationStatusManager({
     PENDING: ["Approve", "Reject"],
     APPROVED: ["Publish", "Reject"],
     REJECTED: ["Approve"],
-    // PUBLISHED: ["Approve"],
   };
 
   const handler = async (state: string, action: string) => {
     try {
       if (action === "Approve") {
         setCurrentStatus("Approved");
-        const result = await ApproveReport({ reportId: report._id });
+        const result = await ApproveReport({ reportId: publication._id });
         const initRequestResult = await InitalRequestResponse({
-          reportId: report._id,
+          reportId: publication._id,
           status: "Approved",
         });
 
         console.log(initRequestResult);
         const secondApprovalRequestResult = await RequestSecondApproval({
-          reportId: report._id,
+          reportId: publication._id,
         });
         console.log("=========== second approval request resultl ==========");
         console.log(secondApprovalRequestResult);
         if (!(result.status == 200)) throw new Error("Something went wrong");
-        message.info("Succesfully approved report");
+        message.info("Succesfully approved publication");
       } else if (action === "Reject") {
         setCurrentStatus("Rejected");
-        const result = await RejectReport({ reportId: report._id });
+        const result = await RejectReport({ reportId: publication._id });
         await InitalRequestResponse({
-          reportId: report._id,
+          reportId: publication._id,
           status: "Rejected",
         });
         if (!(result.status == 200)) throw new Error("Something went wrong");
-        message.info("Succesfully rejected  report");
+        message.info("Succesfully rejected  publication");
       } else if (action === "Publish") {
         setCurrentStatus("Published");
-        const result = await PublishReport({ reportId: report._id });
+        const result = await PublishReport({ reportId: publication._id });
         if (!(result.status == 200)) throw new Error("Something went wrong");
-        message.info("Succesfully Published report");
+        message.info("Succesfully Published publication");
         await dissiminationResponse({
-          reportId: report._id,
+          reportId: publication._id,
           status: currentStatus,
         });
       }
@@ -82,7 +86,7 @@ export default function PublicationStatusManager({
       console.log(err);
       message.error("Something went wrong");
     } finally {
-      refreshReports();
+      //   refreshReports();
     }
   };
 
@@ -98,7 +102,7 @@ export default function PublicationStatusManager({
               ) : (
                 <Menu.Item
                   key={action}
-                  onClick={() => handler(report.status, action)}
+                  onClick={() => handler(publication.status, action)}
                 >
                   {capitalizeFirstLetter(action.toLowerCase())}
                 </Menu.Item>
