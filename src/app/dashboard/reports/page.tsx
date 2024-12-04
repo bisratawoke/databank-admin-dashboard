@@ -43,6 +43,7 @@ const autoMapFields = (
   console.log("Final mapping:", mapping);
   return mapping;
 };
+
 const Reports: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
@@ -222,6 +223,7 @@ const Reports: React.FC = () => {
   return (
     <>
       {/* Render the Report Selection Table regardless of modal visibility */}
+
       <ReportsTable
         loading={loading}
         onReportSelect={handleReportSelect}
@@ -253,7 +255,7 @@ const Reports: React.FC = () => {
         open={isModalVisible}
         onCancel={handleCancel}
         footer={step === "preview" ? null : undefined}
-        width={step === "preview" ? "80%" : undefined}
+        width={step === "preview" ? "100%" : undefined}
         destroyOnClose={true}
       >
         {step === "upload" && <FileUploader onFileSelect={handleFileSelect} />}

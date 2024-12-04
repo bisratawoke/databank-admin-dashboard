@@ -2,7 +2,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
+import { getSession } from "@/lib/auth/auth";
 const API_URL = process.env.BACKEND_URL;
 
 export async function updateReport({
@@ -12,6 +12,7 @@ export async function updateReport({
   reportId: string;
   data: any[];
 }) {
+  const session: any = await getSession();
   console.log(
     "Sending update request with:",
     { reportId },
@@ -27,6 +28,7 @@ export async function updateReport({
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        authorization: `Bearer ${session?.user.accessToken}`,
       },
       body: JSON.stringify({
         data,

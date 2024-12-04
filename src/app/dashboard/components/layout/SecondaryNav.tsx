@@ -1,25 +1,15 @@
+"use client";
 import React from "react";
 import { Breadcrumb } from "antd";
-import { usePathname } from "next/navigation"; // Use this for Next.js App Router
+import { usePathname } from "next/navigation";
 
 export default function SecondaryNav() {
-  const pathname = usePathname(); // Get the current route
-  const pathnames = pathname.split("/").filter((x) => x); // Split and filter the path
+  const pathname = usePathname();
+  const pathnames = pathname.split("/").filter((x) => x);
 
   return (
-    <div
-      style={{
-        backgroundColor: "#1463CA",
-        padding: "16px",
-        paddingLeft: "20px",
-        // padding: "20px",
-      }}
-    >
-      {/* Ant Design Breadcrumb */}
+    <div className="bg-[#1463CA] p-[16px] pl-[20px]">
       <Breadcrumb style={{ color: "#fff" }}>
-        {/* Home link */}
-
-        {/* Dynamically generated breadcrumb items */}
         {pathnames.map((value, index) => {
           const url = `/${pathnames.slice(0, index + 1).join("/")}`;
 

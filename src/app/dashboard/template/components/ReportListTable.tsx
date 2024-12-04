@@ -18,6 +18,7 @@ import styles from "../styles/ReportListTable.module.css";
 
 import AddButton from "../../components/ui/AddButton";
 import { UpdateSubCategory } from "../../organization/actions/updateSubcategory";
+import RequestInitialApproval from "../actions/requestInitalApproval";
 const { Option } = Select;
 
 export default function ReportListTable({
@@ -76,6 +77,7 @@ export default function ReportListTable({
             if (status == 200) {
               message.success("Report added successfully!");
 
+              await RequestInitialApproval(result._id);
               setReports((prevReports) => [
                 ...prevReports,
                 { ...result, key: result._id },
@@ -84,7 +86,6 @@ export default function ReportListTable({
               form.resetFields();
               setIsModalVisible(false);
             } else {
-              alert(status);
               // console.log(body);
             }
           } else {
@@ -113,6 +114,11 @@ export default function ReportListTable({
       key: "description",
     },
     {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
       title: "Fields",
       dataIndex: "fields",
       key: "fields",
@@ -126,6 +132,7 @@ export default function ReportListTable({
         </>
       ),
     },
+
     {
       title: "Start Date",
       dataIndex: "start_date",

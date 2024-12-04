@@ -13,7 +13,7 @@ import { FetchPublications } from "../../actions/fetchPublications";
 import PublicationUpload from "../../upload/components/PublicationUpload";
 import SearchInput from "./SearchInput";
 import DateFilter from "./DateFilter";
-import Spinner from "@/app/(components)/Spinner";
+import Spinner from "@/components/Spinner";
 // import FileStructure from "./FileStructure";
 
 export default function PublicationListView({
@@ -36,10 +36,6 @@ export default function PublicationListView({
 
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
-  /**
-   * Effect to flatten publications whenever the publications list or current path changes
-   */
-
   useEffect(() => {
     const flatFiles = flattenPublications(publications, currentPath);
     setFiles(flatFiles);
@@ -47,74 +43,8 @@ export default function PublicationListView({
     updateBreadcrumb(currentPath);
   }, [publications, currentPath]);
 
-  // /**
-  //  * Function to flatten publications based on the current path
-  //  * Only immediate folders and files within the current path are included
-  //  */
-  // const flattenPublications = (
-  //   publications: Array<publication>,
-  //   currentPath: string
-  // ): any[] => {
-  //   const flatData: any[] = [];
-
-  //   publications.forEach((pub) => {
-  //     const fullPath = pub.name;
-  //     let relativePath = "";
-
-  //     // Determine the relative path based on the current path
-  //     if (currentPath === "") {
-  //       relativePath = fullPath;
-  //     } else if (fullPath.startsWith(`${currentPath}/`)) {
-  //       relativePath = fullPath.substring(currentPath.length + 1);
-  //     } else {
-  //       // If the publication is not under the current path, ignore it
-  //       return;
-  //     }
-
-  //     const parts = relativePath.split("/");
-
-  //     if (parts.length === 1) {
-  //       // It's a file directly under the current path
-  //       flatData.push({
-  //         key: pub.name, // Use the full path as the key
-  //         name: parts[0],
-  //         isLeaf: true,
-  //         icon: <FaFile style={{ marginRight: 8 }} />,
-  //         lastModified: pub.lastModified,
-  //         size: pub.size,
-  //         etag: pub.etag,
-  //       });
-  //     } else if (parts.length > 1) {
-  //       // It's inside a subfolder; only display the first subfolder
-  //       const firstSubFolder = parts[0];
-  //       const folderPath = currentPath
-  //         ? `${currentPath}/${firstSubFolder}`
-  //         : firstSubFolder;
-
-  //       if (!flatData.some((item) => item.key === folderPath)) {
-  //         flatData.push({
-  //           key: folderPath, // Use the full path of the subfolder as the key
-  //           name: firstSubFolder,
-  //           isLeaf: false,
-  //           icon: <FaFolder style={{ marginRight: 8 }} />,
-  //           lastModified: "",
-  //           size: "",
-  //           etag: "",
-  //         });
-  //       }
-  //     }
-  //   });
-
-  //   return flatData;
-  // };
-
-  /**
-   * Function to flatten publications based on the current path
-   * Only immediate folders and files within the current path are included
-   */
-
   const flattenPublications = (
-    publications: Array<any>, // Adjust type according to your use case
+    publications: Array<any>,
     currentPath: string
   ): any[] => {
     const flatData: any[] = [];
@@ -123,13 +53,10 @@ export default function PublicationListView({
       if (pub.metadata) {
         console.log(pub.metadata);
       }
-      const fullPath = pub.fileName; // Replace pub.name with pub.fileName
+      const fullPath = pub.fileName;
       let relativePath = "";
 
-      // Ensure fullPath is defined before proceeding
       if (!fullPath) return;
-
-      // Determine the relative path based on the current path
 
       if (currentPath === "") {
         relativePath = fullPath;
@@ -143,16 +70,18 @@ export default function PublicationListView({
 
       if (parts.length === 1) {
         flatData.push({
-          key: pub.fileName, // Use the full path as the key
+          key: pub.fileName,
 
           name: parts[0],
           isLeaf: true,
           icon: <FaFile style={{ marginRight: 8 }} />,
-          lastModified: pub.uploadDate, // Adjust this field to match your data
-          size: pub.size, // If size is available in your data
-          etag: pub.metaStoreId, // If needed, adjust to match your data
+          lastModified: pub.uploadDate,
+          size: pub.size,
+          etag: pub.metaStoreId,
           metadata: pub.metadata,
           permanentLink: pub.permanentLink,
+          status: pub.status,
+          _id: pub._id,
         });
       } else if (parts.length > 1) {
         const firstSubFolder = parts[0];
@@ -237,8 +166,8 @@ export default function PublicationListView({
   };
 
   const handleUploadSuccess = () => {
-    setIsUploadModalVisible(false); // Close the modal
-    refreshPublications(); // Refresh the publications list
+    setIsUploadModalVisible(false);
+    refreshPublications();
   };
 
   const columns: ColumnsType<any> = [
@@ -274,7 +203,6 @@ export default function PublicationListView({
       render: (_, record) => (
         <PublicationInfoMenu
           downloadFile={() => {
-            alert(record.permanentLink);
             downloadFile(`http://${record.permanentLink}`, record.name);
           }}
           showInfo={() => {

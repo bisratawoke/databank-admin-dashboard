@@ -2,7 +2,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
+import { getSession } from "@/lib/auth/auth";
 interface DataEntry {
   field: string;
   value: string;
@@ -20,12 +20,13 @@ export async function createData(
 ): Promise<CreateDataResponse> {
   console.log("dataEntries: ", dataEntries);
   const API_URL = process.env.BACKEND_URL;
-
+  const session: any = await getSession();
   try {
     const res = await fetch(`${API_URL}/data/bulk`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        authorization: `Bearer ${session?.user.accessToken}`,
       },
       body: JSON.stringify({ reportId, dataEntries }),
     });

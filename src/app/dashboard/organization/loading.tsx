@@ -1,17 +1,6 @@
 "use client";
-import { Spin } from "antd";
+import Spinner from "@/components/Spinner";
 
 export default function Loading() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "50vh",
-      }}
-    >
-      <Spin />;
-    </div>
-  );
+  return <Spinner />;
 }

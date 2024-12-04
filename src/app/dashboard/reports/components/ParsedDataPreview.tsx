@@ -127,6 +127,7 @@ const ParsedDataPreview: React.FC<ParsedDataPreviewProps> = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<any[]>(data);
   const [savedData, setSavedData] = useState<any[]>([]);
+
   useEffect(() => {
     const initialData = data.map((row, index) => ({
       ...row,
