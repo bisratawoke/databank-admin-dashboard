@@ -1,10 +1,11 @@
 "use client";
 
-import { Card, Tag, List } from "antd";
+import { Card, Tag, List, Modal, Input, Button, Form } from "antd";
 import "antd/dist/reset.css"; // Import Ant Design styles
 import PublicationRequestStatusManager from "./publicationRequestStatusManager";
 import { useState } from "react";
 import AssignDepartmentToPublication from "./assignDepartmentToPublication";
+import SetPublicationPrice from "./setPublicationRequestPrice";
 
 export default function PublicationRequestView({
   request: data,
@@ -12,6 +13,27 @@ export default function PublicationRequestView({
 }: any) {
   const [request, setRequest] = useState(data);
   const [departments, setDepartments] = useState(departmentInit);
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility
+  const [form] = Form.useForm(); // Form instance
+
+  const handleTogglePaymentRequired = () => {
+    const updatedRequest = {
+      ...request,
+      paymentRequired: !request.paymentRequired,
+    };
+    setRequest(updatedRequest);
+
+    if (!updatedRequest.paymentRequired) {
+      setIsModalVisible(false);
+    } else {
+      setIsModalVisible(true);
+    }
+  };
+
+  const handleSubmitPrice = (values: { price: number }) => {
+    console.log("Price submitted:", values.price);
+    setIsModalVisible(false);
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
@@ -21,7 +43,6 @@ export default function PublicationRequestView({
         className="w-full max-w-2xl shadow-lg"
       >
         <div className="space-y-4">
-          {/* Status */}
           <div className="flex justify-between items-center">
             <span className="font-semibold">Status:</span>
             <Tag
@@ -35,22 +56,16 @@ export default function PublicationRequestView({
             </Tag>
           </div>
 
-          {/* Payment Required */}
-          <div className="flex justify-between items-center">
+          <SetPublicationPrice request={request} setRequest={setRequest} />
+          {/* <div className="flex justify-between items-center">
             <span className="font-semibold">Payment Required:</span>
-            <Tag color={request.paymentRequired ? "red" : "green"}>
+            <Tag
+              color={request.paymentRequired ? "red" : "green"}
+              onClick={handleTogglePaymentRequired} // Toggle payment status
+              className="cursor-pointer"
+            >
               {request.paymentRequired ? "Yes" : "No"}
             </Tag>
-          </div>
-
-          {/* Category */}
-          {/* <div>
-            <span className="font-semibold">Category:</span>
-            <List
-              dataSource={request.category}
-              renderItem={(item: any) => <Tag>{item}</Tag>}
-              className="mt-2"
-            />
           </div> */}
 
           {/* Preferred Data Format */}
@@ -119,6 +134,29 @@ export default function PublicationRequestView({
           />
         </div>
       </Card>
+
+      <Modal
+        title="Enter Price"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)} // Close modal without saving
+        footer={null}
+      >
+        <Form form={form} onFinish={handleSubmitPrice}>
+          <Form.Item
+            label="Price"
+            name="price"
+            rules={[{ required: true, message: "Please input the price!" }]}
+          >
+            <Input type="number" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Submit Price
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
