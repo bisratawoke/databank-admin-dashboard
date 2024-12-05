@@ -19,9 +19,35 @@ export default function PublicationRequestListView({
       },
     },
     {
+      title: "Administration Units",
+      dataIndex: "adminUnits",
+      key: "adminUnits",
+    },
+    {
+      title: "Data Importance",
+      dataIndex: "dateImportance",
+      key: "dateImportance",
+    },
+    {
       title: "Purpose for Research",
       dataIndex: "purposeForResearch",
       key: "purposeForResearch",
+    },
+    {
+      title: "Attachements",
+      dataIndex: "attachments",
+      key: "attachments",
+      render: (value: Array<string>) => {
+        return (
+          <>
+            {value.map((file, index) => (
+              <a key={index} download href={`http://${file}`}>
+                Download Attachement
+              </a>
+            ))}
+          </>
+        );
+      },
     },
   ];
   return (
