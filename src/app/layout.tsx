@@ -3,6 +3,7 @@ import "../styles/globals.css";
 import { getSession } from "../lib/auth/auth";
 import Providers from "../lib/auth/authProvider";
 import { signIn } from "next-auth/react";
+import { WithServerSession } from "@/lib/auth/WithServerSession";
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -11,8 +12,6 @@ export default async function RootLayout({
   const session = await getSession();
 
   if (!session) signIn();
-  console.log("============= in root layout ===================");
-  console.log(session);
   return (
     <html lang="en">
       <body>

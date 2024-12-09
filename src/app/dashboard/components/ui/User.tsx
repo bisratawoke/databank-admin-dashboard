@@ -127,7 +127,7 @@ const User: React.FC = () => {
       trigger="click"
       placement="bottomRight"
     >
-      <Avatar className="bg-[#078148] pointer">
+      <Avatar className="bg-[#078148] hover:cursor-pointer">
         {firstName && lastName ? firstName[0] + lastName[0] : "B"}
       </Avatar>
     </Popover>
