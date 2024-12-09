@@ -18,9 +18,6 @@ export default function PrimaryNavBar({
     <div className="bg-[#166EE1] flex items-center h-[50px] p-[20px] justify-between">
       <div className="flex items-center gap-[8px]">
         <Logo />
-        <span className="text-[17px]/[24px] text-white font-[675]">
-          Ess Stat Bank
-        </span>
 
         <div>
           <NavItem label="Organization" link="/dashboard/organization" />
