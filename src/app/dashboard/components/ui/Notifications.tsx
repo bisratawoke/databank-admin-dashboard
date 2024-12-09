@@ -15,7 +15,7 @@ export interface Notification {
 }
 
 export default function Notifications({
-  notifications,
+  notifications = [],
 }: {
   notifications: Notification[];
 }) {
@@ -28,8 +28,8 @@ export default function Notifications({
   }, [notifications]);
 
   const removeNotification = (notificationId: string) => {
-    setFilteredNotificationList((prevList) =>
-      prevList.filter((item) => item._id != notificationId)
+    setFilteredNotificationList((prevList: Array<Record<string, any>>) =>
+      prevList.filter((item: Record<string, any>) => item._id != notificationId)
     );
   };
 
@@ -40,16 +40,18 @@ export default function Notifications({
           <span className="text-sky-500">No new Notifications</span>
         </div>
       )}
-      {filteredNotificationList.map((notification, index) => (
-        <NotificationCard
-          key={index}
-          message={notification.message}
-          user={notification.user}
-          createdAt={notification.createdAt}
-          notificationId={notification._id}
-          removeNotification={removeNotification}
-        />
-      ))}
+      {filteredNotificationList.map(
+        (notification: Record<string, any>, index: number) => (
+          <NotificationCard
+            key={index}
+            message={notification.message}
+            user={notification.user}
+            createdAt={notification.createdAt}
+            notificationId={notification._id}
+            removeNotification={removeNotification}
+          />
+        )
+      )}
     </div>
   );
 
