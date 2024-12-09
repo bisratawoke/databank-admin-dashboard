@@ -11,10 +11,6 @@ export default async function SetPublicationRequestPriceAction({
 }) {
   const session: any = await getSession();
 
-  console.log("========= in here ==============");
-  console.log(
-    `${process.env.BACKEND_URL}/publication-request/payment-info-setup/${publicationRequestId}`
-  );
   const res = await fetch(
     `${process.env.BACKEND_URL}/publication-request/payment-info-setup/${publicationRequestId}`,
     {

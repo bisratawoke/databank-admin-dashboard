@@ -14,7 +14,6 @@ import PublicationUpload from "../../upload/components/PublicationUpload";
 import SearchInput from "./SearchInput";
 import DateFilter from "./DateFilter";
 import Spinner from "@/components/Spinner";
-// import FileStructure from "./FileStructure";
 
 export default function PublicationListView({
   publications: initialPublications,

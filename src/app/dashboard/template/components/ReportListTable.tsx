@@ -114,9 +114,14 @@ export default function ReportListTable({
       key: "description",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: "Start Date",
+      dataIndex: "start_date",
+      key: "start_date",
+    },
+    {
+      title: "End Date",
+      dataIndex: "end_date",
+      key: "end_date",
     },
     {
       title: "Fields",
@@ -132,16 +137,95 @@ export default function ReportListTable({
         </>
       ),
     },
-
     {
-      title: "Start Date",
-      dataIndex: "start_date",
-      key: "start_date",
+      title: "Data",
+      dataIndex: "data",
+      key: "data",
+      render: (data: any) => (
+        <>
+          {data?.map((item: any) => (
+            <Tag color="green" key={item._id}>
+              {item.name || item.id}
+            </Tag>
+          ))}
+        </>
+      ),
     },
     {
-      title: "End Date",
-      dataIndex: "end_date",
-      key: "end_date",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => (
+        <Tag color={status === "pending" ? "orange" : "green"}>{status}</Tag>
+      ),
+    },
+    {
+      title: "Data Status",
+      dataIndex: "data_status",
+      key: "data_status",
+      render: (data_status: string) => (
+        <Tag color={data_status === "pending" ? "orange" : "green"}>
+          {data_status}
+        </Tag>
+      ),
+    },
+    {
+      title: "Author",
+      dataIndex: "author",
+      key: "author",
+    },
+    {
+      title: "Data Quality Limitations",
+      dataIndex: "data_quality_limitations",
+      key: "data_quality_limitations",
+    },
+    {
+      title: "Time Coverage",
+      dataIndex: "time_coverage",
+      key: "time_coverage",
+    },
+    {
+      title: "Update Frequency",
+      dataIndex: "update_frequency",
+      key: "update_frequency",
+    },
+    {
+      title: "Access Restrictions",
+      dataIndex: "access_restrictions",
+      key: "access_restrictions",
+    },
+    {
+      title: "Payment Amount",
+      dataIndex: "payment_amount",
+      key: "payment_amount",
+      render: (amount: number) => (amount ? `$${amount}` : "N/A"),
+    },
+    {
+      title: "Licenses/Terms of Use",
+      dataIndex: "licenses_terms_of_use",
+      key: "licenses_terms_of_use",
+    },
+    {
+      title: "Contact Information",
+      dataIndex: "contact_information",
+      key: "contact_information",
+    },
+    {
+      title: "File Formats",
+      dataIndex: "file_formats_available",
+      key: "file_formats_available",
+      render: (formats: string[]) => formats?.join(", ") || "N/A",
+    },
+    {
+      title: "API Access",
+      dataIndex: "api_access",
+      key: "api_access",
+      render: (access: boolean) => (access ? "Enabled" : "Disabled"),
+    },
+    {
+      title: "Data Structure Information",
+      dataIndex: "data_structure_information",
+      key: "data_structure_information",
     },
   ];
 
@@ -183,6 +267,120 @@ export default function ReportListTable({
         cancelText="Cancel"
       >
         <Form form={form} layout="vertical">
+          {/* Existing Fields */}
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter the name" }]}
+          >
+            <Input placeholder="Enter report name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              { required: true, message: "Please enter the description" },
+            ]}
+          >
+            <Input placeholder="Enter report description" />
+          </Form.Item>
+
+          <div style={{ display: "flex", gap: "16px" }}>
+            <Form.Item
+              label="Start Date"
+              name="start_date"
+              rules={[
+                { required: true, message: "Please select the start date" },
+              ]}
+              style={{ flexGrow: 1 }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              label="End Date"
+              name="end_date"
+              rules={[
+                { required: true, message: "Please select the end date" },
+              ]}
+              style={{ flexGrow: 1 }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            label="Sub-category"
+            name="type"
+            rules={[{ required: true, message: "Please select a subcategory" }]}
+          >
+            <Select placeholder="Select report subcategory">
+              {subCategories.map((type: any) => (
+                <Option key={type._id} value={JSON.stringify(type)}>
+                  {type.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* New Fields */}
+          <Form.Item
+            label="Data Quality Limitations"
+            name="data_quality_limitations"
+          >
+            <Input.TextArea placeholder="Enter limitations of the dataset" />
+          </Form.Item>
+
+          <Form.Item label="Time Coverage" name="time_coverage">
+            <Input placeholder="Enter time coverage (e.g., '2020-2023')" />
+          </Form.Item>
+
+          <Form.Item label="Update Frequency" name="update_frequency">
+            <Input placeholder="Enter update frequency (e.g., 'Annually')" />
+          </Form.Item>
+
+          <Form.Item label="Access Restrictions" name="access_restrictions">
+            <Input placeholder="Enter access restrictions (if any)" />
+          </Form.Item>
+
+          <Form.Item label="Payment Amount" name="payment_amount">
+            <Input type="number" placeholder="Enter payment amount" />
+          </Form.Item>
+
+          <Form.Item label="Licenses/Terms of Use" name="licenses_terms_of_use">
+            <Input.TextArea placeholder="Enter licensing or terms of use" />
+          </Form.Item>
+
+          <Form.Item label="Contact Information" name="contact_information">
+            <Input placeholder="Enter contact information" />
+          </Form.Item>
+
+          <Form.Item label="File Formats" name="file_formats_available">
+            <Select mode="multiple" placeholder="Select file formats">
+              <Option value="CSV">CSV</Option>
+              <Option value="Excel">Excel</Option>
+              <Option value="JSON">JSON</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="API Access"
+            name="api_access"
+            valuePropName="checked"
+          >
+            <Input type="checkbox" />
+          </Form.Item>
+
+          <Form.Item
+            label="Data Structure Information"
+            name="data_structure_information"
+          >
+            <Input.TextArea placeholder="Enter data structure details" />
+          </Form.Item>
+        </Form>
+
+        {/* <Form form={form} layout="vertical">
           <Form.Item
             label="Name"
             name="name"
@@ -239,7 +437,6 @@ export default function ReportListTable({
             rules={[{ required: true, message: "Please select a subcategory" }]}
           >
             <Select placeholder="Select report subcategory">
-              {/*eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
               {subCategories.map((type: any) => (
                 <Option key={type._id} value={JSON.stringify(type)}>
                   {type.name}
@@ -247,7 +444,7 @@ export default function ReportListTable({
               ))}
             </Select>
           </Form.Item>
-        </Form>
+        </Form> */}
       </Modal>
     </>
   );

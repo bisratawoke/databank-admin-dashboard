@@ -10,7 +10,7 @@ import WithRole, { ACTION } from "@/lib/auth/WithRole";
 import User from "../ui/User";
 
 export default function PrimaryNavBar({
-  notifications,
+  notifications = [],
 }: {
   notifications: Notification[];
 }) {

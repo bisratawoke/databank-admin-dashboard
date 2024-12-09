@@ -13,27 +13,6 @@ export default function PublicationRequestView({
 }: any) {
   const [request, setRequest] = useState(data);
   const [departments, setDepartments] = useState(departmentInit);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility
-  const [form] = Form.useForm(); // Form instance
-
-  const handleTogglePaymentRequired = () => {
-    const updatedRequest = {
-      ...request,
-      paymentRequired: !request.paymentRequired,
-    };
-    setRequest(updatedRequest);
-
-    if (!updatedRequest.paymentRequired) {
-      setIsModalVisible(false);
-    } else {
-      setIsModalVisible(true);
-    }
-  };
-
-  const handleSubmitPrice = (values: { price: number }) => {
-    console.log("Price submitted:", values.price);
-    setIsModalVisible(false);
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
@@ -57,16 +36,6 @@ export default function PublicationRequestView({
           </div>
 
           <SetPublicationPrice request={request} setRequest={setRequest} />
-          {/* <div className="flex justify-between items-center">
-            <span className="font-semibold">Payment Required:</span>
-            <Tag
-              color={request.paymentRequired ? "red" : "green"}
-              onClick={handleTogglePaymentRequired} // Toggle payment status
-              className="cursor-pointer"
-            >
-              {request.paymentRequired ? "Yes" : "No"}
-            </Tag>
-          </div> */}
 
           {/* Preferred Data Format */}
           <div className="flex justify-between items-center">
@@ -134,29 +103,6 @@ export default function PublicationRequestView({
           />
         </div>
       </Card>
-
-      <Modal
-        title="Enter Price"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)} // Close modal without saving
-        footer={null}
-      >
-        <Form form={form} onFinish={handleSubmitPrice}>
-          <Form.Item
-            label="Price"
-            name="price"
-            rules={[{ required: true, message: "Please input the price!" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Submit Price
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 }

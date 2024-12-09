@@ -133,12 +133,10 @@ const Reports: React.FC = () => {
   };
 
   const handleDataCreate = async (reportId: string, data: any[]) => {
-    console.log("received data for update case: ", reportId, data);
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      // Format the parsed data with field-value pairs
       if (reportId) {
         const formattedData = data
           .map((row: any) =>
@@ -164,8 +162,6 @@ const Reports: React.FC = () => {
           throw new Error(response.error || "Failed to create data entries");
         }
         message.success("Report updated successfully with new data entries");
-
-        // Close modal, refresh reports, and reset state
         await refreshReports();
         setIsModalVisible(false);
         reset();
@@ -179,7 +175,6 @@ const Reports: React.FC = () => {
   };
 
   const handleDataUpdate = async (data: Data[]) => {
-    console.log("received data for update case: ", data);
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -193,7 +188,6 @@ const Reports: React.FC = () => {
 
       message.success("Report updated successfully");
 
-      // Close modal, refresh reports, and reset state
       await refreshReports();
       setIsModalVisible(false);
       reset();
@@ -222,8 +216,6 @@ const Reports: React.FC = () => {
 
   return (
     <>
-      {/* Render the Report Selection Table regardless of modal visibility */}
-
       <ReportsTable
         loading={loading}
         onReportSelect={handleReportSelect}
@@ -232,16 +224,12 @@ const Reports: React.FC = () => {
         onUpdateReport={(props) => {
           console.log("props being recieved; ", props);
           if (!props.reportId) {
-            // This is a direct table edit
             handleDataUpdate(props.data);
           } else if (props.reportId) {
-            // This is from file upload flow
             handleDataCreate(props.reportId, props.data);
           }
         }}
       />
-
-      {/* Modal  */}
       <Modal
         title={
           step === "upload"
@@ -279,10 +267,6 @@ const Reports: React.FC = () => {
           />
         )}
       </Modal>
-
-      {/* <Button type="primary" onClick={handleUpdateReport}>
-        Add data to Report
-      </Button> */}
     </>
   );
 };

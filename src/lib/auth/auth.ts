@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthOptions, getServerSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { redirect } from "next/navigation";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -46,6 +47,25 @@ export const authOptions: AuthOptions = {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
       }
+
+      if (token.exp && token.exp < Date.now()) {
+        const res = await fetch(`${process.env.BACKEND_URL}/auth/refresh`, {
+          headers: {
+            "content-type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({
+            refresh_token: token.refreshToken,
+          }),
+        });
+
+        if (!(res.status == 201)) redirect("/api/auth/signin");
+        const result = await res.json();
+
+        token.accessToken = result.access_token;
+        token.user.accessToken = result.access_token;
+      }
+
       return token;
     },
     async session({ session, token }: any) {

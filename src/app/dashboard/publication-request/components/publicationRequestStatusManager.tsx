@@ -5,6 +5,7 @@ import { message } from "antd";
 import { useSession } from "next-auth/react";
 import InitalApproval from "../actions/initalApproval";
 import SecondaryApproval from "../actions/secondaryApproval";
+import VerifyPublicationRequestPayment from "../actions/VerifyPublicationRequestPayment";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -31,6 +32,7 @@ export default function PublicationRequestStatusManager({
     "PENDING DEPARTMENT ASSIGNMENT": ["Pending Approval"],
     "PENDING APPROVAL": ["Initial Approval", "Reject"],
     "INITIAL APPROVAL": ["Deputy Approval", "Reject"],
+    "PAYMENT PENDING": ["Payment verified"],
     PENDING: ["Approve", "Reject"],
     APPROVED: ["Publish", "Reject"],
     REJECTED: ["Approve"],
@@ -38,6 +40,18 @@ export default function PublicationRequestStatusManager({
 
   const handler = async (state: string, action: string) => {
     try {
+      if (action === "Payment verified") {
+        console.log(
+          "============ in payment verification component ================="
+        );
+        const { body, status }: any = await VerifyPublicationRequestPayment({
+          publicationRequestId: publication._id,
+        });
+        console.log(body);
+        message.success("Successfully verified publication request payment");
+        setPublicationRequest(body);
+        // setCurrentStatus(body.status.toLowerCase());
+      }
       if (action == "Deputy Approval") {
         const { body, status }: any = await SecondaryApproval({
           publicationRequestId: publication._id,
