@@ -8,6 +8,7 @@ import {
   Space,
   Flex,
   Typography,
+  Skeleton,
 } from "antd";
 import {
   EditOutlined,
@@ -19,9 +20,11 @@ import {
 
 import { signOut, useSession } from "next-auth/react";
 import { FiUser } from "react-icons/fi";
+import { useState } from "react";
 
 const useUser = () => {
   const { data: session }: any = useSession();
+
   let userString = null;
   if (session) {
     userString = JSON.stringify({
@@ -108,7 +111,6 @@ const User: React.FC = () => {
             block
             icon={<LogoutOutlined />}
             onClick={() => {
-              //   logOut();
               signOut();
               message.success("Logout successful");
             }}
