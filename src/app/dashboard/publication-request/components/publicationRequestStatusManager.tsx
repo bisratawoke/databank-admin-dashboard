@@ -5,7 +5,7 @@ import { message } from "antd";
 import { useSession } from "next-auth/react";
 import InitalApproval from "../actions/initalApproval";
 import SecondaryApproval from "../actions/secondaryApproval";
-import VerifyPublicationRequestPayment from "../actions/VerifyPublicationRequestPayment";
+import VerifyPublicationRequestPayment from "../actions/verifyPublicationRequestPayment";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);

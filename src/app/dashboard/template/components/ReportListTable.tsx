@@ -143,9 +143,9 @@ export default function ReportListTable({
       key: "data",
       render: (data: any) => (
         <>
-          {data?.map((item: any) => (
+          {data?.slice(0, 20).map((item: any) => (
             <Tag color="green" key={item._id}>
-              {item.name || item.id}
+              {item.value}
             </Tag>
           ))}
         </>
@@ -159,74 +159,65 @@ export default function ReportListTable({
         <Tag color={status === "pending" ? "orange" : "green"}>{status}</Tag>
       ),
     },
-    {
-      title: "Data Status",
-      dataIndex: "data_status",
-      key: "data_status",
-      render: (data_status: string) => (
-        <Tag color={data_status === "pending" ? "orange" : "green"}>
-          {data_status}
-        </Tag>
-      ),
-    },
-    {
-      title: "Author",
-      dataIndex: "author",
-      key: "author",
-    },
-    {
-      title: "Data Quality Limitations",
-      dataIndex: "data_quality_limitations",
-      key: "data_quality_limitations",
-    },
-    {
-      title: "Time Coverage",
-      dataIndex: "time_coverage",
-      key: "time_coverage",
-    },
-    {
-      title: "Update Frequency",
-      dataIndex: "update_frequency",
-      key: "update_frequency",
-    },
-    {
-      title: "Access Restrictions",
-      dataIndex: "access_restrictions",
-      key: "access_restrictions",
-    },
-    {
-      title: "Payment Amount",
-      dataIndex: "payment_amount",
-      key: "payment_amount",
-      render: (amount: number) => (amount ? `$${amount}` : "N/A"),
-    },
-    {
-      title: "Licenses/Terms of Use",
-      dataIndex: "licenses_terms_of_use",
-      key: "licenses_terms_of_use",
-    },
-    {
-      title: "Contact Information",
-      dataIndex: "contact_information",
-      key: "contact_information",
-    },
-    {
-      title: "File Formats",
-      dataIndex: "file_formats_available",
-      key: "file_formats_available",
-      render: (formats: string[]) => formats?.join(", ") || "N/A",
-    },
-    {
-      title: "API Access",
-      dataIndex: "api_access",
-      key: "api_access",
-      render: (access: boolean) => (access ? "Enabled" : "Disabled"),
-    },
-    {
-      title: "Data Structure Information",
-      dataIndex: "data_structure_information",
-      key: "data_structure_information",
-    },
+
+    // {
+    //   title: "Author",
+    //   dataIndex: "author",
+    //   key: "author",
+    // },
+    // {
+    //   title: "Data Quality Limitations",
+    //   dataIndex: "data_quality_limitations",
+    //   key: "data_quality_limitations",
+    // },
+    // {
+    //   title: "Time Coverage",
+    //   dataIndex: "time_coverage",
+    //   key: "time_coverage",
+    // },
+    // {
+    //   title: "Update Frequency",
+    //   dataIndex: "update_frequency",
+    //   key: "update_frequency",
+    // },
+    // {
+    //   title: "Access Restrictions",
+    //   dataIndex: "access_restrictions",
+    //   key: "access_restrictions",
+    // },
+    // {
+    //   title: "Payment Amount",
+    //   dataIndex: "payment_amount",
+    //   key: "payment_amount",
+    //   render: (amount: number) => (amount ? `$${amount}` : "N/A"),
+    // },
+    // {
+    //   title: "Licenses/Terms of Use",
+    //   dataIndex: "licenses_terms_of_use",
+    //   key: "licenses_terms_of_use",
+    // },
+    // {
+    //   title: "Contact Information",
+    //   dataIndex: "contact_information",
+    //   key: "contact_information",
+    // },
+    // {
+    //   title: "File Formats",
+    //   dataIndex: "file_formats_available",
+    //   key: "file_formats_available",
+    //   render: (formats: string[]) => formats?.join(", ") || "N/A",
+    // },
+    // {
+    //   title: "API Access",
+    //   dataIndex: "api_access",
+    //   key: "api_access",
+    //   render: (access: boolean) => (access ? "Enabled" : "Disabled"),
+    // },
+    // {
+    //   title: "Data Structure Information",
+    //   dataIndex: "data_structure_information",
+    //   key: "data_structure_information",
+    // },
   ];
 
   const dataWithButton = [
