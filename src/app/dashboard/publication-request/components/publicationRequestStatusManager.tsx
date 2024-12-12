@@ -21,6 +21,10 @@ export default function PublicationRequestStatusManager({
   const [currentStatus, setCurrentStatus] = useState<string>("");
 
   useEffect(() => {
+    console.log(
+      "=========== in publication request status manager ================="
+    );
+    console.log(session.user.roles);
     setCurrentStatus(publication.status.toLowerCase());
   }, []);
 
@@ -121,10 +125,13 @@ export default function PublicationRequestStatusManager({
     <Menu>
       {availableActions.map((action) => (
         <>
-          {!session.user.roles.includes("DEPARTMENT_EXPERT") && (
+          {action == "Initial Approval" &&
+          !session.user.roles.includes("DEPARTMENT_HEAD") ? (
+            <></>
+          ) : (
             <>
-              {action == "Publish" &&
-              !session.user.roles.includes("DISSEMINATION_HEAD") ? (
+              {action == "Deputy Approval" &&
+              !session.user.roles.includes("DEPUTY_DIRECTOR") ? (
                 <></>
               ) : (
                 <Menu.Item
