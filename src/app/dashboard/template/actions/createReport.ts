@@ -13,7 +13,11 @@ export async function createReport(report: report) {
       method: "POST",
       body: JSON.stringify(report),
     });
+
+    console.log(res.status);
+
     const result = await res.json();
+    console.log(result);
     return {
       body: result,
       status: res.status,

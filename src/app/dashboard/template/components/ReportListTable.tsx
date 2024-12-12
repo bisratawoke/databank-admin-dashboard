@@ -335,9 +335,9 @@ export default function ReportListTable({
             <Input placeholder="Enter access restrictions (if any)" />
           </Form.Item>
 
-          <Form.Item label="Payment Amount" name="payment_amount">
+          {/* <Form.Item label="Payment Amount" name="payment_amount">
             <Input type="number" placeholder="Enter payment amount" />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item label="Licenses/Terms of Use" name="licenses_terms_of_use">
             <Input.TextArea placeholder="Enter licensing or terms of use" />
@@ -354,14 +354,14 @@ export default function ReportListTable({
               <Option value="JSON">JSON</Option>
             </Select>
           </Form.Item>
-
+          {/* 
           <Form.Item
             label="API Access"
             name="api_access"
             valuePropName="checked"
           >
             <Input type="checkbox" />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             label="Data Structure Information"
