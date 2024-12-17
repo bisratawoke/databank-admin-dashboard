@@ -12,6 +12,7 @@ import {
   Select,
   Spin,
   Space,
+  Switch,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import type { RcFile, UploadFile } from "antd/es/upload/interface";
@@ -35,6 +36,7 @@ interface UploadFormValues {
   publicationType: string;
   department: string;
   category: string;
+  price: string;
 }
 
 enum PUBLICATION_TYPE {
@@ -56,6 +58,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [coverImageList, setCoverImageList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [buckets, setBuckets] = useState<string[]>([]);
   const [loadingBuckets, setLoadingBuckets] = useState(true);
@@ -63,6 +66,8 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
   const [loadingLocations, setLoadingLocations] = useState(true);
   const [customLocation, setCustomLocation] = useState(false);
 
+  const [publicationType, setPublicationType] = useState<any>(null);
+  const [paymentRequired, setPaymentRequired] = useState(false);
   const [categories, setCategories] = useState(
     departments.flatMap((department) => department.category)
   );
@@ -125,6 +130,17 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
       return;
     }
 
+    if (coverImageList.length === 0) {
+      message.error("Please select a file to upload");
+      return;
+    }
+
+    const coverImage = coverImageList[0] as RcFile;
+    if (!coverImage) {
+      message.error("Invalid file object");
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -133,13 +149,22 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("publicationType", values.publicationType[0]);
+      formData.append("coverImage", coverImage);
+      // formData.append("publicationType", values.publicationType[0]);
       formData.append("department", values.department[0]);
       formData.append("category", values.category[0]);
+      formData.append("publicationType", values.publicationType);
+      formData.append("paymentRequired", `${paymentRequired}`);
+      formData.append("price", values.price);
+      alert(values.price);
+
       delete values.publicationType;
       delete values.department;
       delete values.category;
-      // Prepare metadata
+      delete values.publicationType;
+      delete values.price;
+      delete values.paymentRequired;
+
       const metadata = {
         ...values,
         fileName: file.name,
@@ -152,8 +177,6 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
         created_date: dayjs(values.created_date).toISOString(),
       };
 
-      // Add all required fields to FormData
-      // Append metadata to FormData
       Object.entries(metadata).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           formData.append(key, JSON.stringify(value)); // Serialize arrays
@@ -184,6 +207,12 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
     }
   };
 
+  const beforeCoverImageUpload = (file: UploadFile) => {
+    setCoverImageList([file]);
+    form.setFieldsValue({ type: file.type });
+    return false;
+  };
+
   const beforeUpload = (file: UploadFile) => {
     setFileList([file]);
 
@@ -212,6 +241,10 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
   //   return isValidType && isValidSize;
   // };
 
+  const onCoverImageRemove = () => {
+    setCoverImageList([]);
+    form.setFieldValue("type", "");
+  };
   const onRemove = () => {
     setFileList([]);
     form.setFieldValue("type", "");
@@ -312,10 +345,14 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
           ]}
         >
           <Select
-            mode="tags"
+            // mode="tags"
             style={{ width: "100%" }}
             placeholder="Please Select the publication type"
             tokenSeparators={[","]}
+            onChange={(value) => {
+              form.setFieldValue("publicationType", value);
+              setPublicationType(value);
+            }}
             className="w-full"
             options={[
               {
@@ -326,13 +363,57 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
                 label: "Internal",
                 value: "INTERNAL",
               },
-              {
-                label: "For Sale",
-                value: "FOR_SALE",
-              },
             ]}
           />
         </Form.Item>
+        {/* {form.getFieldValue("publicationType")} */}
+        {publicationType == "PUBLIC" && (
+          <>
+            <Form.Item label="Cover Image">
+              <Upload
+                beforeUpload={beforeCoverImageUpload}
+                onRemove={onCoverImageRemove}
+                fileList={coverImageList}
+                maxCount={1}
+                className="w-full"
+              >
+                <Button
+                  icon={<UploadOutlined />}
+                  // disabled={fileList.length > 0}
+                >
+                  Select File
+                </Button>
+              </Upload>
+            </Form.Item>
+
+            <Form.Item
+              name="paymentRequired"
+              label="Payment Required"
+              valuePropName="Payment Required"
+            >
+              <Switch onChange={(value) => setPaymentRequired(value)} />
+            </Form.Item>
+
+            {paymentRequired && (
+              <Form.Item
+                name="price"
+                label="Publication Price"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter a publication Price",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Enter publciation price"
+                  className="w-full"
+                />
+              </Form.Item>
+            )}
+          </>
+        )}
+
         <Form.Item
           name="keyword"
           label="Keywords"
@@ -452,200 +533,3 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
 };
 
 export default PublicationUpload;
-
-// import React, { useEffect, useState } from "react";
-// import { Form, Input, Select, DatePicker, Upload, Button, message } from "antd";
-// import { UploadOutlined } from "@ant-design/icons";
-// import { RcFile } from "antd/lib/upload";
-// import dayjs from "dayjs";
-// import { fetchBuckets, fetchLocations } from "../actions/publications";
-// const { Option } = Select;
-
-// interface PublicationManagementProps {
-//   currentPath: string;
-//   editingPublication: any | null;
-//   onSubmit: (values: any, fileList: any[]) => void;
-// }
-
-// const PublicationManagement: React.FC<PublicationManagementProps> = ({
-//   currentPath,
-//   editingPublication,
-//   onSubmit,
-// }) => {
-//   const [form] = Form.useForm();
-//   const [fileList, setFileList] = useState<RcFile[]>([]);
-//   const [buckets, setBuckets] = useState<string[]>([]);
-//   const [locations, setLocations] = useState<string[]>([]);
-//   const [customLocation, setCustomLocation] = useState(false);
-
-//   useEffect(() => {
-//     const loadData = async () => {
-//       try {
-//         const [fetchedBuckets, fetchedLocations] = await Promise.all([
-//           fetchBuckets(),
-//           fetchLocations(),
-//         ]);
-//         setBuckets(fetchedBuckets);
-//         setLocations(fetchedLocations);
-//       } catch (error) {
-//         console.error("Failed to fetch data:", error);
-//         message.error("Failed to load data");
-//       }
-//     };
-
-//     loadData();
-//   }, []);
-
-//   useEffect(() => {
-//     form.setFieldsValue({
-//       location: currentPath,
-//       ...(editingPublication && {
-//         ...editingPublication,
-//         modified_date: dayjs(editingPublication.modified_date),
-//         created_date: dayjs(editingPublication.created_date),
-//       }),
-//     });
-//   }, [currentPath, editingPublication, form]);
-
-//   const handleLocationChange = (value: string) => {
-//     if (value === "custom") {
-//       setCustomLocation(true);
-//       form.setFieldsValue({ location: "" });
-//     } else {
-//       setCustomLocation(false);
-//       form.setFieldsValue({ location: value });
-//     }
-//   };
-
-//   const onFinish = (values: any) => {
-//     onSubmit(values, fileList);
-//   };
-
-//   const beforeUpload = (file: RcFile) => {
-//     setFileList([file]);
-//     return false;
-//   };
-
-//   const onRemove = () => {
-//     setFileList([]);
-//   };
-
-//   return (
-//     <Form form={form} onFinish={onFinish} layout="vertical">
-//       <Form.Item
-//         name="description"
-//         label="Description"
-//         rules={[{ required: true, message: "Please enter a description" }]}
-//       >
-//         <Input.TextArea rows={4} placeholder="Enter file description" />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="keyword"
-//         label="Keywords"
-//         rules={[
-//           { required: true, message: "Please enter at least one keyword" },
-//         ]}
-//       >
-//         <Select
-//           mode="tags"
-//           style={{ width: "100%" }}
-//           placeholder="Enter keywords and press enter"
-//           tokenSeparators={[","]}
-//         />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="bucketName"
-//         label="Bucket"
-//         rules={[{ required: true, message: "Please select a bucket" }]}
-//       >
-//         <Select placeholder="Select a bucket">
-//           {buckets.map((bucket: string) => (
-//             <Option key={bucket} value={bucket}>
-//               {bucket}
-//             </Option>
-//           ))}
-//         </Select>
-//       </Form.Item>
-
-//       <Form.Item
-//         name="type"
-//         label="File Type"
-//         rules={[{ required: true, message: "Please specify the file type" }]}
-//       >
-//         <Input placeholder="e.g., application/pdf" />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="location"
-//         label="Storage Location"
-//         rules={[
-//           { required: true, message: "Please specify the storage location" },
-//         ]}
-//       >
-//         <Select
-//           style={{ width: "100%" }}
-//           placeholder="Select a location"
-//           onChange={handleLocationChange}
-//         >
-//           <Option value="custom">Enter custom location</Option>
-//           {locations.map((location) => (
-//             <Option key={location} value={location}>
-//               {location}
-//             </Option>
-//           ))}
-//         </Select>
-//       </Form.Item>
-//       {customLocation && (
-//         <Form.Item
-//           name="customLocation"
-//           rules={[
-//             { required: true, message: "Please enter a custom location" },
-//           ]}
-//         >
-//           <Input placeholder="Enter custom location" />
-//         </Form.Item>
-//       )}
-
-//       <Form.Item
-//         name="modified_date"
-//         label="Last Modified Date"
-//         rules={[
-//           { required: true, message: "Please select the last modified date" },
-//         ]}
-//       >
-//         <DatePicker showTime style={{ width: "100%" }} />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="created_date"
-//         label="Creation Date"
-//         rules={[{ required: true, message: "Please select the creation date" }]}
-//       >
-//         <DatePicker showTime style={{ width: "100%" }} />
-//       </Form.Item>
-
-//       {!editingPublication && (
-//         <Form.Item label="File">
-//           <Upload
-//             beforeUpload={beforeUpload}
-//             onRemove={onRemove}
-//             fileList={fileList}
-//             maxCount={1}
-//           >
-//             <Button icon={<UploadOutlined />}>Select File</Button>
-//           </Upload>
-//         </Form.Item>
-//       )}
-
-//       <Form.Item>
-//         <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-//           {editingPublication ? "Update Publication" : "Add Publication"}
-//         </Button>
-//       </Form.Item>
-//     </Form>
-//   );
-// };
-
-// export default PublicationManagement;
