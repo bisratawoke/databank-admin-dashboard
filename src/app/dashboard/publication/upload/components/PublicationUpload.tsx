@@ -155,8 +155,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
       formData.append("category", values.category[0]);
       formData.append("publicationType", values.publicationType);
       formData.append("paymentRequired", `${paymentRequired}`);
-      formData.append("price", values.price);
-      alert(values.price);
+      formData.append("price", values.price ? values.price : "0");
 
       delete values.publicationType;
       delete values.department;
@@ -400,7 +399,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
                 label="Publication Price"
                 rules={[
                   {
-                    required: true,
+                    required: false,
                     message: "Please enter a publication Price",
                   },
                 ]}
