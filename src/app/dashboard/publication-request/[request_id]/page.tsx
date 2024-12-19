@@ -24,5 +24,7 @@ export default async function Page({ params }: { params: any }) {
     departments = body;
   }
 
+  console.log("======== in publication request view   ============");
+  console.log(request);
   return <PublicationRequestView request={request} departments={departments} />;
 }

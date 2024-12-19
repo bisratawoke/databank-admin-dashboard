@@ -9,8 +9,8 @@ export default function SetPublicationRequestPrice({
   request: any;
   setRequest: any;
 }) {
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility
-  const [form] = Form.useForm(); // Form instance
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
   const handleTogglePaymentRequired = () => {
     const updatedRequest = {
@@ -19,11 +19,10 @@ export default function SetPublicationRequestPrice({
     };
     setRequest(updatedRequest);
 
-    // If paymentRequired is true, show modal
     if (!updatedRequest.paymentRequired) {
-      setIsModalVisible(false); // Hide modal when toggled back to false
+      setIsModalVisible(false);
     } else {
-      setIsModalVisible(true); // Show modal when toggled to true
+      setIsModalVisible(true);
     }
   };
 
@@ -41,32 +40,32 @@ export default function SetPublicationRequestPrice({
     console.log("=================== in handle submit price =================");
     console.log(status);
     console.log(body);
-    // Update the request with the submitted price
+
     const updatedRequest = { ...request, price: values.price };
     setRequest(updatedRequest);
 
-    setIsModalVisible(false); // Close modal after submission
+    setIsModalVisible(false);
   };
 
   return (
     <div>
-      {/* Payment Required Toggle */}
-      <div className="flex justify-between items-center">
-        <span className="font-semibold">Payment Required:</span>
-        <Tag
-          color={request.paymentRequired ? "red" : "green"}
-          onClick={handleTogglePaymentRequired} // Toggle payment status
-          className="cursor-pointer"
-        >
-          {request.paymentRequired ? "Yes" : "No"}
-        </Tag>
+      <div className="flex flex-col gap-2">
+        <span className="font-bold text-[16px]">Payment Required</span>
+        <div className="flex items-center">
+          <Tag
+            color={request.paymentRequired ? "red" : "green"}
+            onClick={handleTogglePaymentRequired}
+            className="cursor-pointer"
+          >
+            {request.paymentRequired ? "Yes" : "No"}
+          </Tag>
+        </div>
       </div>
 
-      {/* Modal for Price Form */}
       <Modal
-        title="Enter Price"
+        title="Set Publication Pricing"
         visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)} // Close modal without saving
+        onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
         <Form form={form} onFinish={handleSubmitPrice}>
@@ -74,13 +73,19 @@ export default function SetPublicationRequestPrice({
             label="Price"
             name="price"
             rules={[{ required: true, message: "Please input the price!" }]}
+            labelCol={{ span: 24 }} // Makes the label span the full width
+            wrapperCol={{ span: 24 }} // Ensures the input spans the full width
           >
             <Input type="number" />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Submit Price
+            <Button
+              style={{ backgroundColor: "#04AA6D", color: "white" }}
+              htmlType="submit"
+              // block
+            >
+              Apply
             </Button>
           </Form.Item>
         </Form>
