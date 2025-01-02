@@ -2,10 +2,12 @@
 import { Table, Modal, Form, Input, Button, message, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { FieldType } from "../type";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import AddButton from "../../components/ui/AddButton";
 import { createFieldType } from "../actions/createFieldType";
 import { UpdateFieldType } from "../actions/updateFieldType";
+import DeleteButton from "../../components/ui/DeleteButton";
+import deleteFieldType from "../actions/deleteFieldType";
 
 export default function FieldTypesTables({
   fieldTypes: data,
@@ -18,7 +20,6 @@ export default function FieldTypesTables({
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  // Helper function to apply filters
   const getColumnSearchProps = (dataIndex: keyof FieldType) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -76,6 +77,20 @@ export default function FieldTypesTables({
     confirm();
   };
 
+  const handleDeleteFieldType = async (fieldTypeId: string) => {
+    try {
+      alert("yo");
+      const { body, status } = await deleteFieldType({ fieldTypeId });
+
+      setFieldTypes((types) => types.filter((type) => type._id != body._id));
+
+      message.success("Successfully deleted field type");
+    } catch (err) {
+      console.log(err);
+      message.error(err.message);
+    }
+  };
+
   const columns = [
     {
       title: "Name",
@@ -94,6 +109,22 @@ export default function FieldTypesTables({
       dataIndex: "exampleValue",
       key: "exampleValue",
       ...getColumnSearchProps("exampleValue"),
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (record: Record<string, any>) => {
+        return (
+          <DeleteButton
+            action={async (e) => {
+              e.stopPropagation();
+
+              if (selectedRecordId)
+                await handleDeleteFieldType(selectedRecordId);
+            }}
+          />
+        );
+      },
     },
   ];
 
@@ -178,9 +209,9 @@ export default function FieldTypesTables({
         onRow={(record) => ({
           onClick: (e) => {
             e.stopPropagation();
+            setSelectedRecordId(record._id);
             if (record.key !== "addButtonRow") {
               showModal();
-              setSelectedRecordId(record._id);
               setIsEditing(true);
               form.setFieldsValue({
                 ...record,

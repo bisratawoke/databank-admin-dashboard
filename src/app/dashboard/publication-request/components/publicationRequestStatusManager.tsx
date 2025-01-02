@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import InitalApproval from "../actions/initalApproval";
 import SecondaryApproval from "../actions/secondaryApproval";
 import VerifyPublicationRequestPayment from "../actions/verifyPublicationRequestPayment";
+import FinalApproval from "../actions/finalApproval";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -40,6 +41,8 @@ export default function PublicationRequestStatusManager({
     PENDING: ["Approve", "Reject"],
     APPROVED: ["Publish", "Reject"],
     REJECTED: ["Approve"],
+    "DEPUTY APPROVED": ["Final Approval"],
+    "FINAL APPROVED": ["Deputy Approval"],
   };
 
   const handler = async (state: string, action: string) => {
@@ -55,6 +58,14 @@ export default function PublicationRequestStatusManager({
         message.success("Successfully verified publication request payment");
         setPublicationRequest(body);
         // setCurrentStatus(body.status.toLowerCase());
+      }
+      if (action == "Final Approval") {
+        const { body, status }: any = await FinalApproval({
+          publicationRequestId: publication._id,
+        });
+        message.success("Successfully made Final approval");
+        setPublicationRequest(body);
+        setCurrentStatus(body.status.toLowerCase());
       }
       if (action == "Deputy Approval") {
         const { body, status }: any = await SecondaryApproval({
@@ -125,7 +136,14 @@ export default function PublicationRequestStatusManager({
     <Menu>
       {availableActions.map((action) => (
         <>
-          {action == "Initial Approval" &&
+          <Menu.Item
+            key={action}
+            onClick={() => handler(publication.status, action)}
+          >
+            {capitalizeFirstLetter(action.toLowerCase())}
+          </Menu.Item>
+
+          {/* {action == "Initial Approval" &&
           !session.user.roles.includes("DEPARTMENT_HEAD") ? (
             <></>
           ) : (
@@ -142,7 +160,7 @@ export default function PublicationRequestStatusManager({
                 </Menu.Item>
               )}
             </>
-          )}
+          )} */}
         </>
       ))}
     </Menu>

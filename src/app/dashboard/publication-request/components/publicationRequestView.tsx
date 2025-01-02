@@ -8,10 +8,12 @@ import AssignDepartmentToPublication from "./assignDepartmentToPublication";
 import SetPublicationPrice from "./setPublicationRequestPrice";
 import Attachment from "./attachement";
 import TextAreaContainer from "./textAreaContainer";
+import UpdateFilePathForm from "./updateFilePathForm";
 
 export default function PublicationRequestView({
   request: data,
   departments: departmentInit,
+  publications,
 }: any) {
   const [request, setRequest] = useState(data);
   const [departments, setDepartments] = useState(departmentInit);
@@ -85,6 +87,40 @@ export default function PublicationRequestView({
               />
             )}
           </div>
+
+          <div className="mt-1 mb-5 flex flex-col gap-1">
+            <span className="font-bold text-[16px]">Publication</span>
+            {request.fileName != null ? (
+              <div className="flex flex-col gap-2 justify-center">
+                <div className={`border border-[#D8D8D8] flex items-center`}>
+                  <p className="text-[14px] text-[#8A8888] flex items-center p-1">
+                    <>{request.fileName}</>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <UpdateFilePathForm
+                request={request._id}
+                setRequest={setRequest}
+                publications={publications}
+              />
+            )}
+          </div>
+
+          {/* {request.fileName && request.status == "Final Approved" ? (
+            <div className="flex flex-col gap-2 justify-center">
+              <span className="font-bold text-[16px]">File Name</span>
+              <div className={`border border-[#D8D8D8] flex items-center`}>
+                <p className="text-[14px] text-[#8A8888] flex items-center p-1">
+                  {request.fileName}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <UpdateFilePathForm requestId={request._id} />
+            </>
+          )} */}
           <div className="flex flex-col gap-2 justify-center">
             <span className="font-bold text-[16px]">Status</span>
             <div className={`border border-[#D8D8D8] flex items-center`}>
