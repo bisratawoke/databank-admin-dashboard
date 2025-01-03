@@ -36,10 +36,7 @@ export default function AssignDepartmentToPublication({
 
   return (
     <Form form={form} onFinish={(values) => console.log(values)}>
-      <Select
-        placeholder="Select department"
-        onChange={handleDepartmentChange} // Trigger on value change
-      >
+      <Select placeholder="Select department" onChange={handleDepartmentChange}>
         {departments.map((department: any) => (
           <Select.Option key={department._id} value={department._id}>
             {department.name}

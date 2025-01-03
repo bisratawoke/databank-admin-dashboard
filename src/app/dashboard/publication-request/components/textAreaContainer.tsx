@@ -8,7 +8,7 @@ function TextAreaContainer({
   padding?: string | undefined | null;
 }) {
   return (
-    <div className={`border border-[#D8D8D8] p-${padding}`}>
+    <div className={``}>
       <p className="text-[14px] text-[#8A8888]">{text}</p>
     </div>
   );

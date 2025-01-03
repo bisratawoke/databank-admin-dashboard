@@ -24,11 +24,7 @@ export default async function Page({ params }: { params: any }) {
     departments = body;
   }
 
-  console.log("======== in publication request view   ============");
-  console.log(request);
-
   const { body: publications } = await FetchPublications({ path: "" });
-  console.log(publications);
 
   return (
     <PublicationRequestView

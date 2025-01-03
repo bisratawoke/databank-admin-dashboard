@@ -3,7 +3,7 @@
 import { Card, Tag, List, Modal, Input, Button, Form } from "antd";
 import "antd/dist/reset.css"; // Import Ant Design styles
 import PublicationRequestStatusManager from "./publicationRequestStatusManager";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AssignDepartmentToPublication from "./assignDepartmentToPublication";
 import SetPublicationPrice from "./setPublicationRequestPrice";
 import Attachment from "./attachement";
@@ -36,9 +36,8 @@ export default function PublicationRequestView({
               </div>
             </div>
           )}
-
           <div className="flex flex-col gap-2">
-            <span className="font-bold text-[16px]">Date Importance</span>
+            <span className="font-bold text-[16px]">Data Importance</span>
             <TextAreaContainer text={request.dateImportance} />
           </div>
 
@@ -49,7 +48,7 @@ export default function PublicationRequestView({
 
           <div className="flex flex-col gap-2 justify-center">
             <span className="font-bold text-[16px]">Administrative Units</span>
-            <div className={`border border-[#D8D8D8] flex items-center`}>
+            <div className={`flex items-center`}>
               <p className="text-[14px] text-[#8A8888] flex items-center p-1">
                 {request.adminUnits}
               </p>
@@ -58,22 +57,18 @@ export default function PublicationRequestView({
 
           <div className="flex flex-col gap-2 justify-center">
             <span className="font-bold text-[16px]">Preferred data format</span>
-            <div className={`border border-[#D8D8D8] flex items-center`}>
+            <div className={`flex items-center`}>
               <p className="text-[14px] text-[#8A8888] flex items-center p-1">
                 {request.preferredDataFormat}
               </p>
             </div>
           </div>
 
-          {/* <div className="flex flex-col gap-2">
-            <span className="font-semibold">Preferred Data Format:</span>
-            <span>{request.preferredDataFormat}</span>
-          </div> */}
           <div className="mt-1 mb-5 flex flex-col gap-1">
             <span className="font-bold text-[16px]">Department</span>
             {request.department != null ? (
               <div className="flex flex-col gap-2 justify-center">
-                <div className={`border border-[#D8D8D8] flex items-center`}>
+                <div className={`flex items-center`}>
                   <p className="text-[14px] text-[#8A8888] flex items-center p-1">
                     <>{request.department.name}</>
                   </p>
@@ -92,7 +87,7 @@ export default function PublicationRequestView({
             <span className="font-bold text-[16px]">Publication</span>
             {request.fileName != null ? (
               <div className="flex flex-col gap-2 justify-center">
-                <div className={`border border-[#D8D8D8] flex items-center`}>
+                <div className={`flex items-center`}>
                   <p className="text-[14px] text-[#8A8888] flex items-center p-1">
                     <>{request.fileName}</>
                   </p>
@@ -107,23 +102,9 @@ export default function PublicationRequestView({
             )}
           </div>
 
-          {/* {request.fileName && request.status == "Final Approved" ? (
-            <div className="flex flex-col gap-2 justify-center">
-              <span className="font-bold text-[16px]">File Name</span>
-              <div className={`border border-[#D8D8D8] flex items-center`}>
-                <p className="text-[14px] text-[#8A8888] flex items-center p-1">
-                  {request.fileName}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <UpdateFilePathForm requestId={request._id} />
-            </>
-          )} */}
           <div className="flex flex-col gap-2 justify-center">
             <span className="font-bold text-[16px]">Status</span>
-            <div className={`border border-[#D8D8D8] flex items-center`}>
+            <div className={`flex items-center`}>
               <p className="text-[14px] text-[#8A8888] flex items-center p-1">
                 {request.status}
               </p>
