@@ -33,6 +33,8 @@ export default function UserTable({
   roles,
   departments,
 }: UserTableProps) {
+  console.log("========= in user table =================");
+  console.log(data);
   const [users, setUsers] = useState<User[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -120,7 +122,8 @@ export default function UserTable({
       title: "Actions",
       key: "actions",
       render: (_, record: User) =>
-        record.key !== "addButtonRow" && (
+        record.key !== "addButtonRow" &&
+        record.email != "admin@admin.com" && (
           <>
             <>
               {record.isActive == true ? (
