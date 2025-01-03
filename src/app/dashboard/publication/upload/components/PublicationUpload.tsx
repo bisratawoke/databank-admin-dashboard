@@ -73,12 +73,6 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
   );
 
   useEffect(() => {
-    console.log("=========== in publication uploads =================");
-    console.log(departments);
-    console.log(categories);
-  }, []);
-
-  useEffect(() => {
     const loadData = async () => {
       try {
         const [fetchedBuckets, fetchedLocations] = await Promise.all([
@@ -130,16 +124,16 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
       return;
     }
 
-    if (coverImageList.length === 0) {
-      message.error("Please select a file to upload");
-      return;
-    }
+    // if (coverImageList.length === 0) {
+    //   message.error("Please select a file to upload");
+    //   return;
+    // }
 
     const coverImage = coverImageList[0] as RcFile;
-    if (!coverImage) {
-      message.error("Invalid file object");
-      return;
-    }
+    // if (!coverImage) {
+    //   message.error("Invalid file object");
+    //   return;
+    // }
 
     setUploading(true);
 
@@ -149,7 +143,7 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("coverImage", coverImage);
+      coverImage && formData.append("coverImage", coverImage);
       // formData.append("publicationType", values.publicationType[0]);
       formData.append("department", values.department[0]);
       formData.append("category", values.category[0]);

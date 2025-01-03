@@ -2,20 +2,21 @@
 import { Form, message, Select } from "antd";
 import { useEffect } from "react";
 import assignDepartmentToPublicationRequest from "../actions/assignDepartmentToPublicationRequest";
+import setFilePath from "../actions/setFilePath";
 
-export default function AssignDepartmentToPublication({
+export default function updateFilePathForm({
   request,
   setRequest,
-  departments,
+  publications,
 }: any) {
   const [form] = Form.useForm();
-
   // Handler for Select change event
-  const handleDepartmentChange = async (value: string) => {
+  const handlePublicationChange = async (value: string) => {
+    console.log(request);
     console.log("Selected department ID:", value);
-    const { body, status } = await assignDepartmentToPublicationRequest({
-      requestId: request._id,
-      departmentId: value,
+    const { body, status }: any = await setFilePath({
+      publicationRequestId: request,
+      filePath: value,
     });
 
     console.log(body);
@@ -26,7 +27,7 @@ export default function AssignDepartmentToPublication({
 
     setRequest({
       ...request,
-      department: departments.filter((dep: any) => dep._id == value),
+      fileName: value,
     });
   };
 
@@ -36,10 +37,13 @@ export default function AssignDepartmentToPublication({
 
   return (
     <Form form={form} onFinish={(values) => console.log(values)}>
-      <Select placeholder="Select department" onChange={handleDepartmentChange}>
-        {departments.map((department: any) => (
-          <Select.Option key={department._id} value={department._id}>
-            {department.name}
+      <Select
+        placeholder="Select publication"
+        onChange={handlePublicationChange} // Trigger on value change
+      >
+        {publications.map((publication: any) => (
+          <Select.Option key={publication._id} value={publication.fileName}>
+            {publication.name}
           </Select.Option>
         ))}
       </Select>

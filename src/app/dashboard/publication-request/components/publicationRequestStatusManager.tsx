@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import InitalApproval from "../actions/initalApproval";
 import SecondaryApproval from "../actions/secondaryApproval";
 import VerifyPublicationRequestPayment from "../actions/verifyPublicationRequestPayment";
+import FinalApproval from "../actions/finalApproval";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -21,10 +22,6 @@ export default function PublicationRequestStatusManager({
   const [currentStatus, setCurrentStatus] = useState<string>("");
 
   useEffect(() => {
-    console.log(
-      "=========== in publication request status manager ================="
-    );
-    console.log(session.user.roles);
     setCurrentStatus(publication.status.toLowerCase());
   }, []);
 
@@ -36,25 +33,31 @@ export default function PublicationRequestStatusManager({
     "PENDING DEPARTMENT ASSIGNMENT": ["Pending Approval"],
     "PENDING APPROVAL": ["Initial Approval", "Reject"],
     "INITIAL APPROVAL": ["Deputy Approval", "Reject"],
-    "PAYMENT PENDING": ["Payment verified"],
+    "PAYMENT PENDING": [],
     PENDING: ["Approve", "Reject"],
     APPROVED: ["Publish", "Reject"],
     REJECTED: ["Approve"],
+    "DEPUTY APPROVED": ["Final Approval"],
+    "FINAL APPROVED": ["Deputy Approval"],
+    "PAYMENT VERIFIED": ["Final Approval"],
   };
 
   const handler = async (state: string, action: string) => {
     try {
       if (action === "Payment verified") {
-        console.log(
-          "============ in payment verification component ================="
-        );
         const { body, status }: any = await VerifyPublicationRequestPayment({
           publicationRequestId: publication._id,
         });
-        console.log(body);
         message.success("Successfully verified publication request payment");
         setPublicationRequest(body);
-        // setCurrentStatus(body.status.toLowerCase());
+      }
+      if (action == "Final Approval") {
+        const { body, status }: any = await FinalApproval({
+          publicationRequestId: publication._id,
+        });
+        message.success("Successfully made Final approval");
+        setPublicationRequest(body);
+        setCurrentStatus(body.status.toLowerCase());
       }
       if (action == "Deputy Approval") {
         const { body, status }: any = await SecondaryApproval({
@@ -74,43 +77,14 @@ export default function PublicationRequestStatusManager({
       }
       if (action === "Approve") {
         setCurrentStatus("Approved");
-
-        // const result = await ApproveReport({ reportId: publication._id });
-        // const initRequestResult = await InitalRequestResponse({
-        //   reportId: publication._id,
-        //   status: "Approved",
-        // });
-
-        // console.log(initRequestResult);
-        // const secondApprovalRequestResult = await RequestSecondApproval({
-        //   reportId: publication._id,
-        // });
-        // console.log("=========== second approval request resultl ==========");
-        // console.log(secondApprovalRequestResult);
-        // if (!(result.status == 200)) throw new Error("Something went wrong");
-        // message.info("Succesfully approved publication");
       } else if (action === "Reject") {
         setCurrentStatus("Rejected");
         setPublicationRequest((state: any) => ({
           ...state,
           status: "Rejected",
         }));
-        // const result = await RejectReport({ reportId: publication._id });
-        // await InitalRequestResponse({
-        //   reportId: publication._id,
-        //   status: "Rejected",
-        // });
-        // if (!(result.status == 200)) throw new Error("Something went wrong");
-        // message.info("Succesfully rejected  publication");
       } else if (action === "Publish") {
         setCurrentStatus("Published");
-        // const result = await PublishReport({ reportId: publication._id });
-        // if (!(result.status == 200)) throw new Error("Something went wrong");
-        // message.info("Succesfully Published publication");
-        // await dissiminationResponse({
-        //   reportId: publication._id,
-        //   status: currentStatus,
-        // });
       }
     } catch (err) {
       console.log("============ in update errpr ===============");
@@ -125,7 +99,14 @@ export default function PublicationRequestStatusManager({
     <Menu>
       {availableActions.map((action) => (
         <>
-          {action == "Initial Approval" &&
+          <Menu.Item
+            key={action}
+            onClick={() => handler(publication.status, action)}
+          >
+            {capitalizeFirstLetter(action.toLowerCase())}
+          </Menu.Item>
+
+          {/* {action == "Initial Approval" &&
           !session.user.roles.includes("DEPARTMENT_HEAD") ? (
             <></>
           ) : (
@@ -142,7 +123,7 @@ export default function PublicationRequestStatusManager({
                 </Menu.Item>
               )}
             </>
-          )}
+          )} */}
         </>
       ))}
     </Menu>
@@ -151,7 +132,9 @@ export default function PublicationRequestStatusManager({
   const HandlerButton = () => {
     return (
       <Dropdown overlay={menu} trigger={["hover"]} placement="bottom">
-        <Button type="primary">{capitalizeFirstLetter(currentStatus)}</Button>
+        <Button type="primary" size="large">
+          {capitalizeFirstLetter(currentStatus)}
+        </Button>
       </Dropdown>
     );
   };

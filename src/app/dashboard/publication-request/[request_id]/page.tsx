@@ -4,7 +4,7 @@ export const revalidate = 0;
 import { FetchDepartment } from "../../organization/actions/fetchDepartment";
 import { getPublicationRequest } from "../actions/getPublicationRequest";
 import PublicationRequestView from "../components/publicationRequestView";
-
+import { FetchPublications } from "@/app/dashboard/publication/actions/fetchPublications";
 export default async function Page({ params }: { params: any }) {
   const { request_id } = params;
   const result = await getPublicationRequest({ path: request_id });
@@ -24,5 +24,13 @@ export default async function Page({ params }: { params: any }) {
     departments = body;
   }
 
-  return <PublicationRequestView request={request} departments={departments} />;
+  const { body: publications } = await FetchPublications({ path: "" });
+
+  return (
+    <PublicationRequestView
+      request={request}
+      departments={departments}
+      publications={publications}
+    />
+  );
 }
