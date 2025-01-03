@@ -40,12 +40,12 @@ export default function UserTable({
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
 
-  const roleFilters = [...new Set(users.flatMap((user) => user.roles))].map(
-    (role) => ({
-      text: role,
-      value: role,
-    })
-  );
+  const roleFilters = users
+    ? [...new Set(users.flatMap((user) => user.roles))].map((role) => ({
+        text: role,
+        value: role,
+      }))
+    : [];
 
   const columns = [
     {
