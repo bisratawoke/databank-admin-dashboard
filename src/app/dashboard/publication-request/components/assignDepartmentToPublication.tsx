@@ -31,6 +31,7 @@ export default function AssignDepartmentToPublication({
   };
 
   useEffect(() => {
+    alert("yo");
     // Perform any setup or side effects if needed
   }, []);
 

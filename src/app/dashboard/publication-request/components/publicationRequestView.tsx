@@ -9,6 +9,8 @@ import SetPublicationPrice from "./setPublicationRequestPrice";
 import Attachment from "./attachement";
 import TextAreaContainer from "./textAreaContainer";
 import UpdateFilePathForm from "./updateFilePathForm";
+import React from "react";
+import TestComp from "./TestComponent";
 
 export default function PublicationRequestView({
   request: data,
@@ -110,6 +112,17 @@ export default function PublicationRequestView({
               </p>
             </div>
           </div>
+
+          {request.paymentData && (
+            <div className="flex flex-col gap-2 justify-center">
+              <span className="font-bold text-[16px]">Price</span>
+              <div className={`flex items-center`}>
+                <p className="text-[14px] text-[#8A8888] flex items-center p-1">
+                  {request.paymentData.price}
+                </p>
+              </div>
+            </div>
+          )}
 
           <SetPublicationPrice request={request} setRequest={setRequest} />
         </div>

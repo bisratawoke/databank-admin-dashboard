@@ -9,8 +9,15 @@ export default function PublicationRequestPaymentStatusColumnValue({
 
   if (!record.paymentRequired) {
     paymentStatus = "Free";
+  } else {
+    if (record.paymentData) {
+      if (record.paymentData.paymentStatus == "Pending") {
+        paymentStatus = "Not Paid";
+      } else {
+        paymentStatus = "Paid";
+      }
+    }
   }
-
   return (
     <Tag color={paymentStatus == "Free" ? "blue" : ""}>{paymentStatus}</Tag>
   );
