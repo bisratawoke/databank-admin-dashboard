@@ -28,6 +28,10 @@ export default function PrimaryNavBar({
             label="Publication"
             link="/dashboard/publication/list-view"
           />
+          <NavItem
+            label={"Publication Request"}
+            link={"/dashboard/publication-request"}
+          />
           <WithRole role="ADMIN" action={ACTION.HIDE}>
             <NavItem label="User Management" link="/dashboard/users" />
           </WithRole>

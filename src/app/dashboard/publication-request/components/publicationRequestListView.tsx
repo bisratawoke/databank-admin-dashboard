@@ -2,6 +2,8 @@
 import { Table } from "antd";
 import PublicationStatusTag from "./publicationStatusTag";
 import { useRouter } from "next/navigation";
+import PublicationRequestPaymentStatusColumnValue from "./publicationRequestPaymentStatusColumnValue";
+import PublicationRequestDetailViewLinkButton from "./publicationRequestDetailViewLinkButton";
 export default function PublicationRequestListView({
   publicationRequestList,
 }: {
@@ -9,9 +11,23 @@ export default function PublicationRequestListView({
 }) {
   const router = useRouter();
   const columns = [
-    { title: "Request Id", dataIndex: "_id", key: "_id" },
     {
-      title: "Request Status",
+      title: "Administration Units",
+      dataIndex: "adminUnits",
+      key: "adminUnits",
+    },
+    {
+      title: "Date",
+      dataIndex: "",
+      key: "Date",
+      render: (_, record: Record<string, any>) => {
+        const date = new Date(record.createdAt);
+        const parsedDate = date.toUTCString().split(" ").slice(0, 4).join(" ");
+        return <span>{parsedDate}</span>;
+      },
+    },
+    {
+      title: "Status",
       dataIndex: "status",
       key: "status",
       render: (value: string) => {
@@ -19,19 +35,11 @@ export default function PublicationRequestListView({
       },
     },
     {
-      title: "Administration Units",
-      dataIndex: "adminUnits",
-      key: "adminUnits",
-    },
-    {
-      title: "Data Importance",
-      dataIndex: "dateImportance",
-      key: "dateImportance",
-    },
-    {
-      title: "Purpose for Research",
-      dataIndex: "purposeForResearch",
-      key: "purposeForResearch",
+      title: "Payment",
+      key: "payment",
+      render: (_, record: Record<string, any>) => (
+        <PublicationRequestPaymentStatusColumnValue record={record} />
+      ),
     },
     {
       title: "Attachements",
@@ -49,21 +57,24 @@ export default function PublicationRequestListView({
         );
       },
     },
+    {
+      title: "Action",
+      key: "Action",
+      render(_, record: Record<string, any>) {
+        return <PublicationRequestDetailViewLinkButton recordId={record._id} />;
+      },
+    },
   ];
   return (
-    <Table
-      dataSource={publicationRequestList}
-      columns={columns}
-      size="small"
-      bordered
-      onRow={(record) => {
-        return {
-          onClick: () => {
-            router.push(`/dashboard/publication-request/${record._id}`);
-          },
-          onMouseEnter: () => {},
-        };
-      }}
-    />
+    <div className="grid grid-cols-12">
+      <div className="col-start-2 col-end-12">
+        <Table
+          dataSource={publicationRequestList}
+          columns={columns}
+          size="small"
+          bordered
+        />
+      </div>
+    </div>
   );
 }
