@@ -25,6 +25,11 @@ export default function PublicationRequestView({
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    console.log("====== the request changed ============");
+    console.log(request);
+  }, [request]);
+
   if (loading) {
     return <div>loading</div>;
   } else

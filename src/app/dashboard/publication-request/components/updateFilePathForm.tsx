@@ -25,10 +25,10 @@ export default function updateFilePathForm({
       setRequest(body);
     }
 
-    setRequest({
+    setRequest((request: any) => ({
       ...request,
       fileName: value,
-    });
+    }));
   };
 
   useEffect(() => {
