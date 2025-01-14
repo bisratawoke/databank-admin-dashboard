@@ -13,22 +13,22 @@ export default function updateFilePathForm({
   // Handler for Select change event
   const handlePublicationChange = async (value: string) => {
     console.log(request);
-    console.log("Selected department ID:", value);
+    console.log("Selected publication ID:", value);
+
     const { body, status }: any = await setFilePath({
-      publicationRequestId: request,
+      publicationRequestId: request._id,
       filePath: value,
     });
 
     console.log(body);
     if (status == 200) {
-      message.success("Successfully assigned department to publication");
-      setRequest(body);
-    }
+      message.success("Successfully assigned publication to request");
 
-    setRequest((request: any) => ({
-      ...request,
-      fileName: value,
-    }));
+      setRequest((request: any) => ({
+        ...request,
+        fileName: value,
+      }));
+    }
   };
 
   useEffect(() => {

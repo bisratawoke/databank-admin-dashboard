@@ -24,16 +24,12 @@ export default function AssignDepartmentToPublication({
       setRequest(body);
     }
 
-    setRequest({
+    setRequest((request: any) => ({
       ...request,
+      status: body.status,
       department: departments.filter((dep: any) => dep._id == value)[0],
-    });
+    }));
   };
-
-  useEffect(() => {
-    alert("yo");
-    // Perform any setup or side effects if needed
-  }, []);
 
   return (
     <Form form={form} onFinish={(values) => console.log(values)}>
