@@ -26,7 +26,7 @@ export default function AssignDepartmentToPublication({
 
     setRequest({
       ...request,
-      department: departments.filter((dep: any) => dep._id == value),
+      department: departments.filter((dep: any) => dep._id == value)[0],
     });
   };
 

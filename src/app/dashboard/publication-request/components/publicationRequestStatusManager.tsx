@@ -49,14 +49,20 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully verified publication request payment");
-        setPublicationRequest(body);
+        setPublicationRequest((current: any) => ({
+          ...current,
+          status: body.status,
+        }));
       }
       if (action == "Final Approval") {
         const { body, status }: any = await FinalApproval({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made Final approval");
-        setPublicationRequest(body);
+        setPublicationRequest((current: any) => ({
+          ...current,
+          status: body.status,
+        }));
         setCurrentStatus(body.status.toLowerCase());
       }
       if (action == "Deputy Approval") {
@@ -64,7 +70,12 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made seconday approval");
-        setPublicationRequest(body);
+        console.log("========= in deputy approval ========");
+        console.log(body);
+        setPublicationRequest((current: any) => ({
+          ...current,
+          status: body.status,
+        }));
         setCurrentStatus(body.status.toLowerCase());
       }
       if (action == "Initial Approval") {
@@ -72,7 +83,10 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made initial approval");
-        setPublicationRequest(body);
+        setPublicationRequest((current: any) => ({
+          ...current,
+          status: body.status,
+        }));
         setCurrentStatus(body.status.toLowerCase());
       }
       if (action === "Approve") {
