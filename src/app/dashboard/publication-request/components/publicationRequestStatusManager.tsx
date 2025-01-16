@@ -23,7 +23,7 @@ export default function PublicationRequestStatusManager({
 
   useEffect(() => {
     setCurrentStatus(publication.status.toLowerCase());
-  }, []);
+  }, [publication]);
 
   useEffect(() => {
     setAvailableActions(logic[currentStatus.toUpperCase()] || []);
@@ -70,8 +70,6 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made seconday approval");
-        console.log("========= in deputy approval ========");
-        console.log(body);
         setPublicationRequest((current: any) => ({
           ...current,
           status: body.status,
@@ -101,8 +99,6 @@ export default function PublicationRequestStatusManager({
         setCurrentStatus("Published");
       }
     } catch (err) {
-      console.log("============ in update errpr ===============");
-      console.log(err);
       message.error("Something went wrong");
     } finally {
       //   refreshReports();

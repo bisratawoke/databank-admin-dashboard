@@ -10,12 +10,14 @@ import Attachment from "./attachement";
 import TextAreaContainer from "./textAreaContainer";
 import UpdateFilePathForm from "./updateFilePathForm";
 import React from "react";
-import TestComp from "./TestComponent";
+import Spinner from "@/components/Spinner";
+import ChatContainer from "../../components/ui/ChatContainer";
 
 export default function PublicationRequestView({
   request: data,
   departments: departmentInit,
   publications,
+  chat,
 }: any) {
   const [request, setRequest] = useState<any>({});
   const [departments, setDepartments] = useState(departmentInit);
@@ -31,7 +33,7 @@ export default function PublicationRequestView({
   }, [request]);
 
   if (loading) {
-    return <div>loading</div>;
+    return <Spinner />;
   } else
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-4">
@@ -116,7 +118,7 @@ export default function PublicationRequestView({
                 </div>
               ) : (
                 <UpdateFilePathForm
-                  request={request._id}
+                  request={request}
                   setRequest={setRequest}
                   publications={publications}
                 />
@@ -152,6 +154,7 @@ export default function PublicationRequestView({
             />
           </div>
         </Card>
+        <ChatContainer {...chat} />
       </div>
     );
 }
