@@ -36,7 +36,7 @@ export default function PublicationRequestView({
     return <Spinner />;
   } else
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-4">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-4 gap-10">
         <Card title={``} bordered className="w-full max-w-2xl shadow-lg">
           <div className="space-y-4">
             {request.attachments && request.attachments.length > 0 && (
