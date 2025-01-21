@@ -19,23 +19,22 @@ export default function ChatContainer(ChatInfo: IChat) {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     setMessages(ChatInfo.messages);
     setLoading(false);
   }, []);
+
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return; // Prevent sending empty messages
+    if (!newMessage.trim()) return;
 
     try {
-      // Call the server action to create a new message
       const response = await createMessage({
         message: newMessage,
         chatterId: ChatInfo._id,
       });
 
       if (response.status === 201) {
-        console.log("====== up in here =======");
-        console.log(response.body);
         setMessages((prev) => [...response.body.messages]);
         setNewMessage("");
       } else {
@@ -47,7 +46,7 @@ export default function ChatContainer(ChatInfo: IChat) {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto" }}>
+    <div style={{ minWidth: "600px", margin: "auto" }}>
       {!loading && (
         <div
           style={{
@@ -58,9 +57,26 @@ export default function ChatContainer(ChatInfo: IChat) {
             overflowY: "auto",
           }}
         >
-          {messages.map((msg) => (
-            <div key={msg._id} style={{ marginBottom: "10px" }}>
-              <strong>{msg.from}:</strong> {msg.message}
+          {messages.map((msg, index) => (
+            <div
+              key={msg._id}
+              style={{
+                display: "flex",
+                justifyContent: index % 2 === 0 ? "flex-start" : "flex-end",
+                marginBottom: "10px",
+              }}
+            >
+              <div
+                style={{
+                  maxWidth: "70%",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  backgroundColor: index % 2 === 0 ? "#f1f1f1" : "#007bff",
+                  color: index % 2 === 0 ? "#000" : "#fff",
+                }}
+              >
+                <strong>{msg.from}:</strong> {msg.message}
+              </div>
             </div>
           ))}
         </div>
