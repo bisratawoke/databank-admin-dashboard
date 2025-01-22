@@ -154,7 +154,7 @@ export default function PublicationRequestView({
             />
           </div>
         </Card>
-        <ChatContainer {...chat} />
+        {/* <ChatContainer {...chat} /> */}
       </div>
     );
 }

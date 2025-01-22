@@ -105,16 +105,71 @@ export default function PublicationRequestStatusManager({
     }
   };
 
-  const menu = (
+  const SecondMenu = ({ action }: any) => {
+    if (
+      action == "Deputy Approval" &&
+      session.user.roles.includes("DEPUTY_DIRECTOR")
+    ) {
+      return (
+        <Menu.Item
+          key={action}
+          onClick={() => handler(publication.status, action)}
+        >
+          {capitalizeFirstLetter(action.toLowerCase())}
+        </Menu.Item>
+      );
+    }
+    if (action == "Reject" && session.user.roles.includes("DEPARTMENT_HEAD")) {
+      return (
+        <Menu.Item
+          key={action}
+          onClick={() => handler(publication.status, action)}
+        >
+          {capitalizeFirstLetter(action.toLowerCase())}
+        </Menu.Item>
+      );
+    }
+    if (
+      action == "Initial Approval" &&
+      session.user.roles.includes("DEPARTMENT_HEAD")
+    ) {
+      return (
+        <Menu.Item
+          key={action}
+          onClick={() => handler(publication.status, action)}
+        >
+          {capitalizeFirstLetter(action.toLowerCase())}
+        </Menu.Item>
+      );
+    }
+    if (
+      action == "Deputy Approval" &&
+      session.user.roles.includes("DEPUTY_DIRECTOR")
+    ) {
+      return (
+        <Menu.Item
+          key={action}
+          onClick={() => handler(publication.status, action)}
+        >
+          {capitalizeFirstLetter(action.toLowerCase())}
+        </Menu.Item>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const menu = () => (
     <Menu>
       {availableActions.map((action) => (
         <>
-          <Menu.Item
+          <SecondMenu action={action} />
+          {/* <Menu.Item
             key={action}
             onClick={() => handler(publication.status, action)}
           >
             {capitalizeFirstLetter(action.toLowerCase())}
-          </Menu.Item>
+          </Menu.Item> */}
 
           {/* {action == "Initial Approval" &&
           !session.user.roles.includes("DEPARTMENT_HEAD") ? (

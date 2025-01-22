@@ -31,6 +31,7 @@ export async function FetchRoles() {
       "DISSEMINATION_HEAD",
       "DISSEMINATION_EXPERT",
       "DEPUTY_DIRECTOR",
+      "FINANCIAL_OFFICER",
     ],
   };
 }

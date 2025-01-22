@@ -1,7 +1,7 @@
 "use client";
 import { Form, message, Select } from "antd";
-import { useEffect } from "react";
 import assignDepartmentToPublicationRequest from "../actions/assignDepartmentToPublicationRequest";
+import { useSession } from "next-auth/react";
 
 export default function AssignDepartmentToPublication({
   request,
@@ -10,6 +10,7 @@ export default function AssignDepartmentToPublication({
 }: any) {
   const [form] = Form.useForm();
 
+  const { data: session }: any = useSession();
   // Handler for Select change event
   const handleDepartmentChange = async (value: string) => {
     console.log("Selected department ID:", value);
@@ -31,15 +32,22 @@ export default function AssignDepartmentToPublication({
     }));
   };
 
-  return (
-    <Form form={form} onFinish={(values) => console.log(values)}>
-      <Select placeholder="Select department" onChange={handleDepartmentChange}>
-        {departments.map((department: any) => (
-          <Select.Option key={department._id} value={department._id}>
-            {department.name}
-          </Select.Option>
-        ))}
-      </Select>
-    </Form>
-  );
+  if (!session.user.roles.includes("DISSEMINATION_HEAD")) {
+    return <></>;
+  } else {
+    return (
+      <Form form={form} onFinish={(values) => console.log(values)}>
+        <Select
+          placeholder="Select department"
+          onChange={handleDepartmentChange}
+        >
+          {departments.map((department: any) => (
+            <Select.Option key={department._id} value={department._id}>
+              {department.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form>
+    );
+  }
 }
