@@ -79,8 +79,6 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
           fetchBuckets(),
           fetchLocations(),
         ]);
-        console.log("fetchedBuckets", fetchedBuckets);
-        console.log("fetchedLocations", fetchedLocations);
         setBuckets(fetchedBuckets);
         setLocations(fetchedLocations);
       } catch (error) {
@@ -138,9 +136,6 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
     setUploading(true);
 
     try {
-      console.log("============= in upload file ================== ");
-      console.log(values);
-
       const formData = new FormData();
       formData.append("file", file);
       coverImage && formData.append("coverImage", coverImage);
@@ -180,7 +175,6 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
 
       // formData.append("department", "67237bbb2b5c915bcefc61c5");
 
-      console.log("final formData: ", formData);
       const result = await uploadPublication(formData);
 
       if (result.success) {

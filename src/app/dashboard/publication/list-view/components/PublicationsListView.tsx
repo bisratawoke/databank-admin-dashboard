@@ -50,7 +50,6 @@ export default function PublicationListView({
 
     publications.forEach((pub) => {
       if (pub.metadata) {
-        console.log(pub.metadata);
       }
       const fullPath = pub.fileName;
       let relativePath = "";

@@ -12,10 +12,7 @@ export default function SetPublicationRequestPrice({
   setRequest: any;
 }) {
   const { data: session }: any = useSession();
-  useEffect(() => {
-    console.log("============= set publication request price =============");
-    console.log(session);
-  }, []);
+  useEffect(() => {}, []);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 

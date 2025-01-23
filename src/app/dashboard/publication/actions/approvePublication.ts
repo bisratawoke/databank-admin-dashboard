@@ -19,8 +19,6 @@ export default async function ApproveReport({
     }
   );
 
-  console.log("================= in approve report =================");
-  console.log(result.status);
   // const body = await result.json();
   return { status: result.status, body: "" };
 }

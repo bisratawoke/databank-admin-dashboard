@@ -85,7 +85,6 @@ export default function FieldTypesTables({
 
       message.success("Successfully deleted field type");
     } catch (err) {
-      console.log(err);
       message.error(err.message);
     }
   };

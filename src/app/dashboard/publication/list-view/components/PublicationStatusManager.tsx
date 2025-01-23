@@ -54,12 +54,10 @@ export default function PublicationStatusManager({
           status: "Approved",
         });
 
-        console.log(initRequestResult);
         const secondApprovalRequestResult = await RequestSecondApproval({
           reportId: publication._id,
         });
-        console.log("=========== second approval request resultl ==========");
-        console.log(secondApprovalRequestResult);
+
         if (!(result.status == 200)) throw new Error("Something went wrong");
         message.info("Succesfully approved publication");
       } else if (action === "Reject") {
@@ -82,8 +80,6 @@ export default function PublicationStatusManager({
         });
       }
     } catch (err) {
-      console.log("============ in update errpr ===============");
-      console.log(err);
       message.error("Something went wrong");
     } finally {
       //   refreshReports();

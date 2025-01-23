@@ -177,7 +177,6 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   };
 
   const handleSaveLocally = () => {
-    console.log("edditedData: ", editedData);
     setSavedData([...editedData]);
     setHasUnsavedChanges(false);
   };

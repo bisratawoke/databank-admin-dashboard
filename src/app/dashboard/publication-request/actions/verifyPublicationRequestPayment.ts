@@ -9,8 +9,6 @@ export default async function VerifyPublicationRequestPayment({
   try {
     const session: any = await getSession();
 
-    console.log("=========== in verification payment action =================");
-    console.log(session);
     const res = await fetch(
       `${process.env.BACKEND_URL}/publication-request/payment/confirm/${publicationRequestId}`,
       {
@@ -23,15 +21,11 @@ export default async function VerifyPublicationRequestPayment({
       }
     );
 
-    console.log("========== in verification =================");
-    console.log(res.status);
     const result = await res.json();
 
     return {
       status: res.status,
       body: result,
     };
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 }

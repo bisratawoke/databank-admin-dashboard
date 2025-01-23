@@ -10,17 +10,12 @@ export default function updateFilePathForm({
   publications,
 }: any) {
   const [form] = Form.useForm();
-  // Handler for Select change event
   const handlePublicationChange = async (value: string) => {
-    console.log(request);
-    console.log("Selected publication ID:", value);
-
     const { body, status }: any = await setFilePath({
       publicationRequestId: request._id,
       filePath: value,
     });
 
-    console.log(body);
     if (status == 200) {
       message.success("Successfully assigned publication to request");
 
@@ -30,10 +25,6 @@ export default function updateFilePathForm({
       }));
     }
   };
-
-  useEffect(() => {
-    // Perform any setup or side effects if needed
-  }, []);
 
   return (
     <Form form={form} onFinish={(values) => console.log(values)}>

@@ -87,7 +87,6 @@ export default function ReportListTable({
               form.resetFields();
               setIsModalVisible(false);
             } else {
-              // console.log(body);
             }
           } else {
             message.error("Failed to add the report.");
@@ -97,9 +96,7 @@ export default function ReportListTable({
           message.error("An error occurred while creating the report.");
         }
       })
-      .catch((errorInfo) => {
-        console.log("Form Validation Failed:", errorInfo);
-      });
+      .catch((errorInfo) => {});
   };
 
   const columns = [

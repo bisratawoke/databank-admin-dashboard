@@ -13,11 +13,6 @@ export async function updateReport({
   data: any[];
 }) {
   const session: any = await getSession();
-  console.log(
-    "Sending update request with:",
-    { reportId },
-    JSON.stringify(data)
-  );
 
   if (!reportId || !data?.length) {
     throw new Error("Invalid reportId or dataIds");

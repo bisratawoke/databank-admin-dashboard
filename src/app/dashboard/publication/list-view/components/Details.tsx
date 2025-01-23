@@ -30,8 +30,7 @@ export default function Details({
       setLoading(false);
     });
   }, []);
-  console.log("=========== in details ======");
-  console.log(pub);
+
   if (loading) {
     return <Spinner />;
   } else

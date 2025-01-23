@@ -20,7 +20,6 @@ export async function FetchPublications({ path = "" }: { path?: string }) {
       status: res.status,
     };
   } catch (err) {
-    console.log(err);
     return {
       body: [],
       status: 400,

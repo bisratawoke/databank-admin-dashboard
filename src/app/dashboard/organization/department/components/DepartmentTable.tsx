@@ -71,9 +71,6 @@ export default function DepartmentTable({
       const values = await form.validateFields();
 
       if (isEditing) {
-        console.log("============ in editing mode =================");
-        console.log(values);
-
         const { body, status } = await UpdateDepartment({
           payload: values,
           depId: currentDeptId,
@@ -97,7 +94,6 @@ export default function DepartmentTable({
           message.error("Failed to update department.");
         }
       } else {
-        console.log("Form values: ", values);
         const { status, body } = await CreateDepartment(values);
 
         if (status === 201) {
@@ -119,9 +115,7 @@ export default function DepartmentTable({
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
-    } catch (error) {
-      console.log("Validation Failed:", error);
-    }
+    } catch (error) {}
   };
 
   const handleCancel = () => {

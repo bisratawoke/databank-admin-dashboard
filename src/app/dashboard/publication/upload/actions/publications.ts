@@ -16,7 +16,6 @@ interface PublicationData {
 }
 
 export async function uploadPublication(formData: FormData) {
-  console.log("uploadPublication", formData);
   try {
     const session: any = await getSession();
     const response = await fetch(
@@ -32,7 +31,6 @@ export async function uploadPublication(formData: FormData) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.log("uploadFailed", errorData);
       throw new Error(errorData.message || "Failed to upload file");
     }
 

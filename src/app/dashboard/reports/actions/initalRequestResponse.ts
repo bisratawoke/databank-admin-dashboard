@@ -10,8 +10,6 @@ export default async function InitalRequestResponse({
 }) {
   const session: any = await getSession();
 
-  console.log("============= in intial request response =================");
-  console.log(status);
   const res = await fetch(
     `${process.env.BACKEND_URL}/reports/initial-request-response/${reportId}`,
     {
@@ -25,9 +23,6 @@ export default async function InitalRequestResponse({
       }),
     }
   );
-
-  console.log("============= in inital request response =================");
-  console.log(res.status);
 
   // const result = await res.json();
 

@@ -6,8 +6,6 @@ export default async function PublishPublication({
 }: {
   reportId: string;
 }) {
-  console.log("============ publication publisher action =================");
-  console.log(reportId);
   const session: any = await getSession();
 
   const result = await fetch(

@@ -72,11 +72,7 @@ const FileStructure: React.FC<FileStructureProps> = ({
   // Handler for selecting a tree item
   const onSelect = (selectedKeys: React.Key[]) => {
     const selectedKey = selectedKeys[0]; // Get the first selected key
-    console.log("=============== in select =====================");
     const selectedNode = findNodeByKey(tree, selectedKey);
-    console.log(files);
-    console.log(selectedNode);
-    console.log(selectedNode.title);
 
     // handleRowClick(selectedNode.title);
     // if (selectedNode && selectedNode.fileInfo) {

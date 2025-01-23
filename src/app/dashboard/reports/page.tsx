@@ -18,29 +18,21 @@ const autoMapFields = (
   fileHeaders: string[],
   reportFields: { name: string; id: string }[]
 ) => {
-  console.log("autoMapFields input - fileHeaders:", fileHeaders);
-  console.log("autoMapFields input - reportFields:", reportFields);
-
   const mapping: Record<string, string> = {};
 
   fileHeaders.forEach((header) => {
-    console.log(`Processing header: "${header}"`);
     const match = reportFields.find((field) => {
       const fieldNameLower = field.name.toLowerCase().trim();
       const headerLower = header.toLowerCase().trim();
-      console.log(`Comparing: "${fieldNameLower}" with "${headerLower}"`);
       return fieldNameLower === headerLower;
     });
 
     if (match) {
       mapping[header] = match.id;
-      console.log(`Mapped: "${header}" to "${match.id}" (${match.name})`);
     } else {
-      console.log(`No match found for: "${header}"`);
     }
   });
 
-  console.log("Final mapping:", mapping);
   return mapping;
 };
 
@@ -86,7 +78,6 @@ const Reports: React.FC = () => {
   };
 
   const handleReportSelect = async (record: any) => {
-    console.log("reportId: ", record._id);
     setSelectedReport(record._id);
 
     // Extract both field name and ID for mapping
@@ -117,7 +108,6 @@ const Reports: React.FC = () => {
       setParsedData(data);
       // Automatically map headers to fields
       const autoMappedFields = autoMapFields(headers, reportFields);
-      console.log("autoMappedFields: ", autoMappedFields);
       setMapping(autoMappedFields);
 
       setStep("map"); // Proceed to mapping step in the modal
@@ -222,7 +212,6 @@ const Reports: React.FC = () => {
         reports={reports}
         refreshReports={refreshReports}
         onUpdateReport={(props) => {
-          console.log("props being recieved; ", props);
           if (!props.reportId) {
             handleDataUpdate(props.data);
           } else if (props.reportId) {
@@ -260,7 +249,6 @@ const Reports: React.FC = () => {
             data={parsedData}
             mapping={mapping}
             onSubmit={(props) => {
-              console.log("props from preview: ", props);
               handleDataCreate(selectedReport, props);
             }}
             isSubmitting={isSubmitting}

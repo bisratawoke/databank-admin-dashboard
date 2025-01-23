@@ -18,7 +18,6 @@ export async function createData(
   reportId: string,
   dataEntries: DataEntry[]
 ): Promise<CreateDataResponse> {
-  console.log("dataEntries: ", dataEntries);
   const API_URL = process.env.BACKEND_URL;
   const session: any = await getSession();
   try {

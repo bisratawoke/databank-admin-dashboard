@@ -33,8 +33,6 @@ export default function UserTable({
   roles,
   departments,
 }: UserTableProps) {
-  console.log("========= in user table =================");
-  console.log(data);
   const [users, setUsers] = useState<User[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -130,7 +128,6 @@ export default function UserTable({
                 <a
                   onClick={async (e) => {
                     e.stopPropagation();
-                    console.log("Deactivate user:", record);
                     const { body, status } = await deactivateUser(record._id);
                     if (status == 200)
                       message.success("successfully deactivated user");
@@ -151,7 +148,6 @@ export default function UserTable({
                 <a
                   onClick={async (e) => {
                     e.stopPropagation();
-                    console.log("activate user:", record);
                     const { body, status } = await activateUser(record._id);
                     if (status == 200)
                       message.success("successfully deactivated user");
@@ -179,7 +175,6 @@ export default function UserTable({
                 setUsers((users) =>
                   users.filter((user) => user._id != record._id)
                 );
-                console.log("Delete user:", record);
               }}
               style={{ color: "red" }}
             >
@@ -200,7 +195,6 @@ export default function UserTable({
       if (isEditing) {
         // Update logic here
         const result = await UpdateUser({ data: values, id: currentUserId });
-        console.log(result);
         if (result.status == 200) {
           const updatedUsers = users.map((user) =>
             user._id === currentUserId ? { ...user, ...values } : user
@@ -210,7 +204,6 @@ export default function UserTable({
         }
       } else {
         const result = await CreateUser(values);
-        console.log(result);
         if (result.status == 201) {
           setUsers((users) => [...users, result.body]);
           message.success("User added successfully!");
@@ -222,9 +215,7 @@ export default function UserTable({
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
-    } catch (error) {
-      console.log("Validation Failed:", error);
-    }
+    } catch (error) {}
   };
 
   const handleCancel = () => {
@@ -260,11 +251,7 @@ export default function UserTable({
             if (record.key !== "addButtonRow") {
               setIsEditing(true);
               setCurrentUserId(record._id);
-              console.log("==== in update modal =======");
-              console.log(record.department);
-              console.log(
-                departments.filter((dep) => dep._id == record.department)
-              );
+
               form.setFieldsValue({
                 ...record,
                 department: record.department.name,

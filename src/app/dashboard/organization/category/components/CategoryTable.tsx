@@ -116,9 +116,7 @@ export default function CategoryTable({
       setIsModalVisible(false);
       form.resetFields();
       setIsEditing(false);
-    } catch (error) {
-      console.log("Validation Failed:", error);
-    }
+    } catch (error) {}
   };
 
   const handleCancel = () => {

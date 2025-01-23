@@ -9,7 +9,6 @@ export const updateData = async ({
 }: {
   data: Data[];
 }): Promise<{ result?: any; status: number; error?: any }> => {
-  console.log("data being sent: ", data);
   const session: any = await getSession();
   try {
     const response = await fetch(`${API_URL}/data/bulkUpdate`, {
