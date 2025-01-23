@@ -273,7 +273,9 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
       }
 
       // Store both the value and the data ID for this field
-      groupedByRow[rowIndex][fieldName] = value;
+      groupedByRow[rowIndex][fieldName] = isNaN(value)
+        ? value
+        : parseFloat(Number(value).toFixed(2));
       groupedByRow[rowIndex][`${fieldName}_id`] = dataId; // Store the ID with a field-specific key
     });
 
