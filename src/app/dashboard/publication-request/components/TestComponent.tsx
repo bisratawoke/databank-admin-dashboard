@@ -3,9 +3,7 @@ import { useEffect } from "react";
 
 const TestComp = React.memo(
   ({ departmentName }: { departmentName: string }) => {
-    useEffect(() => {
-      alert(departmentName);
-    }, []);
+    useEffect(() => {}, []);
     return <>{departmentName}</>;
   }
 );

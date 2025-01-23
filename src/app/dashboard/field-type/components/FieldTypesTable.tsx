@@ -79,7 +79,6 @@ export default function FieldTypesTables({
 
   const handleDeleteFieldType = async (fieldTypeId: string) => {
     try {
-      alert("yo");
       const { body, status } = await deleteFieldType({ fieldTypeId });
 
       setFieldTypes((types) => types.filter((type) => type._id != body._id));
