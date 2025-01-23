@@ -42,7 +42,6 @@ export default function ChatContainer(ChatInfo: IChat) {
       });
 
       if (response.status === 201) {
-        // Attach user info from the session to the new message
         const newMessages = response.body.messages.map((msg: IMessage) => ({
           ...msg,
           user: {
@@ -63,65 +62,52 @@ export default function ChatContainer(ChatInfo: IChat) {
   };
 
   return (
-    <div style={{ minWidth: "100%", margin: "auto" }}>
+    <div className="min-w-[100%]">
       {!loading && (
-        <div
-          style={{
-            // border: "1px solid #ddd",
-            padding: "10px",
-            borderRadius: "5px",
-            maxHeight: "400px",
-            overflowY: "auto",
-          }}
-        >
+        <div className="p-[10px] rounded-[5px] m-h-[400px] overflow-y-clip">
           {messages.map((msg, index) => (
             <div
               key={msg._id}
-              style={{
-                display: "flex",
-                justifyContent: index % 2 === 0 ? "flex-start" : "flex-end",
-                marginBottom: "10px",
-              }}
+              className={`flex ${
+                session.data.user._id == msg.from
+                  ? "justify-start"
+                  : "justify-end"
+              }  mb-[10px]`}
             >
               <div
-                style={{
-                  maxWidth: "70%",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  backgroundColor: index % 2 === 0 ? "#f1f1f1" : "#007bff",
-                  color: index % 2 === 0 ? "#000" : "#fff",
-                }}
+                className={`m-w-[70%] p-[10px] rounded-[10px] overflow-x-clip overflow-y-clip ${
+                  msg.from == session.data.user._id
+                    ? "bg-[#f1f1f1] text-[000]"
+                    : "bg-[#007bff] text-[fff]"
+                }`}
               >
-                <strong>{msg.user.firstName}:</strong> {msg.message}
+                <div
+                  className={`${
+                    msg.from == session.data.user._id
+                      ? "text-black"
+                      : "text-white"
+                  }`}
+                >
+                  <strong>{msg.user.firstName}:</strong>
+                  <span>{msg.message}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <div style={{ marginTop: "10px", display: "flex" }}>
+      <div className="mt-[10px] flex">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          style={{
-            flex: 1,
-            padding: "10px",
-            border: "1px solid #ddd",
-            borderRadius: "5px 0 0 5px",
-          }}
+          className="flex-1 p-[10px] border-1-[#ddd] rounded-md"
         />
         <button
           onClick={handleSendMessage}
-          style={{
-            padding: "10px",
-            border: "none",
-            backgroundColor: "#007bff",
-            color: "white",
-            borderRadius: "0 5px 5px 0",
-            cursor: "pointer",
-          }}
+          className=" p-[10px] bg-[#007bff] text-white rounded-md cursor-pointer"
         >
           Send
         </button>
