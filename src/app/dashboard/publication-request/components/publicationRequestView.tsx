@@ -27,11 +27,6 @@ export default function PublicationRequestView({
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    console.log("====== the request changed ============");
-    console.log(request);
-  }, [request]);
-
   if (loading) {
     return <Spinner />;
   } else
@@ -87,24 +82,22 @@ export default function PublicationRequestView({
               </div>
             </div>
 
-            <div className="mt-1 mb-5 flex flex-col gap-1">
-              <span className="font-bold text-[16px]">Department</span>
-              {request.department != null ? (
+            {request.department != null ? (
+              <div className="mt-1 mb-5 flex flex-col gap-1">
                 <div className="flex flex-col gap-2 justify-center">
-                  <div className={`flex items-center`}>
-                    <p className="text-[14px] text-[#8A8888] flex items-center p-1">
-                      <>{request.department.name}</>
-                    </p>
-                  </div>
+                  <span className="font-bold text-[16px]">Department</span>
+                  <p className="text-[14px] text-[#8A8888] flex items-center p-1">
+                    <>{request.department.name}</>
+                  </p>
                 </div>
-              ) : (
-                <AssignDepartmentToPublication
-                  request={request}
-                  setRequest={setRequest}
-                  departments={departments}
-                />
-              )}
-            </div>
+              </div>
+            ) : (
+              <AssignDepartmentToPublication
+                request={request}
+                setRequest={setRequest}
+                departments={departments}
+              />
+            )}
 
             <div className="mt-1 mb-5 flex flex-col gap-1">
               <span className="font-bold text-[16px]">Publication</span>
@@ -154,7 +147,9 @@ export default function PublicationRequestView({
             />
           </div>
         </Card>
-        {/* <ChatContainer {...chat} /> */}
+        <Card className="w-full max-w-2xl shadow-lg">
+          <ChatContainer {...chat} />
+        </Card>
       </div>
     );
 }
