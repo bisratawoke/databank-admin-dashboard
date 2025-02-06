@@ -310,7 +310,13 @@ export default function UserTable({
             <Form.Item
               name="password"
               label="Password"
-              rules={[{ required: true, message: "Please enter password" }]}
+              rules={[
+                { required: true, message: "Please enter password" },
+                {
+                  min: 8,
+                  message: "Password must be at least 8 characters long",
+                },
+              ]}
             >
               <Input placeholder="Enter password" />
             </Form.Item>

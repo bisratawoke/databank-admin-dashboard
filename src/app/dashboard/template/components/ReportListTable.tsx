@@ -361,6 +361,37 @@ export default function ReportListTable({
             <Input type="checkbox" />
           </Form.Item> */}
 
+          <Form.Item label="Data Provider" name="data_provider">
+            <Input.TextArea placeholder="Enter data provider details" />
+          </Form.Item>
+
+          <Form.Item
+            label="Data Source And Collection"
+            name="data_source_and_collection"
+          >
+            <Input.TextArea placeholder="Enter data source" />
+          </Form.Item>
+          <Form.Item
+            label="Data Geographical Coverage"
+            name="data_geo_coverage"
+          >
+            <Input.TextArea placeholder="Enter Geographical Coverage" />
+          </Form.Item>
+
+          <Form.Item
+            label="Data Collection Method"
+            name="data_collection_method"
+          >
+            <Input.TextArea placeholder="Enter Collection Method" />
+          </Form.Item>
+
+          <Form.Item
+            label="Data Processing and Adjustment"
+            name="data_processing_adjustment"
+          >
+            <Input.TextArea placeholder="Enter Processing Adjustment" />
+          </Form.Item>
+
           <Form.Item
             label="Data Structure Information"
             name="data_structure_information"

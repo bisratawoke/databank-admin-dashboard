@@ -7,6 +7,7 @@ import InitalApproval from "../actions/initalApproval";
 import SecondaryApproval from "../actions/secondaryApproval";
 import VerifyPublicationRequestPayment from "../actions/verifyPublicationRequestPayment";
 import FinalApproval from "../actions/finalApproval";
+import InitalReject from "../actions/initialReject";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -90,6 +91,8 @@ export default function PublicationRequestStatusManager({
       if (action === "Approve") {
         setCurrentStatus("Approved");
       } else if (action === "Reject") {
+        alert("------ in reject -=----");
+        await InitalReject({ publicationRequestId: publication._id });
         setCurrentStatus("Rejected");
         setPublicationRequest((state: any) => ({
           ...state,
