@@ -31,8 +31,7 @@ export default function SetPublicationRequestPrice({
   };
 
   const handleSubmitPrice = async (values: { price: number }) => {
-    console.log("Price submitted:", values.price);
-
+   
     const { body, status } = await SetPublicationRequestPriceAction({
       publicationRequestId: request._id,
       price: values.price,
@@ -41,9 +40,6 @@ export default function SetPublicationRequestPrice({
     if (status === 200)
       message.success("Successfully set publication request price");
 
-    console.log("=================== in handle submit price =================");
-    console.log(status);
-    console.log(body);
 
     const updatedRequest = { ...request, price: values.price };
     setRequest(updatedRequest);

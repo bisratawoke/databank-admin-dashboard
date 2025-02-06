@@ -11,6 +11,8 @@ export default async function Page({ params }: { params: any }) {
   const { request_id } = params;
   const result = await getPublicationRequest({ path: request_id });
 
+  console.log("======== in publication request page ==========");
+  console.log(result);
   const request = result.body;
   let departments = null;
 

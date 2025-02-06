@@ -1,9 +1,8 @@
 "use server";
 import { getSession } from "@/lib/auth/auth";
-export default async function deleteUser(userId) {
+export default async function deleteUser(userId: any) {
   const session: any = await getSession();
 
-  console.log("====== in delete user =============");
   const res = await fetch(`${process.env.BACKEND_URL}/users/${userId}`, {
     headers: {
       authorization: `Bearer ${session.user.accessToken}`,
@@ -13,7 +12,6 @@ export default async function deleteUser(userId) {
 
     method: "delete",
   });
-  console.log(res.status);
   const result = await res.json();
 
   return {

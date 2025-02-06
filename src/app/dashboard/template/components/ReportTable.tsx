@@ -63,7 +63,7 @@ export default function ReportTable({
         if (addFieldToReportStatus == 200) {
           form.resetFields();
           setIsModalVisible(false);
-          message.success("Report added successfully!");
+          message.success("Report Field added successfully !!");
         } else {
           message.error("Failed to add report. Please try again.");
         }
