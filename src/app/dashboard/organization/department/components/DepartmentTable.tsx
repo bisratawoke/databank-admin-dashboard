@@ -7,7 +7,7 @@ import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { CreateDepartment } from "../../actions/createDepartment";
 import { UpdateDepartment } from "../../actions/updateDepartment";
-
+import { deletDepartment as deleteDepartment } from "../../actions/deleteDepartment";
 interface DepartmentTableProps {
   data: department[];
   categories: category[];
@@ -60,10 +60,43 @@ export default function DepartmentTable({
         return null;
       },
     },
+    {
+      title: "Action",
+      render: (value, record) => {
+        return (
+          <>
+            {
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(record);
+                }}
+              >
+                Delete
+              </span>
+            }
+          </>
+        );
+      },
+    },
   ];
 
   const showModal = () => {
     setIsModalVisible(true);
+  };
+
+  const handleDelete = async (record: Record<string, any>) => {
+    try {
+      if (record.category.length > 0) {
+        message.error(
+          "Cannot delete department because it is accociated with a category."
+        );
+        return;
+      }
+      const result = await deleteDepartment({ depId: record._id });
+      setDepartments((dep) => dep.filter((d: any) => d._id != record._id));
+      message.success("Successfully delete department");
+    } catch (err) {}
   };
 
   const handleOk = async () => {

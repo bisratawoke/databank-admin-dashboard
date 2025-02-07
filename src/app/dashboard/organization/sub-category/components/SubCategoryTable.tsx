@@ -7,7 +7,8 @@ import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { report } from "@/app/dashboard/reports/types";
 import { CreateSubCategory } from "../../actions/createSubCategory";
-import { UpdateSubCategory } from "../../actions/updateSubcategory"; // You need to implement this function similarly to UpdateCategory.
+import { UpdateSubCategory } from "../../actions/updateSubcategory";
+import { deleteSubCategory } from "../../actions/deleteSubCategory";
 
 export default function SubCategoryTable({
   data,
@@ -22,7 +23,6 @@ export default function SubCategoryTable({
   const [currentSubCategoryId, setCurrentSubCategoryId] = useState<any>(null);
   const [form] = Form.useForm();
 
-  // Create unique report options for filtering
   const reportFilterOptions = reports.map((report) => ({
     text: report.name,
     value: report._id,
@@ -59,8 +59,41 @@ export default function SubCategoryTable({
         return null;
       },
     },
+    {
+      title: "Action",
+      render: (value: string, record: Record<string, any>) => {
+        return (
+          <>
+            {
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(record);
+                }}
+              >
+                Delete
+              </span>
+            }
+          </>
+        );
+      },
+    },
   ];
 
+  const handleDelete = async (record: Record<string, any>) => {
+    try {
+      if (record.report.length > 0) {
+        message.error(
+          "Cannot delete subcategorie because reports depend on it"
+        );
+        return;
+      }
+      const res = await deleteSubCategory({ subCategoryId: record._id });
+
+      setSubcategories((subcat) => subcat.filter((sc) => sc._id != record._id));
+      message.success("Successfully delete sub category");
+    } catch (err) {}
+  };
   const showModal = () => {
     setIsModalVisible(true);
   };

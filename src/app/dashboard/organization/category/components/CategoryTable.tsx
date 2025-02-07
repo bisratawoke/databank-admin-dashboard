@@ -7,6 +7,7 @@ import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { CreateCategory } from "../../actions/createCategory";
 import { UpdateCategory } from "../../actions/updateCategory";
+import { deleteCategory } from "../../actions/deleteCategory";
 
 interface CategoryTableProps {
   data: category[];
@@ -62,8 +63,41 @@ export default function CategoryTable({
         return null;
       },
     },
+    {
+      title: "Action",
+      render: (value, record) => {
+        return (
+          <>
+            {
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(record);
+                }}
+              >
+                Delete
+              </span>
+            }
+          </>
+        );
+      },
+    },
   ];
 
+  const handleDelete = async (record: Record<string, any>) => {
+    try {
+      if (record.subcategory.length > 0) {
+        message.error(
+          "Cannot delete category cause it is associated with subcategory"
+        );
+        return;
+      }
+      const res = await deleteCategory({ categoryId: record._id });
+
+      setCategories((cat) => cat.filter((c) => c._id != record._id));
+      message.success("Successfully deleted catgory");
+    } catch (err) {}
+  };
   const showModal = () => {
     setIsModalVisible(true);
   };
