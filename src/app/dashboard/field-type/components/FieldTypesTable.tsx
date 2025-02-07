@@ -8,6 +8,7 @@ import { createFieldType } from "../actions/createFieldType";
 import { UpdateFieldType } from "../actions/updateFieldType";
 import DeleteButton from "../../components/ui/DeleteButton";
 import deleteFieldType from "../actions/deleteFieldType";
+import hasRelatedFields from "../actions/hasRelatedFields";
 
 export default function FieldTypesTables({
   fieldTypes: data,
@@ -111,21 +112,42 @@ export default function FieldTypesTables({
     {
       title: "Action",
       dataIndex: "action",
-      render: (record: Record<string, any>) => {
-        return (
-          <DeleteButton
-            action={async (e) => {
-              e.stopPropagation();
+      render: (value: string, record: Record<string, any>) => {
+        console.log(record);
+        if (record._id)
+          return (
+            <Button>
+              <span
+                onClick={async (e) => {
+                  e.stopPropagation();
 
-              if (selectedRecordId)
-                await handleDeleteFieldType(selectedRecordId);
-            }}
-          />
-        );
+                  await deleteFieldTypes(record._id);
+                }}
+              >
+                Delete
+              </span>
+            </Button>
+          );
       },
     },
   ];
 
+  const deleteFieldTypes = async (id: string) => {
+    const { body: hasRelation } = await hasRelatedFields({ fieldTypeId: id });
+
+    if (hasRelation) {
+      message.error(
+        "Cannot delete field type because there are fields that depend on it!"
+      );
+      return;
+    }
+    await deleteFieldType({ fieldTypeId: id });
+
+    setFieldTypes((fieldTypes) =>
+      fieldTypes.filter((ft: Record<string, any>) => ft._id != id)
+    );
+    message.success("Successfully deleted field type.");
+  };
   const showModal = () => {
     if (isEditing == false) form.resetFields();
     setIsModalVisible(true);
