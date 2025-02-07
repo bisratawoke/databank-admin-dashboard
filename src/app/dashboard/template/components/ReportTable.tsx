@@ -20,6 +20,8 @@ import { updateField } from "../actions/updateField";
 import { deleteField } from "../actions/deleteField";
 import DeleteButton from "../../components/ui/DeleteButton";
 import AddButton from "../../components/ui/AddButton";
+import { hasRelatedData } from "../actions/hasRelatedDataFields";
+import { FaRegArrowAltCircleDown } from "react-icons/fa";
 const { Option } = Select;
 
 export default function ReportTable({
@@ -153,15 +155,7 @@ export default function ReportTable({
               <DeleteButton
                 action={async (e) => {
                   e.stopPropagation();
-                  const result = await deleteField(record._id);
-                  if (result.status == 200) {
-                    message.info("Successfully deleted record");
-                    setFields((fields) =>
-                      fields.filter((field: any) => field._id != record._id)
-                    );
-                  } else {
-                    message.error("Error deleting record");
-                  }
+                  deleteFields(record._id);
                 }}
               />
             </Space>
@@ -172,6 +166,25 @@ export default function ReportTable({
       ),
     },
   ];
+
+  const deleteFields = async (id: string) => {
+    try {
+      const { body: hasRelations } = await hasRelatedData(id);
+      if (hasRelations) {
+        message.error(
+          "Cannot delete fields because there are data records that depend on it."
+        );
+        return;
+      }
+      const result = await deleteField(id);
+      if (result.status == 200) {
+        message.info("Successfully deleted record");
+        setFields((fields) => fields.filter((field: any) => field._id != id));
+      } else {
+        message.error("Error deleting record");
+      }
+    } catch (error) {}
+  };
 
   const dataWithAddButton = [
     ...(fields?.length > 0
