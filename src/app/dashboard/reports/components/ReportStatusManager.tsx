@@ -11,6 +11,7 @@ import InitalRequestResponse from "../actions/initalRequestResponse";
 import RequestSecondApproval from "../actions/RequestSecondApproval";
 import dissiminationResponse from "../actions/dissiminationDepResponse";
 import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
+import DeputyApprove from "../actions/deputyApproval";
 
 export default function ReportStatusManager({ report, refreshReports }: any) {
   const { data: session }: any = useSession();
@@ -33,9 +34,9 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
 
   const logic: { [key: string]: string[] } = {
     PENDING: ["Approve", "Reject"],
-    APPROVED: ["Publish", "Reject"],
+    APPROVED: ["Deputy approved", "Reject"], // Ensure this is correctly mapped
+    "DEPUTY APPROVED": ["Publish", "Reject"],
     REJECTED: ["Approve"],
-    // PUBLISHED: ["Approve"],
   };
 
   const handler = async (state: string, action: string) => {
@@ -72,6 +73,13 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
           reportId: report._id,
           status: currentStatus,
         });
+      } else if (action === "Deputy approved") {
+        setCurrentStatus("Deputy approved");
+        const result = await DeputyApprove({ reportId: report._id });
+        // const result = await RequestSecondApproval({ reportId: report._id });
+
+        if (!(result.status == 200)) throw new Error("Something went wrong");
+        message.info("Successfully marked as Deputy Approved");
       }
     } catch (err) {
       message.error("Something went wrong");
@@ -90,12 +98,19 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
               !session.user.roles.includes("DISSEMINATION_HEAD") ? (
                 <></>
               ) : (
-                <Menu.Item
-                  key={action}
-                  onClick={() => handler(report.status, action)}
-                >
-                  {capitalizeFirstLetter(action.toLowerCase())}
-                </Menu.Item>
+                <>
+                  {action == "Deputy approved" &&
+                  !session.user.roles.includes("DEPUTY_DIRECTOR") ? (
+                    <></>
+                  ) : (
+                    <Menu.Item
+                      key={action}
+                      onClick={() => handler(report.status, action)}
+                    >
+                      {capitalizeFirstLetter(action.toLowerCase())}
+                    </Menu.Item>
+                  )}
+                </>
               )}
             </>
           )}

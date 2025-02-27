@@ -39,8 +39,8 @@ export default function PrimaryNavBar({
       </div>
       <div className="flex gap-[16px] items-center height-[100%]">
         <div className="flex items-center gap-[8px]">
-          <HelpIcon />
-          <ShareIcon />
+          {/* <HelpIcon />
+          <ShareIcon /> */}
         </div>
         <Notifications notifications={notifications} />
 
