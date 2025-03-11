@@ -116,17 +116,33 @@ export default function FieldTypesTables({
         console.log(record);
         if (record._id)
           return (
-            <Button>
-              <span
-                onClick={async (e) => {
-                  e.stopPropagation();
-
-                  await deleteFieldTypes(record._id);
-                }}
-              >
-                Delete
-              </span>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                Modal.confirm({
+                  title: "Are you sure you want to delete this field type?",
+                  content: "This action cannot be undone.",
+                  okText: "Yes",
+                  cancelText: "No",
+                  onOk: async () => {
+                    await deleteFieldTypes(record._id);
+                  },
+                });
+              }}
+            >
+              Delete
             </Button>
+            // <Button>
+            //   <span
+            //     onClick={async (e) => {
+            //       e.stopPropagation();
+
+            //       await deleteFieldTypes(record._id);
+            //     }}
+            //   >
+            //     Delete
+            //   </span>
+            // </Button>
           );
       },
     },

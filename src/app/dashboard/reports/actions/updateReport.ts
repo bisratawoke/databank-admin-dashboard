@@ -9,11 +9,13 @@ export async function updateReport({
   reportId,
   data,
 }: {
-  reportId: string;
+  reportId: string | undefined;
   data: any[];
 }) {
   const session: any = await getSession();
 
+  console.log(reportId);
+  console.log(data);
   if (!reportId || !data?.length) {
     throw new Error("Invalid reportId or dataIds");
   }
@@ -31,14 +33,17 @@ export async function updateReport({
       cache: "no-store",
     });
 
+    console.log(data);
     if (!res.ok) {
       const errorData = await res.json();
+      console.log(errorData);
       throw new Error(
         errorData.message || `Failed to update report: ${res.status}`
       );
     }
 
     const responseData = await res.json();
+    console.log(responseData);
     revalidatePath("/dashboard/reports");
     return responseData;
   } catch (error: any) {

@@ -3,7 +3,7 @@
 
 import { category, subcategory } from "../../types";
 import { useState } from "react";
-import { Table, Tag, Modal, Form, Input, Select, message } from "antd";
+import { Table, Tag, Modal, Form, Input, Select, message, Button } from "antd";
 import AddButton from "@/app/dashboard/components/ui/AddButton";
 import { CreateCategory } from "../../actions/createCategory";
 import { UpdateCategory } from "../../actions/updateCategory";
@@ -66,20 +66,55 @@ export default function CategoryTable({
     {
       title: "Action",
       render: (value, record) => {
-        return (
-          <>
-            {
-              <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(record);
-                }}
-              >
-                Delete
-              </span>
-            }
-          </>
-        );
+        if (record._id) {
+          return (
+            <>
+              {
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    Modal.confirm({
+                      title: "Are you sure you want to delete this record?",
+                      content: "This action cannot be undone.",
+                      okText: "Yes",
+                      cancelText: "No",
+                      onOk: async () => {
+                        await handleDelete(record);
+                        // await deleteFields(record._id);
+                      },
+                    });
+                  }}
+                >
+                  Delete
+                </Button>
+                // <span
+                //   onClick={(e) => {
+                //     e.stopPropagation();
+                //     handleDelete(record);
+                //   }}
+                // >
+                //   Delete
+                // </span>
+              }
+            </>
+          );
+        } else {
+          return <></>;
+        }
+        // return (
+        //   <>
+        //     {
+        //       <span
+        //         onClick={(e) => {
+        //           e.stopPropagation();
+        //           handleDelete(record);
+        //         }}
+        //       >
+        //         Delete
+        //       </span>
+        //     }
+        //   </>
+        // );
       },
     },
   ];

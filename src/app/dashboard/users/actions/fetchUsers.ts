@@ -12,8 +12,6 @@ export async function FetchUsers() {
     cache: "no-cache",
   });
 
-  console.log("===================== in fetch users ======================");
-  console.log(session);
   const result = await res.json();
   return {
     status: res.status,

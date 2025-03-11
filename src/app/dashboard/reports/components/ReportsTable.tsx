@@ -12,7 +12,7 @@ import * as XLSX from "xlsx";
 import { prepareDataForExport } from "../_parsers/exportHelper";
 import ReportStatusManager from "./ReportStatusManager";
 import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
-
+import { useRouter } from "next/navigation";
 interface ReportsTableProps {
   loading: boolean;
   onReportSelect: (record: any) => void;
@@ -46,7 +46,7 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
   const [originalData, setOriginalData] = useState<DataType[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [savedData, setSavedData] = useState<DataType[]>([]);
-
+  const router = useRouter();
   const columns = [
     {
       title: "No.",
@@ -153,11 +153,12 @@ const ReportsTable: React.FC<ReportsTableProps> = ({
     if (isUpload) {
       onReportSelect(record); // This will trigger the upload flow
     } else if (record.data && record.data.length > 0) {
-      setSelectedReport(record);
+      // setSelectedReport(record);
 
-      setIsModalVisible(true);
-      setIsEditing(false);
-      setEditedData([]);
+      // setIsModalVisible(true);
+      // setIsEditing(false);
+      // setEditedData([]);
+      router.push(`/dashboard/reports/${record._id}`);
     } else {
       onReportSelect(record);
     }

@@ -13,10 +13,7 @@ export async function fetchReports() {
     });
     const result = await res.json();
     return result;
-  } catch (err) {
-    console.log("=========== in action error =======");
-    console.log(err);
-  }
+  } catch (err) {}
 }
 
 export async function fetchReport(id: string) {

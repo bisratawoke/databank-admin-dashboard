@@ -25,6 +25,7 @@ export async function fetchReport(id: string) {
   const res = await fetch(`${API_URL}/reports/${id}`, {
     headers: {
       "Cache-Control": "no-store",
+      authorization: `Bearer ${session?.user.accessToken}`,
     },
     cache: "no-cache",
   });

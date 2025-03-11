@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Modal, Form, Input, Button, message } from "antd";
 import resetPassword from "@/app/dashboard/actions/resetPassword"; // Import the server action
+import { signIn, useSession } from "next-auth/react";
 
 export default function PasswordResetModal() {
+  const { data: session, update }: any = useSession();
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -16,6 +18,18 @@ export default function PasswordResetModal() {
 
       if (response.status === 201) {
         message.success("Password reset successfully!");
+        await signIn("credentials", {
+          redirect: false,
+          username: session.user.email,
+          password: values.newPassword,
+        });
+        // inside your successful reset logic:
+        await update({
+          user: {
+            ...session.user,
+            lastLogin: new Date().toISOString(),
+          },
+        });
         setIsModalOpen(false); // Close modal on success
       } else {
         message.error("Failed to reset password. Please try again.");

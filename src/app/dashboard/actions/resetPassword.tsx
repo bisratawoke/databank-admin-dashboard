@@ -24,6 +24,13 @@ export default async function resetPassword({
     `${process.env.BACKEND_URL}/auth/reset-password`,
     opt
   );
+
+  if (res.status === 201) {
+    // Ideally, update the persistent store (database or JWT) here.
+    // For now, update the session and call the update API with the correct URL.
+    session.user.lastLogin = new Date();
+  }
+
   await res.json();
 
   return {

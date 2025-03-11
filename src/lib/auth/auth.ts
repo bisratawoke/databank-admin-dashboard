@@ -42,8 +42,11 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }: any) {
+      console.log("===================== inside jwt callback ==============");
+      console.log(user);
+      console.log(token);
       if (user) {
-        token.user = user;
+        token.user = { ...user, lastLogin: user.lastLogin || null };
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
       }

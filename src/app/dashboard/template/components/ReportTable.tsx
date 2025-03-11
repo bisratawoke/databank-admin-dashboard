@@ -152,12 +152,28 @@ export default function ReportTable({
         <>
           {record.key !== "addButtonRow" ? (
             <Space size="middle">
-              <DeleteButton
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  Modal.confirm({
+                    title: "Are you sure you want to delete this record?",
+                    content: "This action cannot be undone.",
+                    okText: "Yes",
+                    cancelText: "No",
+                    onOk: async () => {
+                      await deleteFields(record._id);
+                    },
+                  });
+                }}
+              >
+                Delete
+              </Button>
+              {/* <DeleteButton
                 action={async (e) => {
                   e.stopPropagation();
                   deleteFields(record._id);
                 }}
-              />
+              /> */}
             </Space>
           ) : (
             <></>

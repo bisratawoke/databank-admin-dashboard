@@ -4,7 +4,6 @@ export default function Error({
 }: {
   error: Error & { digest: string };
 }) {
-  console.log(error);
   return (
     <div>
       caught

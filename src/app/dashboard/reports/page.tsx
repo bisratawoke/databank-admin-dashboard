@@ -58,6 +58,8 @@ const Reports: React.FC = () => {
       try {
         setLoading(true);
         const data = await fetchReports();
+        console.log("============= get reports ==============");
+        console.log(data);
         setReports(data);
         setLoading(false);
       } catch (error) {

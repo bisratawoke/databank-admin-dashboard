@@ -290,12 +290,18 @@ const PublicationUpload: React.FC<PublicationUploadProps> = ({
             placeholder="Select departments"
             onChange={(dep) => {
               if (dep.length > 0) {
-                setCategories((categories) =>
-                  departments.flatMap(
-                    (department) =>
-                      dep.includes(department._id) && department.category
+                setCategories(
+                  departments.flatMap((department) =>
+                    dep.includes(department._id) ? department.category : []
                   )
                 );
+
+                // setCategories((categories) =>
+                //   departments.flatMap(
+                //     (department) =>
+                //       dep.includes(department._id) && department.category
+                //   )
+                // );
               } else {
                 setCategories(
                   departments.flatMap((department) => department.category)
