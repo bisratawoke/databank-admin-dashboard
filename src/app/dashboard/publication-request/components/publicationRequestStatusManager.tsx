@@ -157,6 +157,19 @@ export default function PublicationRequestStatusManager({
           {capitalizeFirstLetter(action.toLowerCase())}
         </Menu.Item>
       );
+    }
+    if (
+      action == "Final Approval" &&
+      session.user.roles.includes("DISSEMINATION_HEAD")
+    ) {
+      return (
+        <Menu.Item
+          key={action}
+          onClick={() => handler(publication.status, action)}
+        >
+          {capitalizeFirstLetter(action.toLowerCase())}
+        </Menu.Item>
+      );
     } else {
       return <></>;
     }
