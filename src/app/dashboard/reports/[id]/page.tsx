@@ -13,6 +13,6 @@ export default async function ReportPage({
 
   console.log("========= in this page ===========");
   console.log(reportData);
-  // Pass the fetched report as a prop into your client component.
+
   return <ReportDetailsPage reports={reportData} />;
 }

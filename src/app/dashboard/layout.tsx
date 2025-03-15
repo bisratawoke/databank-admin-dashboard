@@ -22,7 +22,7 @@ export default async function Index({
     return (
       <Layout>
         <Layout>
-          <PrimaryNavBar notifications={notifications} />
+          <PrimaryNavBar notifications={notifications} session={session} />
           <SecondaryNav />
           <div className="p-[24px] bg-white">{children}</div>
         </Layout>
