@@ -75,7 +75,7 @@ export default function ReportListTable({
             });
 
             if (status == 200) {
-              message.success("Report added successfully baby!");
+              message.success("Report added successfully!");
 
               const response = await RequestInitialApproval(result._id);
 
