@@ -40,14 +40,14 @@ export default function UserTable({
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
 
-  const roleFilters = users
+  const roleFilters: any = users
     ? [...new Set(users.flatMap((user) => user.roles))].map((role) => ({
         text: role,
         value: role,
       }))
     : [];
 
-  const columns = [
+  const columns: any = [
     {
       title: "Name",
       dataIndex: "name",
@@ -119,7 +119,7 @@ export default function UserTable({
     {
       title: "Actions",
       key: "actions",
-      render: (_, record: User) =>
+      render: (_: any, record: any) =>
         record.key !== "addButtonRow" &&
         record.email != "admin@admin.com" && (
           <>

@@ -2,6 +2,7 @@
 "use server";
 import { getSession } from "@/lib/auth/auth";
 export default async function RequestInitialApproval(reportId: string) {
+  console.log("=========== in request initial approval =============");
   const session: any = await getSession();
 
   const result = await fetch(
@@ -13,6 +14,7 @@ export default async function RequestInitialApproval(reportId: string) {
       method: "POST",
     }
   );
+  console.log(result.status);
 
   return { status: result.status };
 }
