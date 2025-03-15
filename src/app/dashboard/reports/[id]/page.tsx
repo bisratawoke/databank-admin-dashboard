@@ -10,9 +10,5 @@ export default async function ReportPage({
 }) {
   // Call your fetchReport action with the ID from the URL.
   const reportData = await fetchReport(params.id);
-
-  console.log("========= in this page ===========");
-  console.log(reportData);
-
   return <ReportDetailsPage reports={reportData} />;
 }

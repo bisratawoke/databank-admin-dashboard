@@ -346,13 +346,16 @@ const ReportDetailsPage: React.FC<{ reports: any }> = ({
         <div className="flex justify-end">
           {!isEditing ? (
             <>
-              <Button
-                icon={<EditOutlined />}
-                onClick={handleEditClick}
-                className="mr-2"
-              >
-                Edit
-              </Button>
+              {selectedReport.status != "published" &&
+                selectedReport.status != "approved" && (
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={handleEditClick}
+                    className="mr-2"
+                  >
+                    Edit
+                  </Button>
+                )}
               {/* {selectedReport?.status != 'published' && (
 
 
