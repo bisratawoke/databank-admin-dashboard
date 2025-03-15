@@ -67,8 +67,6 @@ const ReportDetailsPage: React.FC<{ reports: any }> = ({
   // }, [reportId]);
 
   useEffect(() => {
-    console.log("========== in session =========");
-    console.log(session);
     setSelectedReport(reports);
   }, []);
 
@@ -165,6 +163,17 @@ const ReportDetailsPage: React.FC<{ reports: any }> = ({
       }
 
       message.success("Report updated successfully");
+
+      setSelectedReport((report: any) => ({
+        ...report,
+        data: report.data.map((dataItem: any) => {
+          const updatedRecord = updateResponse.result.find(
+            (record: any) => record._id === dataItem._id
+          );
+          // If a matching record is found, merge the updated data into the current item
+          return updatedRecord ? { ...dataItem, ...updatedRecord } : dataItem;
+        }),
+      }));
     } catch (error: any) {
       console.error("Error in handleDataCreate:", error);
       message.error(error.message || "Failed to update the report");
