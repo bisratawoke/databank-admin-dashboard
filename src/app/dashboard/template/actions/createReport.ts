@@ -14,16 +14,15 @@ export async function createReport(report: report) {
       body: JSON.stringify(report),
     });
 
-    console.log(res.status);
 
     const result = await res.json();
-    console.log(result);
+    console.log("=========== in create report ============")
+    console.log(result)
     return {
       body: result,
       status: res.status,
     };
   } catch (err) {
-    console.log(err);
 
     return {
       status: 500,
