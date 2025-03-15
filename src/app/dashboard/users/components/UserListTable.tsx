@@ -142,7 +142,7 @@ export default function UserTable({
                   }}
                   style={{ marginRight: 8 }}
                 >
-                  deactivate
+                  Deactivate
                 </a>
               ) : (
                 <a
