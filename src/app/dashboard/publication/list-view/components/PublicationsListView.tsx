@@ -207,6 +207,8 @@ export default function PublicationListView({
             setSelectedFile(record);
             setShowDetail(true);
           }}
+          selectedFile={record}
+          refreshPublications={refreshPublications}
         />
       ),
     },

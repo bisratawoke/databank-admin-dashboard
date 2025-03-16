@@ -163,6 +163,8 @@ export async function deletePublication(id: string) {
       }
     );
 
+    console.log(response.status);
+
     if (!response.ok) {
       throw new Error("Failed to delete publication");
     }

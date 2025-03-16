@@ -6,6 +6,7 @@ import fetchChat from "@/app/dashboard/actions/fetchChat";
 import { useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
 import ChatContainer from "@/app/dashboard/components/ui/ChatContainer";
+import { deletePublication } from "../../upload/actions/publications";
 
 const DetailPair = ({ header, value }: { header: string; value: any }) => (
   <div className="flex flex-col">
@@ -18,12 +19,13 @@ export default function Details({
   detail,
   close,
 }: {
-  detail: publication | null;
+  detail: publication | null | any;
   close: any;
 }) {
   const [loading, setLoading] = useState(true);
   const [chatInfo, setChatInfo] = useState<any>(null);
   const pub = JSON.parse(JSON.stringify(detail));
+
   useEffect(() => {
     fetchChat({ subjectId: pub._id }).then((res) => {
       setChatInfo(res.body);
