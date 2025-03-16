@@ -91,7 +91,7 @@ export default function PublicationRequestStatusManager({
       if (action === "Approve") {
         setCurrentStatus("Approved");
       } else if (action === "Reject") {
-        alert("------ in reject -=----");
+        // alert("------ in reject -=----");
         await InitalReject({ publicationRequestId: publication._id });
         setCurrentStatus("Rejected");
         setPublicationRequest((state: any) => ({
