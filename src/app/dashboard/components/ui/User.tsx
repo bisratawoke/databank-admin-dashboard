@@ -21,6 +21,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { FiUser } from "react-icons/fi";
 import { useState } from "react";
+import PasswordResetModal from "./PasswordResetModal";
 
 const useUser = () => {
   const { data: session }: any = useSession();
@@ -75,6 +76,7 @@ const GrayText = ({ children }: { children: any }) => (
 
 const User: React.FC = () => {
   const { firstName, lastName, fullName, email, groups } = useUser();
+  const [showModal, setShowModal] = useState(false);
 
   const content = (
     <Flex vertical>
@@ -103,9 +105,10 @@ const User: React.FC = () => {
           <Button
             block
             icon={<EditOutlined />}
-            // onClick={() => navigate("/auth/change-password")}
+            onClick={() => setShowModal(true)}
           >
             Change password
+            {showModal && <PasswordResetModal />}
           </Button>
           <Button
             block
