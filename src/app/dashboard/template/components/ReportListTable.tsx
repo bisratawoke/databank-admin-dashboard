@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Table,
   Modal,
@@ -11,7 +11,10 @@ import {
   message,
   Tag,
   Select,
+  Button,
 } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+// import Highlighter from "react-highlight-words";
 import { createReport } from "../actions/createReport";
 import { useRouter } from "next/navigation";
 import styles from "../styles/ReportListTable.module.css";
@@ -32,6 +35,103 @@ export default function ReportListTable({
   const [reports, setReports] = useState(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+
+  // State and ref for the name column search
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef<Input | null>(null);
+
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: () => void,
+    dataIndex: string
+  ) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  // Helper function to add search props to a column
+  const getColumnSearchProps = (dataIndex: string) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: {
+      setSelectedKeys: (selectedKeys: React.Key[]) => void;
+      selectedKeys: React.Key[];
+      confirm: () => void;
+      clearFilters: () => void;
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            handleSearch(selectedKeys as string[], confirm, dataIndex)
+          }
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Button
+          type="primary"
+          onClick={() =>
+            handleSearch(selectedKeys as string[], confirm, dataIndex)
+          }
+          icon={<SearchOutlined />}
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={() => handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value: string, record: any) =>
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : false,
+    onFilterDropdownOpenChange: (visible: boolean) => {
+      if (visible) {
+        setTimeout(
+          () => searchInput.current && searchInput.current.select(),
+          100
+        );
+      }
+    },
+    render: (text: string) => <span>{text}</span>,
+    // searchedColumn === dataIndex ? (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[searchText]}
+    //     autoEscape
+    //     textToHighlight={text ? text.toString() : ""}
+    //   />
+    // ) : (
+    //   text
+    // ),
+  });
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -77,7 +177,7 @@ export default function ReportListTable({
             if (status == 200) {
               message.success("Report added successfully!");
 
-              const response = await RequestInitialApproval(result._id);
+              await RequestInitialApproval(result._id);
 
               setReports((prevReports) => [
                 ...prevReports,
@@ -87,6 +187,7 @@ export default function ReportListTable({
               form.resetFields();
               setIsModalVisible(false);
             } else {
+              // handle error if needed
             }
           } else {
             message.error("Failed to add the report.");
@@ -99,11 +200,13 @@ export default function ReportListTable({
       .catch((errorInfo) => {});
   };
 
+  // Updated columns with filtering for "Name" and "Status"
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      ...getColumnSearchProps("name"),
       render: (text: string) => <span>{text}</span>,
     },
     {
@@ -153,69 +256,18 @@ export default function ReportListTable({
       title: "Status",
       dataIndex: "status",
       key: "status",
+      filters: [
+        { text: "pending", value: "pending" },
+        { text: "approved", value: "approved" },
+        { text: "rejected", value: "rejected" },
+        { text: "approved", value: "approved" },
+        // Add more statuses if needed
+      ],
+      onFilter: (value: string, record: any) => record.status === value,
       render: (status: string) => (
         <Tag color={status === "pending" ? "orange" : "green"}>{status}</Tag>
       ),
     },
-
-    // {
-    //   title: "Author",
-    //   dataIndex: "author",
-    //   key: "author",
-    // },
-    // {
-    //   title: "Data Quality Limitations",
-    //   dataIndex: "data_quality_limitations",
-    //   key: "data_quality_limitations",
-    // },
-    // {
-    //   title: "Time Coverage",
-    //   dataIndex: "time_coverage",
-    //   key: "time_coverage",
-    // },
-    // {
-    //   title: "Update Frequency",
-    //   dataIndex: "update_frequency",
-    //   key: "update_frequency",
-    // },
-    // {
-    //   title: "Access Restrictions",
-    //   dataIndex: "access_restrictions",
-    //   key: "access_restrictions",
-    // },
-    // {
-    //   title: "Payment Amount",
-    //   dataIndex: "payment_amount",
-    //   key: "payment_amount",
-    //   render: (amount: number) => (amount ? `$${amount}` : "N/A"),
-    // },
-    // {
-    //   title: "Licenses/Terms of Use",
-    //   dataIndex: "licenses_terms_of_use",
-    //   key: "licenses_terms_of_use",
-    // },
-    // {
-    //   title: "Contact Information",
-    //   dataIndex: "contact_information",
-    //   key: "contact_information",
-    // },
-    // {
-    //   title: "File Formats",
-    //   dataIndex: "file_formats_available",
-    //   key: "file_formats_available",
-    //   render: (formats: string[]) => formats?.join(", ") || "N/A",
-    // },
-    // {
-    //   title: "API Access",
-    //   dataIndex: "api_access",
-    //   key: "api_access",
-    //   render: (access: boolean) => (access ? "Enabled" : "Disabled"),
-    // },
-    // {
-    //   title: "Data Structure Information",
-    //   dataIndex: "data_structure_information",
-    //   key: "data_structure_information",
-    // },
   ];
 
   const dataWithButton = [
@@ -333,10 +385,6 @@ export default function ReportListTable({
             <Input placeholder="Enter access restrictions (if any)" />
           </Form.Item>
 
-          {/* <Form.Item label="Payment Amount" name="payment_amount">
-            <Input type="number" placeholder="Enter payment amount" />
-          </Form.Item> */}
-
           <Form.Item label="Licenses/Terms of Use" name="licenses_terms_of_use">
             <Input.TextArea placeholder="Enter licensing or terms of use" />
           </Form.Item>
@@ -352,14 +400,6 @@ export default function ReportListTable({
               <Option value="JSON">JSON</Option>
             </Select>
           </Form.Item>
-          {/* 
-          <Form.Item
-            label="API Access"
-            name="api_access"
-            valuePropName="checked"
-          >
-            <Input type="checkbox" />
-          </Form.Item> */}
 
           <Form.Item label="Data Provider" name="data_provider">
             <Input.TextArea placeholder="Enter data provider details" />
@@ -399,72 +439,6 @@ export default function ReportListTable({
             <Input.TextArea placeholder="Enter data structure details" />
           </Form.Item>
         </Form>
-
-        {/* <Form form={form} layout="vertical">
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please enter the name" }]}
-          >
-            <Input placeholder="Enter report name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[
-              { required: true, message: "Please enter the description" },
-            ]}
-          >
-            <Input placeholder="Enter report description" />
-          </Form.Item>
-
-          <div
-            style={{
-              display: "flex",
-              gap: "16px",
-            }}
-          >
-            <Form.Item
-              label="Start Date"
-              name="start_date"
-              rules={[
-                { required: true, message: "Please select the start date" },
-              ]}
-              style={{
-                flexGrow: 1,
-              }}
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-
-            <Form.Item
-              label="End Date"
-              name="end_date"
-              rules={[
-                { required: true, message: "Please select the end date" },
-              ]}
-              style={{
-                flexGrow: 1,
-              }}
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-          </div>
-          <Form.Item
-            label="Sub-category"
-            name="type"
-            rules={[{ required: true, message: "Please select a subcategory" }]}
-          >
-            <Select placeholder="Select report subcategory">
-              {subCategories.map((type: any) => (
-                <Option key={type._id} value={JSON.stringify(type)}>
-                  {type.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Form> */}
       </Modal>
     </>
   );
