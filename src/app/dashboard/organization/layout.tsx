@@ -7,6 +7,7 @@ export default async function Layout({
   children: React.ReactNode;
 }>) {
   const session: any = await getSession();
+
   if (!session?.user.roles.includes("ADMIN")) redirect("/dashboard/reports");
   else {
     return (
