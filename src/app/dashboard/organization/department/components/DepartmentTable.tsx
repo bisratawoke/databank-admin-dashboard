@@ -25,7 +25,6 @@ export default function DepartmentTable({
   const [isEditing, setIsEditing] = useState(false);
   const [currentDeptId, setCurrentDepId] = useState<any>(null);
 
-  // Get unique department names and category names for the filters
   const departmentNameFilters = [
     ...new Set(departments.map((dept) => dept.name)),
   ].map((name) => ({
@@ -43,16 +42,16 @@ export default function DepartmentTable({
       title: "Name",
       dataIndex: "name",
       key: "name",
-      filters: departmentNameFilters, // Apply filters for department names
-      onFilter: (value, record) => record.name == value, // Filtering function for names
+      filters: departmentNameFilters,
+      onFilter: (value, record) => record.name == value,
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      filters: categoryFilters, // Apply filters for categories
+      filters: categoryFilters,
       onFilter: (value, record) =>
-        record.category.some((cat: category) => cat._id === value), // Filtering function for categories
+        record.category.some((cat: category) => cat._id === value),
       render: (categories: category[]) => {
         if (categories && categories.length > 0) {
           return categories.map((category: category) => (
@@ -79,21 +78,12 @@ export default function DepartmentTable({
                       cancelText: "No",
                       onOk: async () => {
                         await handleDelete(record);
-                        // await deleteFields(record._id);
                       },
                     });
                   }}
                 >
                   Delete
                 </Button>
-                // <span
-                //   onClick={(e) => {
-                //     e.stopPropagation();
-                //     handleDelete(record);
-                //   }}
-                // >
-                //   Delete
-                // </span>
               }
             </>
           );
