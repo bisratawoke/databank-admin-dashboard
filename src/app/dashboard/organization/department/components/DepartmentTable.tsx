@@ -11,11 +11,13 @@ import { deletDepartment as deleteDepartment } from "../../actions/deleteDepartm
 interface DepartmentTableProps {
   data: department[];
   categories: category[];
+  users: Array<Record<string, any>>;
 }
 
 export default function DepartmentTable({
   data,
   categories,
+  users,
 }: DepartmentTableProps) {
   const [departments, setDepartments] = useState<department[]>(data);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -107,17 +109,30 @@ export default function DepartmentTable({
   };
 
   const handleDelete = async (record: Record<string, any>) => {
-    try {
-      if (record.category.length > 0) {
-        message.error(
-          "Cannot delete department because it is accociated with a category."
-        );
-        return;
+    const result = users.find((user) => {
+      if (!user.department) return false;
+      if (user.department._id == record._id) {
+        return true;
       }
-      const result = await deleteDepartment({ depId: record._id });
-      setDepartments((dep) => dep.filter((d: any) => d._id != record._id));
-      message.success("Successfully delete department");
-    } catch (err) {}
+    });
+
+    if (!result) {
+      try {
+        if (record.category.length > 0) {
+          message.error(
+            "Cannot delete department because it is accociated with a category."
+          );
+          return;
+        }
+        const result = await deleteDepartment({ depId: record._id });
+        setDepartments((dep) => dep.filter((d: any) => d._id != record._id));
+        message.success("Successfully delete department");
+      } catch (err) {}
+    } else {
+      message.info(
+        "The department can not be deleted because there are users that rely on it."
+      );
+    }
   };
 
   const handleOk = async () => {

@@ -25,7 +25,9 @@ export default function PrimaryNavBar({
         <Logo />
 
         <div>
-          <NavItem label="Organization" link="/dashboard/organization" />
+          <WithRole role="ADMIN" action={ACTION.HIDE}>
+            <NavItem label="Organization" link="/dashboard/organization" />
+          </WithRole>
           {!session.user.roles.includes("ADMIN") && (
             <>
               <NavItem label="Data Types" link="/dashboard/field-type" />

@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth/auth";
 export default async function Page() {
   const { body } = await FetchPublications({});
   const session: any = await getSession();
+
   const res = body.filter(
     (item: any) => item.department._id == session?.user.department._id
   );

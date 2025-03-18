@@ -2,21 +2,28 @@
 "use server";
 import { getSession } from "@/lib/auth/auth";
 
-export async function FetchUsers() {
-  const session: any = await getSession();
-  const res = await fetch(`${process.env.BACKEND_URL}/users`, {
-    headers: {
-      "cache-control": "no-cache",
-      authorization: `Bearer ${session.user.accessToken}`,
-    },
-    cache: "no-cache",
-  });
+export async function FetchUsers(): Promise<any> {
+  try {
+    const session: any = await getSession();
+    const res = await fetch(`${process.env.BACKEND_URL}/users`, {
+      headers: {
+        "cache-control": "no-cache",
+        authorization: `Bearer ${session.user.accessToken}`,
+      },
+      cache: "no-cache",
+    });
 
-  const result = await res.json();
-  return {
-    status: res.status,
-    body: result.users,
-  };
+    console.log("======== fetch users ===============");
+    console.log(res.status);
+    const result = await res.json();
+    console.log(result);
+    return {
+      status: res.status,
+      body: result.users,
+    };
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 export async function FetchRoles() {

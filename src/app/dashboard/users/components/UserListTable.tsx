@@ -9,6 +9,7 @@ import { UpdateUser } from "../actions/updateUser";
 import deactivateUser from "../actions/deativateUser";
 import activateUser from "../actions/activateUser";
 import deleteUser from "../actions/deleteUser";
+
 interface User {
   _id: string;
   email: string;
@@ -251,19 +252,17 @@ export default function UserTable({
             if (record.key !== "addButtonRow") {
               setIsEditing(true);
               setCurrentUserId(record._id);
-
+              let dep = {
+                name: "",
+              };
+              if (record.department) {
+                dep = record.department;
+              }
               form.setFieldsValue({
                 ...record,
-                department: record.department.name,
-                // department: departments.filter(
-                //   (dep) => dep._id == record.department
-                // )[0],
+                department: dep.name,
               });
 
-              // form.setFieldsValue({
-              //   name: record.name,
-              //   category: record.category.map((cat: category) => cat._id),
-              // });
               showModal();
             }
           },
