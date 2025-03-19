@@ -12,6 +12,7 @@ import RequestSecondApproval from "../actions/RequestSecondApproval";
 import dissiminationResponse from "../actions/dissiminationDepResponse";
 import { capitalizeFirstLetter } from "@/lib/utils/capitalizeFirstLetter";
 import DeputyApprove from "../actions/deputyApproval";
+import RequestFinalApproval from "../actions/RequestFinalApproval";
 
 export default function ReportStatusManager({ report, refreshReports }: any) {
   const { data: session }: any = useSession();
@@ -34,7 +35,7 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
 
   const logic: { [key: string]: string[] } = {
     PENDING: ["Approve", "Reject"],
-    APPROVED: ["Deputy approved", "Reject"], // Ensure this is correctly mapped
+    APPROVED: ["Deputy approved", "Reject"],
     "DEPUTY APPROVED": ["Publish", "Reject"],
     REJECTED: ["Approve"],
   };
@@ -76,7 +77,7 @@ export default function ReportStatusManager({ report, refreshReports }: any) {
       } else if (action === "Deputy approved") {
         setCurrentStatus("Deputy approved");
         const result = await DeputyApprove({ reportId: report._id });
-        // const result = await RequestSecondApproval({ reportId: report._id });
+        await RequestFinalApproval({ reportId: report._id });
 
         if (!(result.status == 200)) throw new Error("Something went wrong");
         message.info("Successfully marked as Deputy Approved");
