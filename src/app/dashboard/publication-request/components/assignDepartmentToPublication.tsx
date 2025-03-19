@@ -2,6 +2,7 @@
 import { Form, message, Select } from "antd";
 import assignDepartmentToPublicationRequest from "../actions/assignDepartmentToPublicationRequest";
 import { useSession } from "next-auth/react";
+import { RequestInitialApproval } from "../actions/requestInitialApproval";
 
 export default function AssignDepartmentToPublication({
   request,
@@ -17,6 +18,7 @@ export default function AssignDepartmentToPublication({
       departmentId: value,
     });
 
+    await RequestInitialApproval({ departmentId: value });
     if (status == 200) {
       message.success("Successfully assigned department to publication");
       setRequest(body);

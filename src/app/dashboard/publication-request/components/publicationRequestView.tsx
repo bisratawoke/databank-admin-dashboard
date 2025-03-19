@@ -64,7 +64,6 @@ export default function PublicationRequestView({
                 <p className="text-[14px] text-[#8A8888]">
                   Phone Number: {request.author?.phoneNumber}
                 </p>
-                {/* Add other author fields as needed */}
               </div>
             </div>
             <div className="flex flex-col gap-2">

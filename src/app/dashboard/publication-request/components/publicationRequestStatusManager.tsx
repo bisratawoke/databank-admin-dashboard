@@ -8,6 +8,11 @@ import SecondaryApproval from "../actions/secondaryApproval";
 import VerifyPublicationRequestPayment from "../actions/verifyPublicationRequestPayment";
 import FinalApproval from "../actions/finalApproval";
 import InitalReject from "../actions/initialReject";
+import {
+  requestDeputy,
+  requestDissiminationHead,
+  requestFinianceOfficer,
+} from "../actions/requestFincialOfficer";
 export function capitalizeFirstLetter(str: string) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -71,6 +76,9 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made seconday approval");
+        await requestDissiminationHead({
+          publicationRequestId: publication._id,
+        });
         setPublicationRequest((current: any) => ({
           ...current,
           status: body.status,
@@ -82,6 +90,10 @@ export default function PublicationRequestStatusManager({
           publicationRequestId: publication._id,
         });
         message.success("Successfully made initial approval");
+
+        await requestFinianceOfficer({ publicationRequestId: publication._id });
+
+        await requestDeputy({ publicationRequestId: publication._id });
         setPublicationRequest((current: any) => ({
           ...current,
           status: body.status,
@@ -180,31 +192,6 @@ export default function PublicationRequestStatusManager({
       {availableActions.map((action) => (
         <>
           <SecondMenu action={action} />
-          {/* <Menu.Item
-            key={action}
-            onClick={() => handler(publication.status, action)}
-          >
-            {capitalizeFirstLetter(action.toLowerCase())}
-          </Menu.Item> */}
-
-          {/* {action == "Initial Approval" &&
-          !session.user.roles.includes("DEPARTMENT_HEAD") ? (
-            <></>
-          ) : (
-            <>
-              {action == "Deputy Approval" &&
-              !session.user.roles.includes("DEPUTY_DIRECTOR") ? (
-                <></>
-              ) : (
-                <Menu.Item
-                  key={action}
-                  onClick={() => handler(publication.status, action)}
-                >
-                  {capitalizeFirstLetter(action.toLowerCase())}
-                </Menu.Item>
-              )}
-            </>
-          )} */}
         </>
       ))}
     </Menu>
