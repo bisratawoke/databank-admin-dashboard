@@ -172,10 +172,19 @@ export default function UserTable({
               onClick={async (e) => {
                 e.stopPropagation();
 
-                await deleteUser(record._id);
-                setUsers((users) =>
-                  users.filter((user) => user._id != record._id)
-                );
+                Modal.confirm({
+                  title: "Are you sure you want to delete this user?",
+                  content: "This action cannot be undone.",
+                  okText: "Yes",
+                  cancelText: "No",
+                  onOk: async () => {
+                    await deleteUser(record._id);
+                    setUsers((users) =>
+                      users.filter((user) => user._id != record._id)
+                    );
+                    message.success("Successfully deleted user!");
+                  },
+                });
               }}
               style={{ color: "red" }}
             >
