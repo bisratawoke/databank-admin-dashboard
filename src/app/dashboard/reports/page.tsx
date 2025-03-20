@@ -13,6 +13,7 @@ import { updateReport } from "./actions/updateReport";
 import { fetchReports } from "./actions/fetchReports";
 import { updateData } from "./actions/updateData";
 import { Data } from "./types";
+import { useSession } from "next-auth/react";
 
 const autoMapFields = (
   fileHeaders: string[],
@@ -37,6 +38,7 @@ const autoMapFields = (
 };
 
 const Reports: React.FC = () => {
+  const { data: session }: any = useSession();
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [fileHeaders, setFileHeaders] = useState([]);
@@ -58,9 +60,21 @@ const Reports: React.FC = () => {
       try {
         setLoading(true);
         const data = await fetchReports();
+        let res = data;
+        if (
+          !session.user.roles.includes("DISSEMINATION_HEAD") &&
+          !session.user.roles.includes("DEPUTY_DIRECTOR")
+        ) {
+          res = data.filter((item: any) => {
+            if (item.department) {
+              return item.department._id == session.user.department._id;
+            }
+          });
+        }
         console.log("============= get reports ==============");
-        console.log(data);
-        setReports(data);
+        console.log(session);
+        console.log(res);
+        setReports(res);
         setLoading(false);
       } catch (error) {
         console.error(error);
