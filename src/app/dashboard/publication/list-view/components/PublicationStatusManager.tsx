@@ -92,16 +92,23 @@ export default function PublicationStatusManager({
         <>
           {!session.user.roles.includes("DEPARTMENT_EXPERT") && (
             <>
-              {action == "Publish" &&
-              !session.user.roles.includes("DISSEMINATION_HEAD") ? (
+              {action == "Approve" &&
+              !session.user.roles.includes("DEPARTMENT_HEAD") ? (
                 <></>
               ) : (
-                <Menu.Item
-                  key={action}
-                  onClick={() => handler(publication.status, action)}
-                >
-                  {capitalizeFirstLetter(action.toLowerCase())}
-                </Menu.Item>
+                <>
+                  {action == "Publish" &&
+                  !session.user.roles.includes("DISSEMINATION_HEAD") ? (
+                    <></>
+                  ) : (
+                    <Menu.Item
+                      key={action}
+                      onClick={() => handler(publication.status, action)}
+                    >
+                      {capitalizeFirstLetter(action.toLowerCase())}
+                    </Menu.Item>
+                  )}
+                </>
               )}
             </>
           )}
